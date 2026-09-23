@@ -214,8 +214,8 @@ Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
 
 * Stage 12 TODOs
 ** +
-** TODO [#A] <<12.1>> Read through AI-Outputs.org - Focus on "Process Design --- Captured, Not Yet Implemented"
-SCHEDULED: <2026-09-22 Tue>
+** DONE [#A] <<12.1>> Read through AI-Outputs.org - Focus on "Process Design --- Captured, Not Yet Implemented"
+CLOSED: [2026-09-23 Wed 09:22] SCHEDULED: <2026-09-22 Tue>
 - Discuss with me the ** Open items.
 - Update py3/bin CSXUs to Create symlinks to .../mother/AI-Outputs.org when creating fresh ones
 - Update py3/bin CSXUs to Add missing symlinks to .../mother/AI-Outputs.org for exisiting setups
@@ -281,8 +281,10 @@ ship it, e.g. =bxexamples=/=rana-notes= today):
   Cross-Project Findings Ledger" section), plus a new table row and a
   =/bx-ai-outputs= row in the slash-commands table.
 
-Status: implementation complete; user is reviewing the diffs before
-anything is committed. Not marked DONE yet pending that review.
+** TODO [#A] <<12.2>> Update py3/images to include AI-Outputs.org
+SCHEDULED: <2026-09-23 Wed>
+- Show that it is symlinked to outside of templates
+----- AI Results: ------
 
 ** -
 
@@ -293,7 +295,8 @@ Goal: Based on usage consider new features, and non-urgent bugs.
 
 * Stage 14 TODOs
 ** +
-** TODO Mode-detection walk-up misclassifies a nested base install as "sub"
+** TODO [#A] <<14.1>> Mode-detection walk-up misclassifies a nested base install as "sub"
+SCHEDULED: <2026-09-23 Wed>
 Found while testing Stage 12.1: =aiResume=/=refresh= detect base-vs-sub by
 walking up from the *parent* of the target directory looking for an
 ancestor =AI-WORKFLOW.org= symlink under templatesBase. If the target
@@ -302,6 +305,27 @@ repo's own =py3/tests/=, self-hosted), the walk-up finds the *ancestor's*
 symlink and calls it "sub" even when the target directory has its own
 genuine base-mode =AI-WORKFLOW.org=. Affects any project nested inside
 another initiated project, not just this repo's =tests/= dir.
+----- AI Results: ------
+
+** TODO [#A] <<14.2>> in py3/images add a new figure that shows the /commands in the context of typical workflow
+SCHEDULED: <2026-09-23 Wed>
+- top-top-layer  /bx-initiate
+- top-layer  Start with /bx-confirm0  or /bx-confirm-here
+- mid-layer1: Perhaps  /bx-import-archived
+- mid-layer2: Work on selected AI-Workplan.org
+- mid-layer3: Perhaps /bx-ai-outputs
+- mid-layer4: /bx-done  -- Back to mid-layer1
+- bottom layer: /bx-update-status and perhaps /bx-archive
+= color code the command based on whether the results in read, write or read-write
+= Somehow mark the commands as to if they are "always" or "perhaps"
+----- AI Results: ------
+
+** TODO [#A] <<14.3>> in py3/images perhaps add a new image for ByStar Skills
+SCHEDULED: <2026-09-23 Wed>
+- Is there some form of layering that can be applied to skills?
+----- AI Results: ------
+
+
 ** -
 
 
