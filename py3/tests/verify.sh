@@ -23,16 +23,25 @@ lpDo aiActivity.cs -i userConfig_set --parName="templates" --parValue="/bisos/ap
 lpDo aiActivity.cs -i userConfig_get --parName="templates"
 lpDo aiActivity.cs -i initiate --activity="xu-single"           # Install xu-single templates (auto-persists activity to cwdConfig)
 lpDo ls -a -C -F
+lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (installed by initiate)
 lpDo cat .aiActivity.cs/fps/activity/value           # EXPECT: xu-single (auto-persisted)
 lpDo aiActivity.cs -i deClaudify           # Remove AI files from current directory
-lpDo ls -a -C -F
+lpDo ls -a -C -F           # EXPECT: AI-Outputs.org removed
 # Bare initiate — activity resolved from cwdConfig (no --activity flag).
 lpDo aiActivity.cs -i initiate           # EXPECT: uses activity=xu-single from cwdConfig
 lpDo ls -a -C -F
 lpDo aiActivity.cs -i aiSuspend
-lpDo ls -a -C -F
+lpDo ls -a -C -F           # EXPECT: AI-Outputs.org removed
 lpDo aiActivity.cs -i aiResume
 lpDo ls -a -C -F
+lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (reinstalled by aiResume)
+
+# refresh coverage — backfill: simulate a project initiated before
+# AI-Outputs.org existed in templates (unlink it), then refresh should
+# recreate the symlink without touching anything else.
+lpDo eval rm -f AI-Outputs.org
+lpDo aiActivity.cs -i refresh           # EXPECT: SYMLINKED (backfilled): .../AI-Outputs.org
+lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (backfilled by refresh)
 
 # refresh coverage — base mode: normal re-copy of an already-safe-copied CLAUDE.md
 lpDo aiActivity.cs -i refresh           # EXPECT: REFRESHED CLAUDE.md
@@ -49,7 +58,7 @@ lpDo ls -a -C -F
 lpDo aiActivity.cs -i deClaudify           # Remove AI files from current directory
 lpDo ls -a -C -F
 lpDo aiActivity.cs -i initiateSub --activity="xu-single"
-lpDo ls -a -C -F
+lpDo ls -a -C -F           # EXPECT: no AI-Outputs.org here — inherited from parent, like AI-WORKFLOW.org
 
 # refresh coverage — sub mode: parent walk-up should detect sub, re-copy from
 # mother/initiateSub/CLAUDE.md.

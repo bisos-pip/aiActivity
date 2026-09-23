@@ -39,68 +39,7 @@ Goal: A functioning implementation with starting point files for py-dblock and u
 
 * Stage 2 TODOs
 ** +
-** DONE [#A] <<Improve Towards py-dblock>> -- make py imitate org-mode dblocks  :ai:
-SCHEDULED: <2026-06-09 Tue>
-- updateDblock.expandParticulars(dst, targetDir, activity)  is the specific approach.
-- The general approach is to mimic org-mode's model for dblocks.
-- create  a py-dblock.cs file. It will have a command named updateDblocks. And takes args that are in files. For each input file it will call updateDblock.expandAll(dst,)
-- Each dblock processor, registers a signature with a function in a file like ./py3/bisos/aiActivity/dblock_particulars.py
-- then ./py3/bisos/aiActivity/updateDblock.py looks for the signatures and applies the function to each.
-- Re-read the "Modularization" section of aiActivity.org to see my intent from the beginning
------ AI Results: ------
-Generalized the dblock engine across three files:
-
-- =updateDblock.py= :: Rewritten as a general dispatch engine. Handlers register under a
-  signature string via =registerHandler(sig, fn)=. =expandAll(filePath)= does a single-pass
-  =re.sub= over the file, parsing each =####+BEGIN: <signature> [:key value ...]= line into
-  signature + keyword-arg dict, looking up the handler, and replacing the block body with
-  the handler's return value. Unregistered signatures are left untouched. =targetDir= removed
-  from public API — derived internally as =filePath.parent=.
-
-- =dblock_particulars.py= :: Rewritten as a self-registering handler. Calls
-  =updateDblock.registerHandler('b:ai:file/particulars', _handler)= at import time.
-  Derives =activity= from the =AI-Activity.org= symlink and builds companion-docs list
-  by scanning the directory. Accepts =args= dict for future parameterised dblocks.
-
-- =py-dblock.cs= :: New CS executable with =updateDblocks= command. Takes one or more
-  file paths as positional args (=argsMin=1 argsMax=9999=), calls =updateDblock.expandAll=
-  on each. Imports =dblock_particulars= to self-register the handler.
-
-Also: added =chmod +x *= to =.claude/settings.json=; added "Claude Permissions" section
-to =mother/AI-WORKFLOW.org= directing Claude to always offer to persist new permissions
-to =.claude/settings.json= at the time of asking.
-** DONE [#A] <<Improve Towards Persistent Parameters>> -- make userConfig persistent parameters Generic :ai:
-SCHEDULED: <2026-06-09 Tue>
-- Add parPermanence="userConfig" (or an emum) to this. Default is None.
-  csParams.parDictAdd(
-        parName='templates',
-        parDescription="Override templatesBase file parameter for this run.",
-        parDataType=None,
-        parDefault=None,
-        parChoices=[],
-        argparseShortOpt=None,
-        argparseLongOpt='--templates',
-        parPermanence="userConfig"
-    )
-- Existing setup Cmnd, should become userConfig_set, userConfig_get -- With the example including
-  current values.
-- The  userConfig_set etc Cmnds will be in a general purpose file which is imported.
-- The ~/.config/bisos/csxu/param/value should become generic. So aiActivity should become aiActivity.cs
------ AI Results: ------
-Merged =userConfigFileParam_csu.py= (deleted) into a single new =userConfig_csu.py=:
-
-- =parGet(parName, override)= / =parSet(parName, value)= :: generic read/write helpers using
-  =bisos.b fp=. Config root is =~/.config/bisos/<csxu-name>/= where =<csxu-name>= comes from
-  =pathlib.Path(sys.argv[0]).name= — so =aiActivity.cs= → =~/.config/bisos/aiActivity.cs/=.
-- =userConfig_get= / =userConfig_set= :: CS command classes taking =--parName= and =--parValue=.
-  Available on the CLI for any parameter, not just =templatesBase=.
-
-In =aiActivity.cs=:
-- =userConfig_csu= added to =csuList= so its commands are imported automatically.
-- =parName= / =parValue= added to =commonParamsSpecify=.
-- =setup= command removed; replaced by =userConfig_set= / =userConfig_get= in =examples=.
-- =initiate= uses =userConfig_csu.parGet('templatesBase', templates)= with the =--templates=
-  override still working as before.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 * Stage 3: Documentation and pypi upload
@@ -110,34 +49,7 @@ Goal: Update README for pypi, Update Blee-Panels documentation, upload to pypi a
 
 * Stage 3 TODOs
 ** +
-** DONE [#A] Based on this ai context, Write ./README.org
-CLOSED: [2026-07-12 Sat]
-SCHEDULED: <2026-06-09 Tue>
------ AI Results: ------
-Wrote =README.org= at repo root covering: Overview, Part of BISOS, Command-Only
-PyCS Facility, Post-Installation Setup, Installation (pip + pipx), Usage
-(userConfig_set, initiate, py-dblock), Key Files, Documentation/Blee-Panels,
-Support, Planned Improvements. Also wrote =py3/README.rst= as the converted
-PyPI form, following RST conventions matching pandoc/ox-rst output.
-** DONE [#A] Based on this ai context, Write ./py3/panels/bisos.aiActivity/_nodeBase_/fullUsagePanel-en.org
-CLOSED: [2026-07-12 Sat] SCHEDULED: <2026-06-09 Tue>
------ AI Results: ------
-Wrote the full Blee panel at =py3/panels/bisos.aiActivity/_nodeBase_/fullUsagePanel-en.org=
-with standard header dblocks, Overview, Pip/Pipx Installation (runResult dblocks),
-aiActivity.cs intro, User Config section (userConfig_get/set), initiate section
-(bisos-pip, repo, xu-single, blee-panels, lcnt activities), py-dblock.cs section,
-and Design/Evolution TODOs. No RO/service sections (command-only package).
-** DONE [#A] <<No py-dblock.cs>> in Documentation
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-06-09 Tue>
-Now that bisos.pyDblock is in place separate from aiActivity. Delete all mention of py-dblock.cs from documentation
-Show me current mentions before deleting them
------ AI Results: ------
-Removed all =py-dblock.cs= mentions from the four documentation files:
-- =README.org= — removed from Overview paragraph, Installation commands list, "Update Dblocks" Usage section, and Key Files section
-- =AI-DevStatus.org= — removed from Architecture listing, Entry points, What Works, and What Is Untested
-- =fullUsagePanel-en.org= — removed Overview bullet and entire "py-dblock.cs --- Update Org Dblocks" section
-Historical references in =AI-WorkPlan.org= (DONE task bodies) and =aiActivity.org= were left intact as they are part of the development record.
-=py3/README.rst= was not touched — it is machine-generated from =README.org=.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -148,31 +60,7 @@ Goal: Add commands for reversible and permanent removal of AI collaboration file
 
 * Stage 4 TODOs
 ** +
-** DONE [#A] <<deClaudify>> -- permanent removal of AI collaboration files :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Add a =deClaudify= command that permanently removes all AI collaboration files
-installed by =initiate=: symlinks (CLAUDE.md, AI-WORKFLOW.org,
-AI-Activity.org, .claude/settings.json, .claude/commands), copied files
-(AI-DevStatus.org, AI-WorkPlan.org), and the .claude/ dir if empty.
-No =--root= param needed — always operates on the current directory.
------ AI Results: ------
-Implemented =deClaudify= in =aiActivity.cs=. Removes symlinks only if they
-are symlinks (leaves regular files intact), removes copied files only if they are
-regular files (leaves symlinks intact), removes =.claude/= if empty after cleanup.
-Added to =examples= command output.
-** DONE [#A] <<aiSuspend-aiResume>> -- reversible suspension of AI collaboration :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Add =aiSuspend= and =aiResume= command pair. =aiSuspend= removes symlinks and
-=.claude/= (same as =deClaudify=) but instead of deleting =AI-DevStatus.org= and
-=AI-WorkPlan.org=, renames them to =.dormant= suffix so they survive.
-=aiResume= restores the =.dormant= files and re-installs all symlinks and =.claude/=
-entries, inferring the activity from the =AI-Activity.org= symlink target or the
-=Activity:= header in =AI-WorkPlan.org=. Neither command takes =--root=.
------ AI Results: ------
-Implemented =aiSuspend= and =aiResume= in =aiActivity.cs=. End-to-end tested:
-suspend/resume cycle leaves the directory identical to its pre-suspend state.
-Activity inference works from =AI-WorkPlan.org= dblock header when the symlink
-is absent (which it is after suspend). Added both to =examples= output.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -205,104 +93,7 @@ symlink the same way they handle the other =.claude/= entries.
 
 * Stage 5 TODOs
 ** +
-** DONE [#B] <<Skills Directory Layout>> Design directory layout for skills :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Decide the on-disk layout for skills under templates:
-- =mother/_skills/<skill-name>/SKILL.md= for baseline skills
-- =<activity>/_skills/<skill-name>/SKILL.md= for activity-specific skills
-- Should activity skills override mother skills of the same name, or
-  should both be installed side-by-side under =.claude/skills/=?
-Document the resolution rule in =AI-Activity.org= (mother) once decided.
------ AI Results: ------
-Chose the activity-root layout =<activity>/_skills/<skill-name>/SKILL.md=,
-NOT nested under =_claude/=. Rationale: skills are semantically distinct
-from =.claude/= machinery (settings, commands) — they're documentation /
-knowledge. Placing them at the activity root keeps them independently
-visible to humans and other tools; the installed location under
-=.claude/skills/= is just where Claude Code looks. Resolution rule
-mirrors =_claude/= entries: activity =_skills/= if present, else fall
-back to =mother/_skills/=. Activity replaces mother wholesale (no
-side-by-side merging) — same semantics as the existing =_claude/=
-handling.
-** DONE [#B] <<initiate Skills Symlink>> Extend =initiate= to symlink =.claude/skills= :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Update =initiate= in =aiActivity.cs= to symlink =.claude/skills= from
-=<activity>/_skills/= (falling back to =mother/_skills/=) the same way
-=settings.json= and =commands= are handled. Ensure that empty or missing
-=_skills/= directories are handled gracefully (no symlink created).
------ AI Results: ------
-Added a =.claude/skills/= block to =initiate= after the existing
-=settings.json= / =commands= loop in =py3/bin/aiActivity.cs=. Uses
-the same "activity else mother" fallback. If neither has a =_skills/=
-directory, no symlink is created (silent no-op). Verified end-to-end
-against =bisos-pip/_skills/= which currently has 5 skill folders:
-=writing-cs-commands=, =dblock-authoring=, =readme-authorship=,
-=blee-panel-authorship=, =bisos-pip-release=.
-** DONE [#B] <<Lifecycle Commands Skills Handling>> Update lifecycle commands for skills :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Extend =deClaudify=, =aiSuspend=, and =aiResume= to handle the
-=.claude/skills= symlink alongside =settings.json= and =commands=. All
-three commands loop over the same list of =.claude/= entries — add
-=skills= to that list in each.
------ AI Results: ------
-Added =skills= to the =claudeEntry= list in =deClaudify= and =aiSuspend=
-(they iterate a shared list). =aiResume= gets its own dedicated
-=activity=/=mother= skills-symlink block after the existing
-=settings.json= / =commands= re-install loop, mirroring the =initiate=
-logic. Verified full cycle: =initiate= → =aiSuspend= → =aiResume= →
-=deClaudify= leaves the directory in the correct state at every stage.
-Note during implementation: an initial =replace_all: true= edit
-silently matched only one of four target occurrences (the four
-=for claudeEntry in [...]:= lines differ by surrounding context); had
-to re-run a targeted Edit on =aiSuspend=. Now correct — verified by
-grep for the three-element list.
-** DONE [#B] <<First Custom Skill>> Author custom skills :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Author one useful skill to validate the workflow end-to-end. Candidates:
-- =bisos-pip-release= — bump version, regenerate =py3/README.rst=,
-  test with =pipx=, upload to PyPI.
-- =dblock-authoring= — write a new =b:ai:file/particulars= style dblock
-  handler for =bisos.pyDblock=.
-- =blee-panel-authoring= — scaffold a new =fullUsagePanel-en.org= from
-  a bisos-pip package.
-Place under =mother/_skills/= if broadly applicable, or =bisos-pip/_skills/=
-if activity-specific.
------ AI Results: ------
-Went further than "one" — authored five skills, all in
-=bisos-pip/_skills/= (none in =mother/_skills/= yet since baseline is
-bisos-pip-specific). Split from the pre-existing 456-line
-=bisos-pip/AI-Activity.org= (Type A / Type B analysis):
-- =writing-cs-commands= (187 lines) — =cs.Cmnd= subclass authorship
-- =dblock-authoring= (187 lines) — poly-dblock, csuListProc, inline tests
-- =readme-authorship= (170 lines) — org→rst conversion conventions
-- =blee-panel-authorship= (195 lines) — fullUsagePanel-en.org skeleton
-- =bisos-pip-release= (177 lines) — PyPI release checklist
-Slimmed =bisos-pip/AI-Activity.org= to 154 lines of always-loaded
-orientation + a "Available Skills" table + a "Reference Panels" section.
-Original preserved as =AI-Activity.org.pre-skills-backup=. Baseline
-per-session context drops ~66%; procedural knowledge (~916 lines) now
-loads only on demand.
-** DONE [#B] <<Documentation for Skills>> Document skills in README and Blee panel :ai:
-CLOSED: [2026-07-13 Sun] SCHEDULED: <2026-07-13 Sun>
-Update =README.org= and =fullUsagePanel-en.org= with a "Skills" section
-explaining what they are, where they live in the templates tree, and how
-to author new ones. Regenerate =py3/README.rst= from =README.org=.
------ AI Results: ------
-Documentation updates for Stage 5:
-- =AI-DevStatus.org= — added Stage 5 to Current State; noted =initiate=
-  now installs =.claude/skills/= symlink; added skills templates section
-  to Architecture; added skills entries to What Works.
-- =README.org= — added "Skills" Usage subsection; updated =initiate=
-  description; regenerated TOC entry.
-- =fullUsagePanel-en.org= — added a folding section describing the
-  installed =.claude/skills/= symlink and the currently-shipping five
-  skills.
-=py3/README.rst= was NOT updated in this pass — that is not a manual step:
-=README.rst= is regenerated automatically by =py3/pypiProc.sh -i fullPrep=
-during release preparation. Between releases, =README.rst= being stale
-relative to =README.org= is expected. (Earlier notes in this WorkPlan
-that described =README.rst= as needing manual regeneration were wrong —
-see the corrected =readme-authorship= skill.)
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -322,76 +113,7 @@ subproject state local without duplicating the base.
 
 * Stage 6 TODOs
 ** +
-** DONE [#B] <<initiateSub Command>> Add =initiateSub= command :ai:
-CLOSED: [2026-07-14 Mon] SCHEDULED: <2026-07-14 Mon>
-Requires =--activity= (no inheritance from parent). Preconditions:
-1. Walk up from target directory looking for a =CLAUDE.md= symlink whose
-   target lands under the configured =templatesBase=. If none, refuse.
-2. Target directory must not already have a =CLAUDE.md=. If it does, refuse.
-Install: slim =CLAUDE.md= (symlink to =mother/initiateSub/CLAUDE.md=),
-=AI-Activity.org= (symlink), =AI-DevStatus.org= and =AI-WorkPlan.org=
-(safe-copy with dblock expansion). Does NOT install 
-=AI-WORKFLOW.org=, or =.claude/=.
------ AI Results: ------
-Implemented in =py3/bin/aiActivity.cs=. New template at
-=mother/initiateSub/CLAUDE.md= imports only =@./AI-Activity.org=,
-=@./AI-DevStatus.org=, =@./AI-WorkPlan.org=. Precondition uses symlink-
-target check (readlink + relative_to templatesBase) — no content parsing.
-Nested =initiateSub= works because both base and sub CLAUDE.md symlinks
-land under =templatesBase=, so the precondition treats them equivalently.
-End-to-end verified: refusal on isolated dir, refusal when CLAUDE.md
-already present, success in properly-nested child, success in
-grandchild (nested case).
-** DONE [#B] <<aiSuspend/aiResume Mode Detection>> Sub-aware suspend/resume :ai:
-CLOSED: [2026-07-14 Mon] SCHEDULED: <2026-07-14 Mon>
-=aiSuspend= should NOT unlink =CLAUDE.md= — it should rename it to
-=CLAUDE.md.dormant=, preserving the symlink target as the mode signature.
-=aiResume= should read =CLAUDE.md.dormant='s target: if it points at
-=mother/initiateSub/CLAUDE.md=, restore in sub mode (no 
-=AI-WORKFLOW.org=, or =.claude/=); otherwise base mode.
------ AI Results: ------
-=aiSuspend= now stashes CLAUDE.md → CLAUDE.md.dormant instead of removing
-it. The other symlinks (=AI-WORKFLOW.org=, =AI-Activity.org=)
-are still removed since they can be re-derived. =aiResume= reads the
-=.dormant= symlink target, compares against
-=<templatesBase>/mother/initiateSub/CLAUDE.md= (resolved), sets
-=subMode= boolean, and gates the AI-WORKFLOW/.claude/ install
-blocks on it. If no =CLAUDE.md.dormant= is found, defaults to base mode.
-Verified: base-mode suspend/resume cycle unchanged from Stage 4;
-sub-mode cycle correctly restores the slim overlay without touching
-inherited invariants. =deClaudify= updated to also remove =.dormant=
-files (base and sub), in case cleanup runs while suspended.
-** DONE [#B] <<initiateSub Docs>> Update documentation :ai:
-CLOSED: [2026-07-14 Mon] SCHEDULED: <2026-07-14 Mon>
-Update =README.org=, =AI-DevStatus.org=, =fullUsagePanel-en.org= with the
-subproject-overlay concept and =initiateSub= usage. Add =initiateSub= to
-=examples= command output.
------ AI Results: ------
-Documentation updates: =AI-WorkPlan.org= (Stage 6 with TODOs marked DONE),
-=AI-DevStatus.org= (Current State, What Works, Key Design Decisions),
-=README.org= (new Subproject Overlay Usage subsection),
-=fullUsagePanel-en.org= (new folding section for =initiateSub=).
-=examples= command extended with an =initiateSub= chapter.
-** DONE [#B] <<verify.sh Test Harness>> Author end-to-end verify.sh :ai:
-CLOSED: [2026-07-14 Mon] SCHEDULED: <2026-07-14 Mon>
-Author a =py3/test/verify.sh= that exercises the full command surface
-end-to-end from a fresh directory: =userConfig_set/get=,
-=initiate= (both root modes), =deClaudify=, =aiSuspend=/=aiResume=
-(base mode with mode-detection log), =initiateSub= (positive case
-inside repo), and =initiateSub= (negative case in isolated =/tmp/=
-dir — expect =EH_Problem_UsageError= refusal). Uses =lpDo= for
-uniform logging.
------ AI Results: ------
-Wrote =py3/test/verify.sh=. Shebang =#!/bin/bash -i= (needed so
-=~/.bashrc= runs its interactive body and defines =_opDo=; =lpDo= is
-an alias defined there and needs =bash -i= to expand). Uses
-=lpDo eval rm -rf ... 2\>/dev/null= for silent cleanup (escaped
-redirect so eval sees it as shell syntax). Uses =lpDo pushd= / =popd=
-around the =/tmp= negative case for visible directory changes, and
-=lpDo eval rm -rf "$TMPDIR"= to clean up. Full cycle exits 0 and
-leaves the test directory containing only =verify.sh= itself.
-Refusal is visible in the trace as
-=EH_Problem_UsageError: No initiated parent found for /tmp/tmp.*=.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -406,42 +128,7 @@ Currently =parDefault= for the =templates= param probes only
 
 * Stage 7 TODOs
 ** +
-** DONE [#A] <<Templates Precedence Probe>> Add ~/aiActivityTemplates before BISOS path :ai:
-CLOSED: [2026-07-15 Tue] SCHEDULED: <2026-07-15 Tue>
-Extract the =parDefault= probe into a helper =_detectTemplatesDefault()=
-that walks a candidate list in precedence order (=~/aiActivityTemplates=,
-then =/bisos/apps/defaults/ai-templates=) and returns the first existing
-path as a resolved absolute string, or None. User-first ordering: a
-personal clone at =~/aiActivityTemplates= wins over the BISOS system
-copy even when both are present. Uses =pathlib.Path(...).expanduser()=
-for tilde resolution and stores the expanded absolute path.
------ AI Results: ------
-Implemented =_detectTemplatesDefault()= in =aiActivity.cs=
-immediately before =commonParamsSpecify=; the =parDictAdd= call for
-=templates= now uses =parDefault=_detectTemplatesDefault()=. Verified:
-on this BISOS machine (no =~/aiActivityTemplates=, BISOS path present),
-the function returns =/bisos/apps/defaults/ai-templates= (fallback
-correct); running =aiActivity.cs -i userConfig_get --parName=templates=
-through the CLI returns the same. Precedence path (both exist) not
-directly testable on this machine but the loop order guarantees it.
-** DONE [#A] <<Precedence Docs>> Update three docs :ai:
-CLOSED: [2026-07-15 Tue] SCHEDULED: <2026-07-15 Tue>
-Update the engine =README.org= (Post-Installation Setup + two-part
-architecture section), the templates repo =README.org= (Using This Repo
-+ BISOS-Specific Users), and =AI-DevStatus.org= (What Is Untested +
-Key Design Decisions) to reflect the precedence-based probe.
------ AI Results: ------
-Engine README: replaced the single-path "BISOS users pre-provisioned"
-subsection with a precedence-explaining "Auto-detection: two canonical
-locations" subsection; Post-Installation Setup restructured to lead
-with the zero-config canonical-clone path, with the explicit
-=userConfig_set= form kept as an escape hatch for non-canonical clone
-paths. Templates repo README: step 2 rewritten to advertise the
-zero-config path; BISOS-Specific Users section updated to describe the
-combined precedence behavior. =AI-DevStatus.org=: "What Is Untested"
-entry updated to reflect both paths as auto-defaults; "Conditional
-parDefault" Key Design Decision rewritten as "Precedence-based
-parDefault probe" with the user-first rationale.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -458,39 +145,7 @@ and equally functional. Merge and delete.
 
 * Stage 8 TODOs
 ** +
-** DONE [#A] <<AI-AGENTS Merge>> Merge AI-AGENTS.org into CLAUDE.md across three template trees + engine :ai:
-CLOSED: [2026-07-16 Tue] SCHEDULED: <2026-07-16 Tue>
-Merge steps:
-1. Rewrite =mother/CLAUDE.md= in each of the three template trees
-   (=/bisos/apps/defaults/ai-templates/=, =bxexamples/aiActivityTemplates/=,
-   =/git/rana/rana-notes/aiActivityTemplates/=) to =@import= the four
-   subordinate files directly.
-2. Delete =mother/AI-AGENTS.org= from all three trees.
-3. Update =aiActivity.cs=: remove =AI-AGENTS.org= from =initiate='s
-   =constantFiles= and =aiResume='s constant-symlink loop. *Keep* it in
-   =aiSuspend= and =deClaudify= symlink-lists as legacy cleanup (with
-   explanatory comment) so pre-merge projects can still be cleaned up
-   correctly.
-4. Update =mother/initiateSub/CLAUDE.md= to drop the =AI-AGENTS.org=
-   mention from the "inherited from parent" list.
-5. Sweep documentation: =AI-WORKFLOW.org= (three copies), all README.org
-   files (three template repos + engine + T-Mobile), all activity-level
-   starter files (=AI-Activity.org=, initial =AI-DevStatus.org= and
-   =AI-WorkPlan.org=, =bx-initiate.md=, =bx-confirm0.md=). Batch with
-   sed patterns; clean up ==,= artifacts left by aggressive substitution.
------ AI Results: ------
-Executed. Ten-plus-file coordinated change across three repos, no
-regressions. verify.sh exits 0. =initiate= now creates only
-=CLAUDE.md=, =AI-WORKFLOW.org=, =AI-Activity.org= symlinks + =.claude/=;
-the =AI-AGENTS.org= symlink no longer exists in fresh projects.
-=deClaudify= still recognizes and removes legacy =AI-AGENTS.org=
-symlinks from pre-merge projects — the legacy-cleanup path is
-explicitly commented at the two list sites. All three =mother/CLAUDE.md=
-files now import =AI-WORKFLOW.org= + =AI-Activity.org= + =AI-DevStatus.org=
-+ =AI-WorkPlan.org= directly. Batch sed cleanup was aggressive and left
-some ==,= empty-verbatim artifacts across ~15 files; those were
-targeted-cleaned in a follow-up pass. Templates directory now cleaner:
-each activity ships exactly the files it should, no dead indirection.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -501,18 +156,7 @@ Goal: Make sure that aiActivity works fine outside of bisos
 
 * Stage 9 TODOs
 ** +
-** DONE [#A] Setup an Examples repo for the templates and test against it. :me:
-CLOSED: [2026-07-15 Wed 15:12] SCHEDULED: <2026-06-09 Tue>
------ AI Results: ------
-/bxRepos/bxexamples/aiActivityTemplates
-** DONE [#A] After upload to pypi, test it as a pipx install in a fresh Debian Machine :me:
-CLOSED: [2026-07-15 Wed 15:14] SCHEDULED: <2026-06-09 Tue>
------ AI Results: ------
-Verified.
-** DONE [#A] Update Documentation to include Examples Repo specifically. :aiAndMe:
-CLOSED: [2026-07-15 Wed 15:14] SCHEDULED: <2026-06-09 Tue>
------ AI Results: ------
-Verified.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -527,84 +171,14 @@ session:
    would have been caught faster with visible birth-certificate data)
 2. =--noLink= CLI override for symlinked files (needed by =custom= activity
    where =AI-Activity.org= must be per-project, not shared)
-3. New =custom/= activity in all three templates trees (BISOS, bxexamples,
-   T-Mobile fork), for projects whose conventions don't fit any standard
+3. New =custom/= activity in all three templates trees (BISOS, bxexamples),
+   for projects whose conventions don't fit any standard
    activity
 
 
 * Stage 10 TODOs
 ** +
-** DONE [#A] <<Provenance Line>> Multi-line org-comment provenance in safe-copied files :ai:
-CLOSED: [2026-07-16 Tue] SCHEDULED: <2026-07-16 Tue>
-After the safe-copy of =AI-DevStatus.org= and =AI-WorkPlan.org= (and
-before dblock expansion), insert a multi-line org-comment block
-recording: date (ISO 8601 with tz), user (=USER= env → =LOGNAME= env
-→ =os.getlogin()= → =pwd.getpwuid(os.getuid())=), templates base
-(actually used, via =_resolveTemplatesBase=), and =sys.argv=. Placement:
-after the last =#+= directive at the top of the file. Not a dblock
---- inert text, written once at install time, never regenerated.
-Rationale: elisp dblock expanders can't recover invocation context;
-provenance must be birth-certificate data.
------ AI Results: ------
-Implemented in =py3/bin/aiActivity.cs=. New helpers
-=_detectUser()= (4-tier fallback chain, handles nohup/detached shells
-where =os.getlogin()= raises) and =_writeProvenanceLine()= (scans for
-last =#+= header, inserts multi-line comment block). Called from
-both =initiate= and =initiateSub= safe-copy sites. Verified in test
-runs --- provenance appears at the top of both editable files with
-correct date, user (=bystar=), templates path, and full command line.
-=aiSuspend= / =aiResume= treat provenance as opaque file content, so
-it survives suspend/resume cycles unchanged.
-** DONE [#A] <<noLink Override>> --noLink CLI flag for safe-copy override :ai:
-CLOSED: [2026-07-16 Tue] SCHEDULED: <2026-07-16 Tue>
-Add =--noLink=<filename>= parameter to both =initiate= and =initiateSub=.
-When passed, the named file is safe-copied instead of being installed
-as a symlink. Applies to =CLAUDE.md=, =AI-WORKFLOW.org=, and
-=AI-Activity.org= (files the engine would otherwise install as
-symlinks). Not applicable to =.claude/= entries. Single filename only
-for now; multi-file support later via a =bisos.b= framework improvement
-(=nargs='+'= or =append= action on =parDictAdd=).
------ AI Results: ------
-Implemented. Chose CLI-flag over per-activity config file after
-discussion --- preserves the principle that templates should stay
-passive (a filesystem of examples, not a configuration layer). Two
-new =parDictAdd= entries (=noLink= in the =commonParamsSpecify=
-common list), classHead dblocks for both =initiate= and =initiateSub=
-extended with =noLink= in =parsOpt=, and the symlink-installation
-sites in both commands now branch on =noLink == fname= to select
-=shutil.copy2()= vs =symlink_to()=. Log messages distinguish the
-two behaviors (=SYMLINKED:= vs =COPIED (--noLink=<file>):=). All four
-combinations tested (default, =--noLink=AI-Activity.org=,
-=--noLink=CLAUDE.md=, =initiateSub --noLink=AI-Activity.org=).
-=verify.sh= regression-clean.
-** DONE [#A] <<custom Activity>> Add custom/ activity to all three templates trees :ai:
-CLOSED: [2026-07-16 Tue] SCHEDULED: <2026-07-16 Tue>
-The =custom= activity is the escape hatch for projects whose
-conventions don't fit any standard activity. Its =AI-Activity.org=
-is meant to be safe-copied via =--noLink=AI-Activity.org= and owned
-by each project. Add to T-Mobile fork first, then copy structure
-to BISOS and bxexamples so all three templates trees stay aligned.
-Also update =examples= menu output to advertise the =--noLink=
-form after each =--activity=custom= line (three menu chapters ×
-one custom line each = three additions).
------ AI Results: ------
-=custom/AI-Activity.org= authored with proper per-project template
-framing (explains =--noLink=AI-Activity.org=, provides placeholder
-sections for project conventions). Copied to all three template
-trees; three-way md5 match confirmed. =examples= menu updated: each
-=--activity=custom= line now followed by a =--noLink=AI-Activity.org=
-variant with an explanatory comment.
-** DONE [#A] <<Stage 10 Docs>> Update README + DevStatus + WorkPlan + templates READMEs :ai:
-CLOSED: [2026-07-16 Tue] SCHEDULED: <2026-07-16 Tue>
-Four documentation edits: engine =README.org= new subsection under
-Usage covering =--noLink=; engine =AI-DevStatus.org= updates to
-Current State + Key Design Decisions; engine =AI-WorkPlan.org= this
-Stage 10 entry; per-activity Note for =custom= in each of the three
-template trees' READMEs.
------ AI Results: ------
-Documentation updates in progress at time of writing this AI Result;
-the four edits are being applied in the same session that closed the
-three prior Stage 10 TODOs.
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
 
@@ -631,489 +205,105 @@ Two related changes:
 
 * Stage 11 TODOs
 ** +
-** DONE [#A] <<CLAUDE.md Safe-Copy>> Switch CLAUDE.md from symlink to safe-copy in initiate/initiateSub :ai:
-CLOSED: [2026-07-17 Wed] SCHEDULED: <2026-07-17 Wed>
-=initiate= and =initiateSub= now =shutil.copy2= =CLAUDE.md= from
-=mother/CLAUDE.md= (base) or =mother/initiateSub/CLAUDE.md= (sub)
-instead of symlinking. No provenance line for =CLAUDE.md= --- must be
-byte-identical to the template. =deClaudify= moved =CLAUDE.md= (and
-=CLAUDE.md.dormant=) from the symlink-only list to the removable-files
-list so it removes either form. =aiSuspend= now =rename=-s =CLAUDE.md=
-→ =CLAUDE.md.dormant= (file, not symlink); if a legacy symlink is
-found, it is unlinked. =aiResume= promotes =CLAUDE.md.dormant= back
-if present, or re-copies from templates.
------ AI Results: ------
-Mode detection needed to change: previously =aiResume= and =initiateSub=
-compared the =CLAUDE.md= symlink target against
-=<templatesBase>/mother/initiateSub/CLAUDE.md= to distinguish sub from
-base. Since =CLAUDE.md= is now a copy, both switched to walking up for
-a parent =AI-WORKFLOW.org= symlink under =templatesBase=. =AI-WORKFLOW.org=
-remains a symlink (harmless --- it has no =@./= back-imports), so this
-signature is still available. =initiateSub= precondition and =aiResume=
-mode-detection both use the same walk-up helper logic (inlined for now;
-extract to a helper if a third caller emerges).
-** DONE [#A] <<refresh Cmnd>> New refresh command to re-copy CLAUDE.md from templates :ai:
-CLOSED: [2026-07-17 Wed] SCHEDULED: <2026-07-17 Wed>
-New =refresh= Cmnd (=parsOpt="templates"=): detects base vs sub via
-parent-AI-WORKFLOW.org walk-up under =templatesBase=, then re-copies
-=CLAUDE.md= from =mother/= or =mother/initiateSub/=. Upgrades legacy
-symlinked =CLAUDE.md= installs by unlinking then copying (this is the
-one-shot migration path for pre-Stage-11 projects). Only touches
-=CLAUDE.md= for now; per-project files (=AI-DevStatus.org=,
-=AI-WorkPlan.org=, and any =--noLink= file) are never touched.
-Multi-file =refresh= (parallel to multi-file =--noLink=) is deferred to
-the same =bisos.b= framework improvement.
------ AI Results: ------
-Cmnd class added after =aiResume= in =aiActivity.cs=. Examples
-menu got a new =refresh= chapter between aiSuspend/aiResume and
-deClaudify. Log messages distinguish the three cases: =UPGRADED (legacy
-symlink -> safe-copy)=, =REFRESHED=, =COPIED (was not present)=.
-** DONE [#A] <<Stage 11 Docs>> README + AI-DevStatus + AI-WorkPlan updates :ai:
-CLOSED: [2026-07-17 Wed] SCHEDULED: <2026-07-17 Wed>
-Engine =README.org=: new subsection "Refresh CLAUDE.md From Templates"
-under Usage (placed before Suspend/Resume) + TOC entry. Engine
-=AI-DevStatus.org=: Current State entry describing the change and a
-new Key Design Decision entry explaining why =CLAUDE.md= is
-safe-copied (the =@./= symlink-resolution bug). Engine =AI-WorkPlan.org=:
-this Stage 11 with three DONE TODOs.
------ AI Results: ------
-Applied in the same session that implemented the code changes.
-** DONE [#A] <<aiActivity Activity>> Create aiActivity activity + authoring-skills skill :ai:
-CLOSED: [2026-07-17 Wed] SCHEDULED: <2026-07-17 Wed>
-New activity directory =/bisos/apps/defaults/ai-templates/aiActivity/=
-containing =AI-Activity.org= (freestanding orientation to the AI
-Activity model itself --- concepts, file roles, symlink-vs-copy
-semantics with the CLAUDE.md exception, initiate/initiateSub/refresh
-mechanics, walk-up, templatesBase resolution) and one skill:
-=_skills/authoring-skills/SKILL.md= (frontmatter contract, weak-vs-
-strong description examples, when to write a skill vs extend
-=AI-Activity.org=, naming conventions, testing loop).
------ AI Results: ------
-Designed to be used two ways: (1) installed directly with
-=--activity=aiActivity= at repo level as an alternative to =basic=,
-giving fresh Claude sessions in an aiActivity-model-focused project
-correct orientation; (2) =@=-imported by other activities'
-=AI-Activity.org= files so their sessions inherit the model layer.
-Deliberately kept freestanding (no =@./= back-imports) so import-safe.
-Initially BISOS-only per user direction ("use in a large project
-first, then propagate") --- propagated to bxexamples and rana-notes
-on 2026-07-21 (see next TODO).
-** DONE [#A] <<Templates Propagation>> Propagate BISOS templates to bxexamples and rana-notes :ai:
-CLOSED: [2026-07-21 Tue] SCHEDULED: <2026-07-21 Tue>
-Bxexamples: full structural mirror of BISOS canonical tree ---
-overwrote/added all 11 activity directories (=mother/=, =basic/=,
-=custom/=, =bisos-pip/=, =bisos-core/=, =xu-single/=, =blee-panels/=,
-=lcnt/=, =aiActivity/=, =sbom+cap/=, =pycs/=). Preserved bxexamples
-own =README.org=, =LICENSE=, and =.git/=. Did NOT copy the BISOS
-templates-root per-project files --- those are BISOS's own dogfood
-install, not part of the shared template content. Dropped
-=basic/.claude/= and =custom/.claude/= leftover directories.
-Rana-notes: added =aiActivity/= only (BISOS's most recent work);
-existing =mother/=, =ranaApiUsage/=, =tmoLatex/=, =basic/=, =custom/=
-left untouched. Rana-notes =basic/AI-Activity.org= deliberately kept
-rana-adjusted --- differs from BISOS by design. =sbom+cap/= NOT
-propagated per user direction. Rana-notes =aiActivityTemplates/=
-directory is intentionally untracked in rana-notes git.
------ AI Results: ------
-Applied via a =cp -a= loop (rsync unavailable on this host). Seven
-key files spot-md5-checked BISOS-vs-bxexamples parity: all matched.
-Two git repos have uncommitted changes (bxexamples and rana-notes)
-for user to commit at leisure. During survey, spotted
-=bisos-capabilites.org= (typo, should be =capabilities=) in three
-activities (=bisos-pip=, =pycs=, =sbom+cap=) --- noted, no action
-taken (intentional content, but the typo is a candidate for a
-future filename fix).
+** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
 
-* Stage 12: Maintenance and New Feature Ideas
+* Stage 12: Capture the Concept of AI-Outputs.org 
 
-Goal: Based on usage consider new features, and non-urgent bugs.
+Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
 
 * Stage 12 TODOs
 ** +
-** DONE [#A] Add to documentation the concept of "Homogenous and Heterogeneous AI-Activities" :aiAndMe:
-CLOSED: [2026-07-27 Sun]
-SCHEDULED: <2026-07-27 Mon 11:56>
-When all the directories and the repo of those directories all have references to a single set of
-ai-templates, we call that Homogenous AI-Activities. Example is that of a group of collaborators
-using one set of templates base for python convention pip package development and latex conventions for documentation.
-------
-When some  directories in the repo have references to different sets of ai-templates, we call that Heterogeneous
-AI-Activities. An example would be when you are developing some proprietary pip packages with one set of ai-templates
-and open-source pip packages with a different set of ai-templates.
------
-aiActivity.cs supports both.
-Add this to the README.org
------ AI Results: ------
-Added new "AI-Activity Topology" section to =README.org= under Usage, covering
-both dimensions in two subsections (Homogeneous/Heterogeneous and
-Hierarchical/Lateral) with concrete examples. TOC entry added. Notes that the two
-axes are orthogonal and combinable, and that =--templates= / the forthcoming
-per-directory override are the mechanisms for Heterogeneous topologies.
-** DONE [#A] Add to documentation the concept of "Lateral AI-Activities and Hierarchical AI-Activities"  :aiAndMe:
-CLOSED: [2026-07-27 Sun]
-SCHEDULED: <2026-07-27 Mon 11:56>
-When working on a project, you may be working on a set of directories that fall under the same repo.
-We call that Hierarchical AI-Activities. In one directory you do pip pkg dev. And under it you do its latex doc.
-This would be called Hierarchical AI-Activities
------
-Work on a project may involve visiting multiple repos. This would be called a Laterial AI-Activity.
-----
-aiActivity.cs supports both.
-Homogenous and Heterogenous and Lateral and Hierarchical can be combined.
-Add this to the README.org
------ AI Results: ------
-Covered in the same "AI-Activity Topology" section as TODO 1 above (combined as
-planned). Hierarchical = nested dirs / =initiate= + =initiateSub=; Lateral =
-multiple independent repos each =initiate=-d, Claude walk-up picks up both.
-Noted that all four variants combine freely.
-** DONE [#A]  In ~/.config/bisos/aiActivity.cs  create an fps directory and move the fps there
-CLOSED: [2026-07-27 Sun]
-SCHEDULED: <2026-07-21 Tue 13:41>
-This will then become a standard for persistent user parameters.
-Currently the implementation uses ~/.config/bisos/aiActivity.cs/templates for base of its file param.
-Instead we want to use ~/.config/bisos/aiActivity.cs/fps/templates
------ AI Results: ------
-Changed =_configRoot()= in =bisos.b.userConfig_csu= to append =/fps= to the path,
-making the standard store =~/.config/bisos/<csxu-name>/fps/<parName>/value= for all
-bisos-pip packages. Applied to both the source repo
-(=/bisos/git/auth/bxRepos/bisos-pip/b/py3/bisos/b/userConfig_csu.py=) and the
-installed copy in the venv. Cold migration — old entries at the old path are left
-in place; no auto-migration. Verified: =userConfig_set= / =userConfig_get= work
-correctly and the config root log now shows =/fps=.
-
-** DONE [#A] <<Add a .aiActivity.cs to the current directory>> that captures and defines templates directory :aiAndMe:
-CLOSED: [2026-07-27 Sun]
-SCHEDULED: <2026-07-21 Tue 13:41>
-In the case of Heterogenous AI-Activities, one needs to change the templates parameter for aiActivity.cs.
-In situations when one works with different template dirs it is possible to confuse re-creations and resumes.
-Existence of a .aiActivity.cs/fps/templates in the current directory over rides the value in
-~/.config/bisos/aiActivity.cs/fps/templates
-This makes usafge more  convenient. Also upon creation of the repo this can be configured to move towards less config.
------ AI Results: ------
-Implemented as a separate CSU rather than a =--cwd= flag on =userConfig_csu=.
-Initial implementation added =--cwd= to =userConfig_csu.parGet/parSet= and
-its two commands; the user reviewed and pushed back --- correctly --- that
-composition-of-CSUs is the better factoring. Redone as follows:
-
-- New module =bisos.b.cwdConfig_csu= (source + venv). Mirrors
-  =userConfig_csu= structurally but its =_configRoot()= returns
-  =<cwd>/.<csxu-name>/fps/= (hidden dotdir) instead of the =~/.config/=
-  path. Exposes =cwdConfig_get= and =cwdConfig_set= commands with the
-  same =--parName= / =--parValue= interface. Reuses the =parName= /
-  =parValue= params declared by =userConfig_csu= (its own
-  =commonParamsSpecify()= is empty).
-- =userConfig_csu= reverted to its pre-Stage-12 shape --- no =cwd=
-  parameter anywhere. No LSP diagnostics remain.
-- =aiActivity.cs= adds =bisos.b.cwdConfig_csu= to its csuList
-  alongside =bisos.b.userConfig_csu= (both the elisp block and the
-  =csuList= list). Imports both modules. The =examples= command
-  invokes =cwdConfig_csu.examples_csu().pyCmnd()= right after the
-  =userConfig_csu= one, so the top-level =examples= menu shows both
-  =userConfig_get/set= and =cwdConfig_get/set= chapters.
-- =_resolveTemplatesBase()= composes them: step 2 is
-  =cwdConfig_csu.parGet('templates')=, step 3 is
-  =userConfig_csu.parGet('templates')=. Each reads only its own
-  store; the precedence policy lives here, not in the CSUs.
-- End-to-end smoke test verified: =cwdConfig_set --parName=templates=
-  writes to =./.aiActivity.cs/fps/templates/value=; =cwdConfig_get=
-  reads it back; unset case reports =(not set)=; examples menu shows
-  both CSUs' chapters as expected.
-
-** DONE [#A] <<Eliminate root + parPermanence-as-list + activity persistence>> :aiAndMe:
-CLOSED: [2026-07-27 Sun]
-SCHEDULED: <2026-07-27 Sun>
-Coordinated redesign following on TODO 4:
-- =parPermanence= becomes a Python list (breaking change; only one
-  caller in tree).
-- =templates= tagged =["userConfig", "cwdConfig"]=; =activity= tagged
-  =["cwdConfig"]=.
-- Eliminate the =root= param entirely from =initiate= / =initiateSub=;
-  both always operate on cwd.
-- =activity= becomes optional on both commands, resolved by new
-  =_resolveActivity()= (CLI → cwdConfig).
-- =initiate= / =initiateSub= auto-persist =activity= to cwdConfig on
-  success (deferred until after preconditions pass).
-- Examples menu grows a conditional chapter: if cwdConfig has
-  =activity= set, show a bare =aiActivity.cs -i initiate= line
-  at the top of the =initiate= chapter.
-- Update =verify.sh= to drop =--root= and add coverage for
-  bare-invocation + auto-persistence trace.
------ AI Results: ------
-Implemented in a single pass across =aiActivity.cs= (source repo
---- venv is a symlink so no separate sync), =b/py3/bisos/b/userConfig_csu.py=
-and =b/py3/bisos/b/cwdConfig_csu.py= (both source + venv), and
-=py3/tests/verify.sh=. Removed =subprocess= import (no longer needed).
-Bug caught during smoke test: initial version wrote =activity= to
-cwdConfig before the =initiateSub= walk-up precondition ran, leaving
-=.aiActivity.cs/= behind in =/tmp= when the negative-case test
-refused. Fixed by moving the auto-persist call after the walk-up
-succeeds. =verify.sh= confirmed clean: bare =initiate= reads from
-cwdConfig, auto-persistence trace visible, negative-case =/tmp/= dir
-stays clean.
-** TODO [#A] <<Add Figures To README.org>> :aiAndMe:
-SCHEDULED: <2026-07-27 Sun>
-Continue work at py3/images/AI-WorkPlan.org --- Start by reading its CLAUDE.md
+** TODO [#A] <<12.1>> Read through AI-Outputs.org - Focus on "Process Design --- Captured, Not Yet Implemented"
+SCHEDULED: <2026-09-22 Tue>
+- Discuss with me the ** Open items.
+- Update py3/bin CSXUs to Create symlinks to .../mother/AI-Outputs.org when creating fresh ones
+- Update py3/bin CSXUs to Add missing symlinks to .../mother/AI-Outputs.org for exisiting setups
+- And the rest of Work Needed in =bisos.aiActivity=
 ----- AI Results: ------
 
-** DONE [#A] <<Add cwdConfig_record>> :aiAndMe:
-CLOSED: [2026-07-31 Fri]
-SCHEDULED: <2026-07-31 Fri 11:29>
-Looks at end of symlink of AI-WORKFLOW.org if it exists and determines --templates base.
-If ./.aiActivity.cs does not exist create it and record it.
-If AI-WORKPLAN.org does not exist look at AI-Activity.org end of symlink.
-The above applies to exisiting dirs. Moving forward we will be doing this at initiate and initiateSub.
------ AI Results: ------
-Added two reusable helpers and one new Cmnd class in
-=py3/bin/aiActivity.cs=:
+Discussed the Open items from =AI-Outputs.org='s "Process Design" section
+(now removed from that file --- content consolidated here) and closed each:
 
-- =_deduceCwdConfig(targetDir)= --- returns =(templatesBase, activity)=
-  by reading =AI-WORKFLOW.org= and =AI-Activity.org= symlink targets.
-  =AI-WORKFLOW.org= target's parent's parent is the templates base;
-  =AI-Activity.org= target's parent name is the activity; the same
-  target's parent's parent is a fallback for =templatesBase= when
-  =AI-WORKFLOW.org= is absent. Returns =(None, None)= when neither
-  symlink exists.
-- =_recordCwdConfig(templatesBase, activity)= --- writes both to
-  cwdConfig via =cwdConfig_csu.parSet=, skipping =None= fields and
-  writing only when the stored value would change. Returns a list of
-  human-readable notes (=cwdConfig: templates=X= or =cwdConfig:
-  templates unchanged (X)=) for the caller to report. Idempotent.
-- =cwdConfig_record= Cmnd class --- no params, no args. Runs on
-  =pathlib.Path.cwd()=, calls =_deduceCwdConfig=, then
-  =_recordCwdConfig=, reports notes via =b_io.ann.note=. Refuses with
-  a clear message if neither symlink is found ("Nothing to deduce.
-  Run 'initiate' here first."). Placed between =refresh= and
-  =deClaudify= in the source file.
+- *Destination*: confirmed as an extra symlink hop, not a new repo.
+  =mother/AI-Outputs.org= is itself a symlink into a separate blee-binders
+  repo (=blee-binders/evolution/aiActivity-outputs/=, renamed from
+  =aiActivity-evolution= --- the original name read as "the evolution of
+  the aiActivity tool," when the binder actually holds outputs generated
+  *through* aiActivity, not about aiActivity itself). This resolves the
+  original concern (don't make =mother/= a high-churn write target)
+  without inventing new repo machinery in =bisos.aiActivity= --- the tool
+  only ever creates one symlink, identical in shape to =AI-WORKFLOW.org=.
+  =bxexamples/aiActivityTemplates= is deliberately NOT given this symlink
+  now; it will get a real (non-symlinked) file later, with a note that
+  BISOS's symlink approach is optional to mirror.
+- *In the import chain or not*: decided NOT imported by =CLAUDE.md=.
+  Read via =/bx-ai-outputs= (index mode) or opened directly when relevant.
+- *Growth*: not a blocking design problem --- an operating-discipline
+  matter (drain the =TODO=/=WORKAROUND= backlog regularly).
+- *=/bx-ai-outputs= command*: written at
+  =mother/_claude/commands/bx-ai-outputs.md=. No argument = index mode,
+  grouped =WORKAROUND= first then =TODO= then =INFO=, read-only. An
+  argument = capture mode --- drafts an entry (asks for keyword and
+  =:REPO:= if unclear, since the fix-repo is often not the current repo),
+  shows it for confirmation, then appends under the matching existing
+  top-level section (or a new one). Not the only way to write --- the file
+  is an ordinary symlinked org file --- but keeps entries consistent.
+- *Dangling symlinks*: accepted as a known, pre-existing risk class
+  (same as =AI-WORKFLOW.org='s own repo dependency). No action needed.
 
-Examples menu grew a new chapter for =cwdConfig_record= between
-=refresh= and =deClaudify=.
+=bisos.aiActivity= engine changes (=py3/bin/aiActivity.cs=), all following
+the existing =AI-WORKFLOW.org= symlink pattern exactly, and all treating
+=AI-Outputs.org= as optional (skip silently if the templates tree doesn't
+ship it, e.g. =bxexamples=/=rana-notes= today):
 
-Verified end-to-end:
-- Fresh-initiated dir has =activity= in cwdConfig but not =templates=
-  (current pre-TODO-3 behaviour). Running =cwdConfig_record= writes
-  =templates= (deduced from =AI-WORKFLOW.org=) and reports =activity
-  unchanged=.
-- Idempotent second run reports both as unchanged.
-- With =AI-WORKFLOW.org= deleted but =AI-Activity.org= symlink intact,
-  fallback deduces both correctly from just =AI-Activity.org='s
-  target.
-- Empty directory (no symlinks) refuses with the "Nothing to deduce"
-  message; no traceback.
+- =initiate=: installs the =AI-Outputs.org= symlink from =mother/=.
+- =initiateSub=: unchanged by design --- inherits from the parent, exactly
+  like =AI-WORKFLOW.org=, rather than installing its own copy.
+- =aiSuspend= / =deClaudify=: remove the symlink.
+- =aiResume=: reinstalls it, base mode only.
+- =refresh=: extended to *backfill* the symlink when missing --- this is
+  the retroactive path for already-=initiate=-d projects that predate this
+  feature, reusing =refresh= rather than adding a new command. Verified in
+  an isolated directory: =MODE: base= → =SYMLINKED (backfilled)=.
+- =py3/tests/verify.sh=: extended with coverage for install / remove /
+  reinstall / backfill. Full harness run passes (exit 0). One pre-existing
+  quirk surfaced during testing, unrelated to this change: running the
+  harness from =py3/tests/= --- nested inside this repo's own self-=
+  initiate=-d tree --- causes =aiResume=/=refresh= to always detect "sub"
+  mode, because the walk-up finds the *parent* aiActivity project's own
+  =AI-WORKFLOW.org= symlink even when the target directory has its own
+  genuine base install. Pre-existing (same walk-up code path used for
+  =AI-WORKFLOW.org= before this stage), not introduced here, and out of
+  scope for this stage --- logged as a Stage 14 candidate.
+- Documented the =TODO=/=WORKAROUND=/=INFO= keyword vocabulary and the
+  =:REPO:= convention in =AI-WORKFLOW.org= (new "AI-Outputs.org ---
+  Cross-Project Findings Ledger" section), plus a new table row and a
+  =/bx-ai-outputs= row in the slash-commands table.
 
-The =_recordCwdConfig= helper is reusable for TODO 3 which will wire
-it into =initiate= and =initiateSub= to auto-record on every install.
-
-** DONE [#A] <<Add ./.aiActivity.cs at -i initiate and initiateSub>> :aiAndMe:
-CLOSED: [2026-07-31 Fri]
-SCHEDULED: <2026-07-31 Fri 11:29>
-Execution of -i initiate and initiateSub, should do the equivalent of cwdConfig_record if ./.aiActivity.cs does not exist.
------ AI Results: ------
-Replaced the two ad-hoc auto-persist blocks in =initiate= (line 579)
-and =initiateSub= (line 798) with a single call each to
-=_recordCwdConfig= (the helper factored out in TODO 2). Behaviour
-changes:
-
-- *Both* =templates= and =activity= are now persisted, not just
-  =activity=. The previous behaviour wrote only =activity= (leaving
-  =templates= unset in cwdConfig, which required a separate
-  =cwdConfig_record= run to backfill).
-- Persist is *unconditional on successful install* --- previously it
-  was gated on =cliActivity= (only when user supplied =--activity= on
-  CLI). New behaviour records the templates base and activity actually
-  used, regardless of resolution source. Ground truth: "this directory
-  was initiated with these values."
-- Notes filter: =_recordCwdConfig= returns both "cwdConfig: X=..."
-  (changed) and "cwdConfig: X unchanged (...)" lines. In =initiate=
-  and =initiateSub= the "unchanged" lines are filtered out so bare
-  re-initiates stay quiet; only genuine writes produce output.
-- Deferred placement in =initiateSub= preserved --- the persist call
-  is still after the walk-up succeeds, so a failed walk-up leaves no
-  =.aiActivity.cs/= behind (verified with a fresh =/tmp= dir).
-
-Dead-code cleanup: =cliActivity = activity= capture was used only for
-the removed gate. Deleted both assignments (=initiate= and
-=initiateSub=).
-
-Verified end-to-end (under the BISOS venv where all imports resolve):
-- Fresh =initiate --activity=xu-single= in an empty dir produces both
-  "cwdConfig: templates=..." and "cwdConfig: activity=xu-single"
-  notes. Both files land under =./.aiActivity.cs/fps/=.
-- Second invocation (=deClaudify= then bare =initiate=) uses cwdConfig
-  and produces no cwdConfig noise --- filter working.
-- =initiateSub --activity=bisos-pip= in a nested subdir persists both
-  values.
-- Negative case: =initiateSub= in an orphan =/tmp= dir refuses cleanly
-  (no initiated parent) and leaves no =.aiActivity.cs/= behind.
-
-Flagged for follow-up (unrelated to TODO 3 but surfaced by running
-verify.sh): =verify.sh= uses =#!/bin/bash -i= which activates the
-=tmoBisos= venv on this box; that venv lacks =bisos.pyDblock=, so
-=aiActivity.cs= crashes on its =from bisos.pyDblock import= line
-93. Not caused by TODO 3 --- the same failure predates it. Fixes:
-either install =bisos.pyDblock= in tmoBisos, or change verify.sh's
-python resolution to the BISOS venv explicitly, or gate the pyDblock
-import. Worth a separate TODO in a maintenance stage.
-
-** DONE [#A] <<Add Table of Commands to README.org>> :aiAndMe:
-CLOSED: [2026-07-31 Fri]
-SCHEDULED: <2026-07-31 Fri 11:29>
-Perhaps two separate tables. One for xxConfig_yy commands and one for the rest of the usage commands.
-The noLink param should be included in initiate and initiateSub.
------ AI Results: ------
-Added a new =Table of Commands= subsection under =Usage=, placed
-between =Self-Discovery: the examples Menu= and =Set Templates Base
-Directory=. This lands it in the reader's first Usage screen so the
-detail subsections that follow can be scanned against the table
-overview.
-
-Two tables per your direction:
-
-- *Config commands* --- three-column (Command, Store, Purpose):
-  =userConfig_get=, =userConfig_set=, =cwdConfig_get=, =cwdConfig_set=,
-  =cwdConfig_record= (Store column names =userConfig= vs =cwdConfig=,
-  clarifying which persistent store each command touches).
-- *Lifecycle commands* --- three-column (Command, Purpose, Notable
-  options): =initiate=, =initiateSub=, =refresh=, =aiSuspend=,
-  =aiResume=, =deClaudify=, =examples=. The =initiate= and
-  =initiateSub= rows list =--activity=, =--templates=, =--noLink=<file>=
-  in the Notable options column per your ask.
-
-Two short paragraphs follow the tables: (a) a pointer to the
-=--noLink= section for readers who want the "when to use it"
-narrative, (b) a note that =initiate= / =initiateSub= auto-record
-templates + activity into cwdConfig on success --- explaining why
-subsequent invocations in the same directory don't need CLI flags.
-
-Also updated: the operations-list paragraph in Overview (line 119)
-now includes =cwdConfig_record= and ends with a pointer to the
-Table of Commands. TOC gained a new entry
-=table-of-commands= under Usage.
-
-** DONE [#A] <<What if AI systems weren’t chatbots?>> :aiAndMe:
-CLOSED: [2026-08-02 Sun]
-SCHEDULED: <2026-07-31 Fri 11:29>
-Add the following as a short paragraph towards the begining of README.org
-Read /bisos/panels/bisos-core/AI/AiGeneralInfo /bisos/panels/bisos-core/AI/AiGeneralInfo/3805689.3812232.pdf
-The idea is that natural language interactions are better outside of a chatbox paradigm.
-So, define your own workflow, define your own activity and define your own workplan -- then make Claude/etc conform to your model.
------ AI Results: ------
-Added a new top-level section =Why AI-Activity, Not Chatbot?= between
-=Collaboration Across People and Across Sessions= and =Overview=.
-Placement rationale: practical framings (concept + model, human/AI
-continuity) are established first, so the philosophical section reads
-as reflection rather than manifesto, and it lands cleanly into the
-concrete Overview that follows.
-
-Iterated with user through three drafts: initial (~8 sentences,
-Ghosh et al. named explicitly + full Illich unpacking), user's own
-denser edit (dropped Illich unpacking, added an =AI-Activity=
-identity claim), and final tight version. Final is six sentences,
-one paragraph:
-
-- Opening claim: the chatbot has quietly become the default
-  interface for AI.
-- Diagnostic pivot: this is not a neutral choice.
-- Citation carrying epistemic weight: the paper title
-  =/What if AI systems weren't chatbots?/= is the DOI link
-  (=https://doi.org/10.1145/3805689.3812232=); Ghosh et al. are
-  reachable through the link but not named in prose. "A
-  peer-reviewed argument" flags the epistemic register without
-  paraphrasing further.
-- Three harms in one clause: agency erosion, deskilling, knowledge
-  homogenization. Contrast: task-specific workflow-integrated systems
-  largely avoid these.
-- The =AI-Activity= identity claim: "our move toward /convivial
-  tools/ --- shaped by their user rather than the reverse --- and
-  away from the industrial default." =convivial tools= is a link to
-  the Wikipedia entry for Illich's =Tools for Conviviality=, so
-  readers who want the philosophical grounding can follow the link;
-  the six-word unpacking ("shaped by their user rather than the
-  reverse") keeps the definition on-page without a name-drop.
-- Transitional close: "What follows is the concrete mechanics of
-  that inversion" --- graceful hinge into Overview.
-
-TOC entry added at the appropriate position between the two
-neighbouring sections.
-
-** DONE <<Add listClaudesPath Command>> :aiAndMe:
-CLOSED: [2026-08-03 Sun]
-SCHEDULED: <2026-08-03 Mon 16:22>
-Add a new Cmnd =listClaudesPath= that walks upward from cwd toward the git repo root
-(determined via =git rev-parse --show-toplevel=), collecting every directory that contains
-a =CLAUDE.md=. For each such directory, print the full path of =CLAUDE.md= and the full
-path of the =AI-Activity.org= symlink target (resolved) as a pair. cwd is printed
-flush-left; each ancestor level adds one indent step, so the repo root is the most
-indented entry. The purpose is to show the user which AI Activities are in effect across
-the =initiate= / =initiateSub= hierarchy.
------ AI Results: ------
-Implemented =listClaudesPath= in =py3/bin/aiActivity.cs=. The command walks upward
-from cwd to the git repo root (via =git rev-parse --show-toplevel=; falls back to
-filesystem root if not in a git repo), collecting every directory containing a =CLAUDE.md=.
-For each hit, prints =CLAUDE.md: <path>= and the resolved =AI-Activity.org= symlink target
-on the next line, both at the same indent level (cwd flush-left, each ancestor adds two
-spaces). Added a =listClaudesPath= chapter to the =examples= menu. Smoke-tested: in this
-repo, correctly finds the single =CLAUDE.md= at cwd and shows its =AI-Activity.org=
-pointing to =/bisos/apps/defaults/ai-templates/bisos-pip/AI-Activity.org=.
-
-* DONE <<Fully rename startAiActivity to aiActivity.cs>> :me:
-CLOSED: [2026-08-03 Mon 21:33] SCHEDULED: <2026-08-03 Mon 16:22>
------ MB Results: ------
-Renamed the bisos.startAiActivity repo to bisos.aiActivity.
-At PyPi pip installed bisos.aiActivty.
-Locally removed bisos.startAiActivity pip packages.
-Locally installed bisos.aiActivity.
-
-* DONE <<Emphasize Part 2 in Two-Part Arch>> :aiAndMe:
-CLOSED: [2026-08-04 Mon]
-SCHEDULED: <2026-08-03 Mon 16:22>
------ AI Results: ------
-Rewrote the "Part 2" subsection of Two-Part Architecture in =README.org=.
-Leads with "*This is where the value accumulates.*" to make the asymmetry
-explicit: Part 1 is stable infrastructure; Part 2 is the living knowledge
-base. Added a new "Refine shared conventions" bullet making the symlink-
-propagation point concrete in this section. Reframed "Customize" bullet
-to emphasize organizational conventions encoded once and available
-everywhere. Mechanics (clone, point, update) follow the value framing
-rather than leading it.
-
-* DONE <<In Not Chatbot Mention Claude's Plan and Google's Gemini Notebook as industrial >> :aiAndMe:
-CLOSED: [2026-08-04 Mon]
-SCHEDULED: <2026-08-03 Mon 16:22>
------ AI Results: ------
-Added a second paragraph to "Why AI-Activity, Not Chatbot?" naming both
-industrial examples: Google's Gemini Notebook (formerly NotebookLM) as
-the most sympathetic form --- solves amnesia but within Google's platform
---- and Claude's Plan mode as a subtler case --- a better chatbot, not a
-different paradigm, ends with nothing durable on the filesystem. Closes
-with the AI-Activity contrast: plan in =AI-WorkPlan.org=, conventions in
-=AI-Activity.org=, AI works within the structure the human defines.
-
-* DONE <<Introduce our stack somewhere>> :aiAndMe:
-CLOSED: [2026-08-04 Mon]
-SCHEDULED: <2026-08-03 Mon 16:22>
------ AI Results: ------
-Added a third paragraph to "Why AI-Activity, Not Chatbot?": the Linux +
-Git + org-mode foundation framing, verbatim from the TODO with light
-editing. Closes with "Our own use is Emacs-based via Blee; yours need
-not be." — a reworded version of the existing line-79 disclaimer,
-serving a positioning role here rather than a reassurance role.
-
-* DONE <<no CLAUDE.md listClaudesPath  behaviour>> :aiAndMe:
-CLOSED: [2026-08-04 Mon]
-SCHEDULED: <2026-08-03 Mon 16:22>
-When you run listClaudesPath in a directory that has no CLAUDE.md, it should say None at {fullPathOfCwd}
-The next line for AI-Activity.org should be -> None
------ AI Results: ------
-In =listClaudesPath=, added a special case for depth==0 (cwd): when cwd has no
-=CLAUDE.md=, the loop now prints =CLAUDE.md: None at <fullPathOfCwd>= and
-=AI-Activity.org -> None= instead of silently skipping cwd. Also unified the
-"no AI-Activity.org" output for found CLAUDE.md entries to use =-> None= for
-consistency. Verified: running from =/tmp= (no CLAUDE.md) shows the None lines;
-running from the repo root (has CLAUDE.md) is unchanged.
-
+Status: implementation complete; user is reviewing the diffs before
+anything is committed. Not marked DONE yet pending that review.
 
 ** -
+
+
+* Stage 14: Maintenance and New Feature Ideas
+
+Goal: Based on usage consider new features, and non-urgent bugs.
+
+* Stage 14 TODOs
+** +
+** TODO Mode-detection walk-up misclassifies a nested base install as "sub"
+Found while testing Stage 12.1: =aiResume=/=refresh= detect base-vs-sub by
+walking up from the *parent* of the target directory looking for an
+ancestor =AI-WORKFLOW.org= symlink under templatesBase. If the target
+directory sits inside another already-=initiate=-d project (e.g. this
+repo's own =py3/tests/=, self-hosted), the walk-up finds the *ancestor's*
+symlink and calls it "sub" even when the target directory has its own
+genuine base-mode =AI-WORKFLOW.org=. Affects any project nested inside
+another initiated project, not just this repo's =tests/= dir.
+** -
+
 
 
 # Local Variables:

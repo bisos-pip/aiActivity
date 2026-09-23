@@ -453,7 +453,7 @@ class examples(cs.Cmnd):
         cs.examples.menuChapter('=refresh= -- re-copy safe-copied invariants (CLAUDE.md) from templates')
         cmnd('refresh',
              pars=od([]),
-             comment="# Re-copy CLAUDE.md from templates; upgrades legacy symlinks")
+             comment="# Re-copy CLAUDE.md, backfill missing invariant symlinks (e.g. AI-Outputs.org)")
 
 
         cs.examples.menuChapter('=deClaudify= -- remove AI collaboration files')
@@ -608,11 +608,16 @@ falling back to cwdConfig at ./.<csxu-name>/fps/activity/value.
             b_io.ann.note(f"COPIED: {claudeMdSrc} -> {claudeMdDst}")
 
         # Other constant files — symlinked to mother/. If --noLink matches,
-        # safe-copy instead.
-        constantFiles = ['AI-WORKFLOW.org']
+        # safe-copy instead. AI-Outputs.org is optional: templates trees that
+        # don't ship it (e.g. bxexamples, rana-notes as of this writing) are
+        # skipped rather than treated as an error.
+        constantFiles = ['AI-WORKFLOW.org', 'AI-Outputs.org']
         for fname in constantFiles:
             src = motherDir / fname
             dst = targetDir / fname
+            if not src.exists() and not src.is_symlink():
+                b_io.ann.note(f"SKIP (no such file in templates): {src}")
+                continue
             if dst.exists() or dst.is_symlink():
                 b_io.ann.note(f"SKIP (exists): {dst}")
             elif noLink == fname:
@@ -877,8 +882,8 @@ class aiSuspend(cs.Cmnd):
 ####+END:
         self.cmndDocStr(f""" #+begin_org
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Suspend AI collaboration in current directory.
-Removes symlinks (AI-WORKFLOW.org, AI-Activity.org, plus any legacy
-AI-AGENTS.org from pre-merge projects) and =.claude/= entries.
+Removes symlinks (AI-WORKFLOW.org, AI-Outputs.org, AI-Activity.org, plus
+any legacy AI-AGENTS.org from pre-merge projects) and =.claude/= entries.
 Stashes =CLAUDE.md= as =CLAUDE.md.dormant= (rename; CLAUDE.md is now a
 safe-copy, not a symlink). Renames AI-DevStatus.org and AI-WorkPlan.org
 to .dormant so they survive and can be restored by aiResume.
@@ -908,7 +913,7 @@ to .dormant so they survive and can be restored by aiResume.
         # reinstalled from templates based on the CLAUDE.md.dormant signature).
         # AI-AGENTS.org is retained as legacy cleanup — pre-merge projects
         # have this symlink and aiSuspend should still remove it.
-        symlinkFiles = ['AI-AGENTS.org', 'AI-WORKFLOW.org', 'AI-Activity.org']
+        symlinkFiles = ['AI-AGENTS.org', 'AI-WORKFLOW.org', 'AI-Activity.org', 'AI-Outputs.org']
         for fname in symlinkFiles:
             dst = targetDir / fname
             if dst.is_symlink():
@@ -1087,11 +1092,15 @@ target or the =Activity:= header in =AI-WorkPlan.org=.
             shutil.copy2(claudeSrc, claudeLive)
             b_io.ann.note(f"COPIED: {claudeSrc} -> {claudeLive}")
 
-        # AI-WORKFLOW.org: base mode only; subs inherit from parent.
+        # AI-WORKFLOW.org / AI-Outputs.org: base mode only; subs inherit from
+        # parent. AI-Outputs.org is optional in the templates tree.
         if not subMode:
-            for fname in ['AI-WORKFLOW.org']:
+            for fname in ['AI-WORKFLOW.org', 'AI-Outputs.org']:
                 src = motherDir / fname
                 dst = targetDir / fname
+                if not src.exists() and not src.is_symlink():
+                    b_io.ann.note(f"SKIP (no such file in templates): {src}")
+                    continue
                 if dst.exists() or dst.is_symlink():
                     b_io.ann.note(f"SKIP (exists): {dst}")
                 else:
@@ -1148,7 +1157,7 @@ target or the =Activity:= header in =AI-WorkPlan.org=.
         )
 
 
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "refresh" :comment "Re-copy safe-copied invariant files from templates (CLAUDE.md)" :extent "verify" :ro "cli" :parsMand "" :parsOpt "templates" :argsMin 0 :argsMax 0 :pyInv ""
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "refresh" :comment "Re-copy safe-copied invariants (CLAUDE.md) and backfill missing invariant symlinks (AI-Outputs.org)" :extent "verify" :ro "cli" :parsMand "" :parsOpt "templates" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
 *  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<refresh>>  =verify= parsOpt="templates" ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
@@ -1171,11 +1180,15 @@ class refresh(cs.Cmnd):
         templates = csParam.mappedValue('templates', templates)
 ####+END:
         self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Re-copy safe-copied invariant files from templates.
-Currently refreshes =CLAUDE.md= only. Detects base vs sub mode by walking
-up for a parent =AI-WORKFLOW.org= symlink under templatesBase: if found,
-this is a sub install and =CLAUDE.md= is re-copied from
-=mother/initiateSub/CLAUDE.md=; otherwise from =mother/CLAUDE.md=.
+** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Re-copy safe-copied invariant files from templates,
+and create any missing invariant symlinks (e.g. =AI-Outputs.org= on a
+project =initiate=-d before that symlink existed in the templates tree).
+Detects base vs sub mode by walking up for a parent =AI-WORKFLOW.org=
+symlink under templatesBase: if found, this is a sub install and
+=CLAUDE.md= is re-copied from =mother/initiateSub/CLAUDE.md=; otherwise
+from =mother/CLAUDE.md=. Missing-symlink backfill (=AI-Outputs.org=) is
+base-mode only — subs inherit it from the parent, same as
+=AI-WORKFLOW.org=.
 Upgrades legacy symlinked =CLAUDE.md= installs by unlinking then copying.
 Never touches per-project files (AI-DevStatus.org, AI-WorkPlan.org, or
 files installed with =--noLink=). No provenance line: CLAUDE.md is meant
@@ -1235,6 +1248,23 @@ to be the equivalent of a symlink.
         else:
             shutil.copy2(claudeSrc, claudeDst)
             b_io.ann.note(f"COPIED (was not present): {claudeSrc} -> {claudeDst}")
+
+        # Backfill missing invariant symlinks — base mode only; subs inherit
+        # from parent. Handles projects initiated before AI-Outputs.org
+        # existed in the templates tree. Optional: skipped if the templates
+        # tree doesn't ship it (e.g. bxexamples, rana-notes as of this writing).
+        if not subMode:
+            for fname in ['AI-Outputs.org']:
+                src = motherDir / fname
+                dst = targetDir / fname
+                if not src.exists() and not src.is_symlink():
+                    b_io.ann.note(f"SKIP (no such file in templates): {src}")
+                    continue
+                if dst.exists() or dst.is_symlink():
+                    b_io.ann.note(f"SKIP (exists): {dst}")
+                else:
+                    dst.symlink_to(src)
+                    b_io.ann.note(f"SYMLINKED (backfilled): {dst} -> {src}")
 
         return cmndOutcome.set(
             opError=b.op.OpError.Success,
@@ -1405,7 +1435,7 @@ class deClaudify(cs.Cmnd):
 ####+END:
         self.cmndDocStr(f""" #+begin_org
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Remove AI collaboration files installed by initiate.
-Deletes symlinks: CLAUDE.md, AI-WORKFLOW.org, AI-Activity.org,
+Deletes symlinks: CLAUDE.md, AI-WORKFLOW.org, AI-Outputs.org, AI-Activity.org,
 .claude/settings.json, .claude/commands (plus legacy AI-AGENTS.org
 from pre-merge projects, if present).
 Deletes copied files: AI-DevStatus.org, AI-WorkPlan.org.
@@ -1422,7 +1452,7 @@ Removes .claude/ directory if it becomes empty.
         # AI-AGENTS.org is retained here as a legacy cleanup — pre-merge
         # projects have an AI-AGENTS.org symlink that deClaudify should
         # still remove even though initiate no longer installs it.
-        symlinkFiles = ['AI-AGENTS.org', 'AI-WORKFLOW.org']
+        symlinkFiles = ['AI-AGENTS.org', 'AI-WORKFLOW.org', 'AI-Outputs.org']
         for fname in symlinkFiles:
             dst = targetDir / fname
             if dst.is_symlink():
