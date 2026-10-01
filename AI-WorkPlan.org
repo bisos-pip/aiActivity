@@ -29,7 +29,10 @@ Goal: Confirm AI's understanding of the context and capture that in [[Context Co
 
 * Stage 0: TODOs
 ** +
------ AI Results: ------
+** LOOP <<0.1>> In chatbot confirmation that /bx-confirm0 was done
+SCHEDULED: <2026-10-01 Thu>
+Scheduled date can be updated but [[0.1]] remains as LOOP.
+ ----- Results: ------
 ** -
 
 * Stage 2: Fully Implement aiActivity.cs
@@ -337,12 +340,20 @@ SCHEDULED: <2026-09-23 Wed>
   .aiActivity template as one to use. Only applies to sub.
 ----- AI Results: ------
 
-** TODO [#A] <<14.5>> Test out creation of AI-Outputs.org
+** TODO [#A] <<14.5>>  _IMPORTANT_ Test out creation of AI-Outputs.org :aiAndMe:
 SCHEDULED: <2026-09-26 Sat 21:42>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: High
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+
 - Code has been added but it does not seem to work.
 ----- AI Results: ------
 
-** TODO [#A] <<14.6>> In all templates with TODO replace "AI Results:" to "Results:" :aiAndMe:
+** TODO [#A] <<14.6>> Update mother AI-WorkPlan.org--  In all new templates with TODO replace "AI Results:" to "Results:" :aiAndMe:
 SCHEDULED: <2026-10-01 Thu 10:23>
 :PROPERTIES:
 :ORIGIN: Mohsen
@@ -355,10 +366,11 @@ No need to keep backwards compatibility. This is just a convention that makes th
 for me as well. Not just AI. We could even have ME Results, when by choice I do it.
 ----- Results: ------
 
-** TODO [#A] <<14.7>> In all templates with TODO add PROPERTIES like this one and for AI-Outputs :aiAndMe:
+** TODO [#A] <<14.7>> In all new templates with TODO add PROPERTIES like this one and for AI-Outputs :aiAndMe:
 SCHEDULED: <2026-10-01 Thu 10:23>
 :PROPERTIES:
 :ORIGIN: Mohsen
+:IMPORTANCE: Low
 :REPO: this
 :BASE: this
 :FOUND: <2026-10-01 Thu 10:32>
@@ -367,7 +379,32 @@ SCHEDULED: <2026-10-01 Thu 10:23>
 Add concept of ORIGIN as AI-Outputs.org
 ----- Results: ------
 
+** TODO [#A] <<14.8>> Update mother AI-WorkPlan.org-- Make 0.1 be LOOP :aiAndMe:
+SCHEDULED: <2026-10-01 Thu 10:23>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
 
+Consider this one as example.
+----- Results: ------
+
+** TODO [#A] <<14.9>>  Add a AI-Activity set of templates for YaSnippets
+SCHEDULED: <2026-10-01 Thu 10:23>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+
+It should show up under bx-ai-activity in the moded drop down.
+It should have a bx-ai-activity -> WorkPlan -> "aiAndMe"
+----- Results: ------
 
 
 
@@ -385,7 +422,7 @@ Goal: Make sure relevant common activities, commands and skills are consistent a
 ** +
 ** LOOP [#A] <<15.1>>
 SCHEDULED: <2026-09-23 Wed>
-Compare the 3 directories and identify the useful ones that should become common.
+Some TODOs like Stage 0 [[0.1]]
 ----- AI Results: ------
 
 ** -
