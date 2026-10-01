@@ -321,6 +321,11 @@ SCHEDULED: <2026-09-23 Wed>
 = Somehow mark the commands as to if they are "always" or "perhaps"
 ----- AI Results: ------
 
+* TODO [#A] <<14.2.1>> As in [[12.2]] Update py3/images to include AI-Outputs.org
+SCHEDULED: <2026-09-23 Wed>
+------ AI Results: ------
+
+
 ** TODO [#A] <<14.3>> in py3/images perhaps add a new image for ByStar Skills
 SCHEDULED: <2026-09-23 Wed>
 - Is there some form of layering that can be applied to skills?
@@ -332,7 +337,56 @@ SCHEDULED: <2026-09-23 Wed>
   .aiActivity template as one to use. Only applies to sub.
 ----- AI Results: ------
 
+** TODO [#A] <<14.5>> Test out creation of AI-Outputs.org
+SCHEDULED: <2026-09-26 Sat 21:42>
+- Code has been added but it does not seem to work.
+----- AI Results: ------
 
+** TODO [#A] <<14.6>> In all templates with TODO replace "AI Results:" to "Results:" :aiAndMe:
+SCHEDULED: <2026-10-01 Thu 10:23>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:REPO: this
+:BASE: this
+:FOUND: 2026-09-11
+:END:
+
+No need to keep backwards compatibility. This is just a convention that makes the results clear as
+for me as well. Not just AI. We could even have ME Results, when by choice I do it.
+----- Results: ------
+
+** TODO [#A] <<14.7>> In all templates with TODO add PROPERTIES like this one and for AI-Outputs :aiAndMe:
+SCHEDULED: <2026-10-01 Thu 10:23>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+
+Add concept of ORIGIN as AI-Outputs.org
+----- Results: ------
+
+
+
+
+
+** -
+
+* Stage 15: Sync ai-templates accross  bisos/examples/other
+
+Goal: Make sure relevant common activities, commands and skills are consistent across:
+
+- /bisos/apps/defaults/ai-templates/
+- /bxRepos/bxexamples/aiActivityTemplates/
+- Others  /de/active/aiTemplates
+
+* Stage 15 TODOs
+** +
+** LOOP [#A] <<15.1>>
+SCHEDULED: <2026-09-23 Wed>
+Compare the 3 directories and identify the useful ones that should become common.
+----- AI Results: ------
 
 ** -
 
