@@ -37,8 +37,9 @@
 
 ####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
 """ #+begin_org
-* *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
-** This File: /bisos/git/auth/bxRepos/bisos-pip/aiActivity/py3/bin/aiActivity.cs
+* *[[elisp:(org-cycle)][| Particulars |]]* :: This File, Authors, version
+** This File: /bxRepos/bisos-pip/aiActivity/py3/bin/aiActivity.cs
+** File True Name: /bisos/git/auth/bxRepos/bisos-pip/aiActivity/py3/bin/aiActivity.cs
 ** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
 #+end_org """
 ####+END:
@@ -47,9 +48,8 @@
 """ #+begin_org
 * *[[elisp:(org-cycle)][| Particulars-csInfo |]]*
 #+end_org """
-import typing
-csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['aiActivity'], }
-csInfo['version'] = '202508030000'
+if 'csInfo' not in globals(): import typing ; csInfo: typing.Dict[str, typing.Any] = { 'moduleName': ['loadAs'], }
+csInfo['version'] = '202610070443'
 csInfo['status']  = 'inUse'
 csInfo['panel'] = 'aiActivity-Panel.org'
 csInfo['groupingType'] = 'IcmGroupingType-pkged'
@@ -75,7 +75,7 @@ csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 """ #+begin_org
 *  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] *Imports* =Based on Classification=cs-mu=
 #+end_org """
-from bisos import b
+from bisos import b  # noqa: E402
 from bisos.b import cs
 from bisos.b import b_io
 from bisos.common import csParam
@@ -130,7 +130,7 @@ def g_extraParams():
 
 ####+BEGIN: b:py3:cs:orgItem/section :title "Common Parameters Specification"
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  /Section/    [[elisp:(outline-show-subtree+toggle)][||]] *Common Parameters Specification*  [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  /Section/    [[elisp:(outline-show-subtree+toggle)][||]] *Common Parameters Specification*   [[elisp:(org-cycle)][| ]]
 #+end_org """
 ####+END:
 
@@ -390,7 +390,7 @@ def commonParamsSpecify(
 
 ####+BEGIN: b:py3:cs:main/outcomeReportControl :disabled? nil :cmnd t :ro nil
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] ~Invokation's Outcome Reporting Control~ with /cmnd=t/ /ro=nil/
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] ~Invokation's Outcome Reporting Control~ with /cmnd=t/ /ro=nil/ 
 #+end_org """
 # cs.invOutcomeReportControl(cmnd=True, ro=True)
 ####+END:
@@ -533,7 +533,7 @@ class examples(cs.Cmnd):
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "initiate" :comment "Install AI templates via symlinks and safe-copy" :extent "verify" :ro "cli" :parsMand "" :parsOpt "activity templates noLink" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<initiate>>  =verify= parsOpt="activity templates noLink" ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<initiate>>  *Install AI templates via symlinks and safe-copy*  =verify= parsOpt=activity templates noLink ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class initiate(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -544,11 +544,11 @@ class initiate(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             activity: typing.Optional[str]=None,    # Cs Optional Param
-             templates: typing.Optional[str]=None,   # Cs Optional Param
-             noLink: typing.Optional[str]=None,      # Cs Optional Param
+             activity: typing.Optional[str]=None,  # Cs Optional Param
+             templates: typing.Optional[str]=None,  # Cs Optional Param
+             noLink: typing.Optional[str]=None,  # Cs Optional Param
     ) -> b.op.Outcome:
-
+        """Install AI templates via symlinks and safe-copy"""
         failed = b_io.eh.badOutcome
         callParamsDict = {'activity': activity, 'templates': templates, 'noLink': noLink, }
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -704,7 +704,7 @@ falling back to cwdConfig at ./.<csxu-name>/fps/activity/value.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "initiateSub" :comment "Install slim subproject AI-collaboration overlay (requires initiated parent)" :extent "verify" :ro "cli" :parsMand "" :parsOpt "activity templates noLink" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<initiateSub>>  =verify= parsOpt="activity templates noLink" ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<initiateSub>>  *Install slim subproject AI-collaboration overlay (requires initiated parent)*  =verify= parsOpt=activity templates noLink ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class initiateSub(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -715,11 +715,11 @@ class initiateSub(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             activity: typing.Optional[str]=None,    # Cs Optional Param
-             templates: typing.Optional[str]=None,   # Cs Optional Param
-             noLink: typing.Optional[str]=None,      # Cs Optional Param
+             activity: typing.Optional[str]=None,  # Cs Optional Param
+             templates: typing.Optional[str]=None,  # Cs Optional Param
+             noLink: typing.Optional[str]=None,  # Cs Optional Param
     ) -> b.op.Outcome:
-
+        """Install slim subproject AI-collaboration overlay (requires initiated parent)"""
         failed = b_io.eh.badOutcome
         callParamsDict = {'activity': activity, 'templates': templates, 'noLink': noLink, }
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -866,7 +866,7 @@ already has a CLAUDE.md.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "aiSuspend" :comment "Suspend AI collaboration: remove symlinks/.claude, stash editable files" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiSuspend>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiSuspend>>  *Suspend AI collaboration: remove symlinks/.claude, stash editable files*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class aiSuspend(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -878,7 +878,7 @@ class aiSuspend(cs.Cmnd):
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
     ) -> b.op.Outcome:
-
+        """Suspend AI collaboration: remove symlinks/.claude, stash editable files"""
         failed = b_io.eh.badOutcome
         callParamsDict = {}
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -968,7 +968,7 @@ to .dormant so they survive and can be restored by aiResume.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "aiResume" :comment "Resume AI collaboration: restore .dormant files and re-install symlinks/.claude" :extent "verify" :ro "cli" :parsMand "" :parsOpt "templates" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiResume>>  =verify= parsOpt="templates" ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiResume>>  *Resume AI collaboration: restore .dormant files and re-install symlinks/.claude*  =verify= parsOpt=templates ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class aiResume(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -979,9 +979,9 @@ class aiResume(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             templates: typing.Optional[str]=None,   # Cs Optional Param
+             templates: typing.Optional[str]=None,  # Cs Optional Param
     ) -> b.op.Outcome:
-
+        """Resume AI collaboration: restore .dormant files and re-install symlinks/.claude"""
         failed = b_io.eh.badOutcome
         callParamsDict = {'templates': templates, }
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -1163,7 +1163,7 @@ target or the =Activity:= header in =AI-WorkPlan.org=.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "refresh" :comment "Re-copy safe-copied invariants (CLAUDE.md) and backfill missing invariant symlinks (AI-Outputs.org)" :extent "verify" :ro "cli" :parsMand "" :parsOpt "templates" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<refresh>>  =verify= parsOpt="templates" ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<refresh>>  *Re-copy safe-copied invariants (CLAUDE.md) and backfill missing invariant symlinks (AI-Outputs.org)*  =verify= parsOpt=templates ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class refresh(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -1174,9 +1174,9 @@ class refresh(cs.Cmnd):
     def cmnd(self,
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
-             templates: typing.Optional[str]=None,   # Cs Optional Param
+             templates: typing.Optional[str]=None,  # Cs Optional Param
     ) -> b.op.Outcome:
-
+        """Re-copy safe-copied invariants (CLAUDE.md) and backfill missing invariant symlinks (AI-Outputs.org)"""
         failed = b_io.eh.badOutcome
         callParamsDict = {'templates': templates, }
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -1278,7 +1278,7 @@ to be the equivalent of a symlink.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "cwdConfig_record" :comment "Record deduced cwdConfig for an already-initiated directory" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<cwdConfig_record>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<cwdConfig_record>>  *Record deduced cwdConfig for an already-initiated directory*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class cwdConfig_record(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -1290,7 +1290,7 @@ class cwdConfig_record(cs.Cmnd):
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
     ) -> b.op.Outcome:
-
+        """Record deduced cwdConfig for an already-initiated directory"""
         failed = b_io.eh.badOutcome
         callParamsDict = {}
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -1330,7 +1330,7 @@ Writes only when the deduced value differs from what is already in cwdConfig
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "listClaudesPath" :comment "Walk up to git repo root and list CLAUDE.md + AI-Activity.org at each level" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<listClaudesPath>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<listClaudesPath>>  *Walk up to git repo root and list CLAUDE.md + AI-Activity.org at each level*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class listClaudesPath(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -1342,7 +1342,7 @@ class listClaudesPath(cs.Cmnd):
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
     ) -> b.op.Outcome:
-
+        """Walk up to git repo root and list CLAUDE.md + AI-Activity.org at each level"""
         failed = b_io.eh.badOutcome
         callParamsDict = {}
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -1419,7 +1419,7 @@ git repo, stops at the filesystem root.
 
 ####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "deClaudify" :comment "Remove AI collaboration files installed by initiate" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<deClaudify>>  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<deClaudify>>  *Remove AI collaboration files installed by initiate*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
 #+end_org """
 class deClaudify(cs.Cmnd):
     cmndParamsMandatory = [ ]
@@ -1431,7 +1431,7 @@ class deClaudify(cs.Cmnd):
              rtInv: cs.RtInvoker,
              cmndOutcome: b.op.Outcome,
     ) -> b.op.Outcome:
-
+        """Remove AI collaboration files installed by initiate"""
         failed = b_io.eh.badOutcome
         callParamsDict = {}
         if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
@@ -1524,9 +1524,9 @@ Removes .claude/ directory if it becomes empty.
 if __name__ == '__main__':
     cs.main.g_csMain(
         csInfo=csInfo,
-        noCmndEntry=examples,
+        noCmndEntry=examples,  # specify a Cmnd name
         extraParamsHook=g_extraParams,
-        ignoreUnknownParams=False,
+        ignoreUnknownParams=False,  # True is for Uploaded Modules
         importedCmndsModules=g_importedCmndsModules,
     )
 
