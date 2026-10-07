@@ -196,6 +196,17 @@ def _resolveActivity(cliOverride: typing.Optional[str]) -> typing.Optional[str]:
     return cwdConfig_csu.parGet('activity')
 
 
+# Top-level templates-base directories that are NOT activities:
+#   mother/        --- the baseline installed into every project
+#   test/          --- templates-engine test material
+#   _nonTemplate_/ --- the one escape from the templates concept: material
+#                      about the templates tree (images, docs, ...) that is
+#                      neither a template nor installed.
+# Used both for listing activities (examples) and for refusing them as
+# --activity values (initiate, initiateSub, aiResume).
+nonActivityDirs = {'mother', 'test', '_nonTemplate_'}
+
+
 def _deduceCwdConfig(
         targetDir: pathlib.Path,
 ) -> typing.Tuple[typing.Optional[str], typing.Optional[str]]:
@@ -474,10 +485,9 @@ class examples(cs.Cmnd):
             activities = []
         else:
             templatesBase = pathlib.Path(templatesBaseStr)
-            excludedDirs = {'mother', 'test'}
             activities = sorted([
                 d.name for d in templatesBase.iterdir()
-                if d.is_dir() and d.name not in excludedDirs and not d.name.startswith('.')
+                if d.is_dir() and d.name not in nonActivityDirs and not d.name.startswith('.')
             ])
             for activity in activities:
                 cmnd('initiate',
@@ -580,6 +590,10 @@ falling back to cwdConfig at ./.<csxu-name>/fps/activity/value.
             return failed(cmndOutcome)
         templatesBase = pathlib.Path(templatesBaseStr)
 
+        if activity in nonActivityDirs:
+            b_io.eh.problem_usageError(
+                f"Not an activity: {activity} (reserved: {', '.join(sorted(nonActivityDirs))})")
+            return failed(cmndOutcome)
         activityDir = templatesBase / activity
         if not activityDir.is_dir():
             b_io.eh.problem_usageError(f"Activity directory not found: {activityDir}")
@@ -756,6 +770,10 @@ already has a CLAUDE.md.
             return failed(cmndOutcome)
         templatesBase = pathlib.Path(templatesBaseStr).resolve()
 
+        if activity in nonActivityDirs:
+            b_io.eh.problem_usageError(
+                f"Not an activity: {activity} (reserved: {', '.join(sorted(nonActivityDirs))})")
+            return failed(cmndOutcome)
         activityDir = templatesBase / activity
         if not activityDir.is_dir():
             b_io.eh.problem_usageError(f"Activity directory not found: {activityDir}")
@@ -1075,6 +1093,10 @@ target or the =Activity:= header in =AI-WorkPlan.org=.
                 "Cannot infer activity. Ensure AI-Activity.org symlink or AI-WorkPlan.org with Activity: header is present.")
             return failed(cmndOutcome)
 
+        if activity in nonActivityDirs:
+            b_io.eh.problem_usageError(
+                f"Not an activity: {activity} (reserved: {', '.join(sorted(nonActivityDirs))})")
+            return failed(cmndOutcome)
         activityDir = templatesBase / activity
         if not activityDir.is_dir():
             b_io.eh.problem_usageError(f"Activity directory not found: {activityDir}")

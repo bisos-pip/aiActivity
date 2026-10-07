@@ -1,0 +1,27 @@
+#+title: Figures Copied From the Templates Tree
+
+These PNGs are *rendered copies*. Do not edit them here; regenerate them at
+the source and copy again.
+
+| File                    | Source (in the =bisos/defaults= repo)                                             |
+|-------------------------+-----------------------------------------------------------------------------------|
+| =aiStartupWorkflow.png= | =ai-templates/_nonTemplate_/images/aiStartupWorkflow-graphviz.pcs=                |
+| =aiUsageWorkflow.png=   | =ai-templates/_nonTemplate_/images/aiUsageWorkflow-graphviz.pcs=                  |
+| =aiGeneralTree.png=     | =ai-templates/_nonTemplate_/images/aiCommandsSkillsTrees-graphviz.pcs= (=aiGeneralTree=)   |
+| =aiEcosystemTree.png=   | =ai-templates/_nonTemplate_/images/aiCommandsSkillsTrees-graphviz.pcs= (=aiEcosystemTree=) |
+
+Why copies rather than links: the figures live with the commands and skills
+they depict, in the templates tree. This README documents a particular
+engine version, so it carries a snapshot that matches it. Only rendered
+PNGs are copied; the =.pcs= sources stay single-sourced in the templates
+tree.
+
+Last copied: 2026-10-07, from =bisos/defaults= at =fe6d1c8= plus uncommitted
+work of that day.
+
+Refresh (part of the Stage 15 templates-sync loop):
+
+#+begin_src sh
+S=/bisos/git/bxRepos/bisos/defaults/ai-templates/_nonTemplate_/images
+cp -p $S/{aiStartupWorkflow,aiUsageWorkflow,aiGeneralTree,aiEcosystemTree}.png .
+#+end_src

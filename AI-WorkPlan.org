@@ -353,6 +353,136 @@ SCHEDULED: <2026-09-23 Wed>
 = Somehow mark the commands as to if they are "always" or "perhaps"
 ----- AI Results: ------
 
+*First cut (2026-10-07), awaiting review.*
+
+*Location (decided in discussion):* not here, but in the templates repo
+(=bisos/defaults=), next to the commands it depicts. Path:
+=ai-templates/_nonTemplate_/images/aiWorkflow-graphviz.pcs= (+ png, pdf, svg,
+jpg, gv, title, caption).
+- =_nonTemplate_/= is the templates tree's /one/ escape from the templates
+  concept. Everything in a templates repo is a template or relates to one;
+  material about the tree itself (images, docs, ...) goes under this single
+  directory as subdirectories.
+- A general "=_=-prefix = not an activity" pattern was considered and
+  rejected. One explicit escape is enough by construction, and a pattern
+  would silently hide any =_foo/= someone creates.
+- =bxexamples= receives the figure by the Stage 15 sync, not by authoring
+  there. This repo's README can later link to it by its bxexamples GitHub URL.
+
+*Engine change (=aiActivity.cs=):* new module-level
+=nonActivityDirs = {'mother', 'test', '_nonTemplate_'}=, replacing the
+=examples=-only =excludedDirs=. It is now also enforced as a refusal in
+=initiate=, =initiateSub= and =aiResume=: =--activity=mother= /
+=--activity=_nonTemplate_= give
+=Not an activity: ... (reserved: _nonTemplate_, mother, test)= and create
+no files. Before this, any existing directory, including =mother=, was
+accepted. Verified in a scratch dir; =examples= no longer lists
+=_nonTemplate_=.
+
+*Figure decisions*:
+- Layers top to bottom, labelled in a left column: Setup (once per
+  directory) → Session start → Work loop (per TODO) → Session end.
+- mid-layer3 uses =/bx-commit-msg=. The spec said =/bx-ai-outputs= for
+  the commit message, which reads as a slip.
+- Fill = effect on files:
+  - blue = /read/ (loads into the session, changes no files)
+  - pink = /write/ (records session knowledge into files)
+  - purple = /read-write/
+  Mnemonic: blue + pink = purple.
+- The classification: read = =/bx-confirm0=, =/bx-confirm-here=,
+  =/bx-status=, =/bx-import-archive=. write = =/bx-done=,
+  =/bx-update-status=. read-write = =/bx-initiate=, the work itself,
+  =/bx-commit-msg=, =/bx-ai-outputs= (index reads, capture writes),
+  =/bx-archive=, =/bx-context-trim=.
+- Solid border = always, dashed = perhaps. "Perhaps" steps sit inline on
+  the main path rather than with skip-edges. A dashed node means "may be
+  skipped", which keeps the figure clean.
+- Additions beyond the spec:
+  - =/bx-status= as a perhaps-alternative at session start
+  - =/bx-context-trim= in the session-end layer ([[16.4]])
+  - =/bx-initiate= marked perhaps, with "(or aiActivity.cs -i initiate
+    from the shell)"
+- The =next TODO= loop runs from =/bx-done= back to =/bx-import-archive=
+  (green, =constraint=false=). =end of session= exits to
+  =/bx-update-status=.
+- The legend is an HTML table inside the figure.
+
+*Pointer:* one line added to =mother/AI-WORKFLOW.org= under the
+slash-commands table:
+=[[file:../_nonTemplate_/images/aiWorkflow.png]]=. As discussed, the link
+works on GitHub and when the real file is opened, but not through a
+project's symlink in Emacs unless =find-file-visit-truename= is set.
+
+*Rendering:* uses the same =PYTHONPATH= workaround as [[12.2]] (old
+=bisos.graphviz= 0.29 in the bisos3 venv).
+
+*Commits:* two repos.
+- =bisos/defaults=: =_nonTemplate_/= (new), =mother/AI-WORKFLOW.org=
+- this repo: =py3/bin/aiActivity.cs=, =AI-WorkPlan.org=
+
+*Second cut (same day): scope narrowed and write targets added.*
+- *Scope = usage of an existing setup.* =/bx-initiate= and
+  =/bx-context-trim= removed, and with them the Setup layer. Both shape the
+  setup and belong to a separate figure about how the templates and setup
+  are created. The figure now starts at Session start.
+- *Write targets.* A column of five subjects on the right, each on the rank
+  of its main writer:
+  - =Repo content (working tree)= ← Work
+  - =Repo git (.git)= ← =/bx-commit-msg=, labelled
+    =.git/CLAUDE_COMMIT_MSG / you commit=. Splitting git from content makes
+    the "Claude writes the message, you commit" boundary visible.
+  - =AI-Outputs.org (cross-project)=, grey as in the structure figure ←
+    =/bx-ai-outputs= (capture)
+  - =AI-WorkPlan.org (+ _archive)= ← =/bx-done=, =/bx-archive=. The archive
+    file is folded in rather than drawn as a separate subject.
+  - =AI-DevStatus.org= ← =/bx-update-status=
+- *Writes only*, as red arrows. Reads stay encoded in the fill colour.
+  Drawing reads too would roughly triple the edges. The full read/write
+  matrix (command × subject) was worked out in discussion. It is a
+  candidate for a table in =AI-WORKFLOW.org= next to the figure.
+- *What the figure now shows:* only "Work" touches repo content. Every
+  =/bx-*= command manages AI state (WorkPlan, DevStatus, Outputs) or, for
+  =/bx-commit-msg=, only a message file in =.git=.
+- *Layout:*
+  - =group= attributes plus an invisible chain keep the main path and the
+    subject column straight
+  - the dotted =update-status — archive= link was dropped; the shared rank
+    already shows they go together
+  - west ports on the =next TODO= loop were tried and reverted, because dot
+    then crossed the main path twice
+- Legend gains =red arrow = writes=. =AI-WORKFLOW.org= pointer text updated.
+
+*Third cut (same day): renamed, locality, your git write, table.*
+- *Renamed* =aiWorkflow= → =aiUsageWorkflow= (the =.pcs=, the graph name,
+  all outputs). The old outputs were removed. A sibling
+  =aiStartupWorkflow= figure is planned for setup/templates creation;
+  Mohsen wrote =uiStartupWorkflow=, read as a typo. Paths above that say
+  =aiWorkflow= are historical.
+- *Locality by position.* =AI-Outputs.org= moved to the /left/ of the main
+  path, which is outside this repo and shared across projects. The right
+  column is now purely this repo. The legend's second row says so.
+- *Repo content → Repo git* as a dashed black arrow labelled
+  =you: git add, git commit -t=: a write by /you/, not Claude. The
+  commit-msg node lost its "git add, then" prefix and its edge label is
+  now just =.git/CLAUDE_COMMIT_MSG=. Legend: "red arrow = Claude writes",
+  "dashed black arrow = you write".
+- *Read/write table* captured as
+  =_nonTemplate_/images/aiUsageWorkflow.org=, which also holds the figure
+  link, the full R/W matrix (including a /You/ row and the index vs
+  capture modes of =/bx-ai-outputs=), notes on reading it, and the fill
+  colour key. =AI-WORKFLOW.org= now points to both the PNG and this
+  table.
+- *Graphviz lessons* (worth adding to the graphviz-authoring skill):
+  - Source order within a =rank=same= subgraph is /not/ honoured. Neither
+    =dir='back'= nor a labelled flat edge pinned the order. What works is
+    invisible flat edges (=label → left node → spine=), which dot always
+    draws left to right.
+  - A long back-edge (the =next TODO= loop) can't be steered by ports.
+    Route it through invisible point waypoints, one per rank, chained top
+    to bottom with =dir='back'= on the first segment and =dir='none'= on
+    the rest, so it doesn't fight the ranking. Zero-size points leave
+    gaps in the line; use =width=0.03= in the edge colour.
+
 * DONE [#A] <<14.2.1>> As in [[12.2]] Update py3/images to include AI-Outputs.org
 CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-09-23 Wed>
 ------ AI Results: ------
@@ -367,6 +497,83 @@ goes in its bottom (housekeeping) layer next to =/bx-archive= and
 SCHEDULED: <2026-09-23 Wed>
 - Is there some form of layering that can be applied to skills?
 ----- AI Results: ------
+
+*First cut (2026-10-07), awaiting review.* Not in =py3/images= but with the
+other workflow figures:
+=bisos/defaults/ai-templates/_nonTemplate_/images/aiCommandsSkillsTree-graphviz.pcs=
+(+ all outputs), linked from =mother/AI-WORKFLOW.org=. Covers commands as
+well as skills, as discussed.
+
+*Decisions (Mohsen):*
+- An unnumbered tree in the style of an object-id tree.
+- Show where each leaf lives.
+- Include the prerequisite edges.
+
+*The tree* (left to right, four levels on both sides):
+#+begin_example
+AI-Activity commands and skills
+├─ General (guiding the workflow)
+│   ├─ Commands (you invoke):  session start | work loop | session end | setup   [11 /bx-*]
+│   └─ Skills (Claude loads):  AI-Activity model                               [authoring-skills]
+└─ Digital-ecosystem specific (BISOS / Blee / ByStar)
+    └─ Skills (Claude loads):  authorship model | PyCS commands | seeded CS |
+                               packaging and docs | lookups                      [17 skills]
+#+end_example
+- Leaf colour = where it lives in the templates tree, which is also who sees
+  it: =mother/= (every project), =bisos-pip/=, =aiActivity/=, =sbom+cap/=
+  (each only for that =--activity=).
+- Box = command, rounded = skill.
+- Purple dotted arrows = "load the target skill first". These were taken
+  from the SKILL.md files, not from memory:
+  - =spread-seeded= → =seeded=
+  - =walkable= → =seeded= and =spread-seeded=
+  - =cbm= → =spread-seeded= (and → =walkable= /if walked/, drawn
+    lighter as conditional)
+  - =icm-to-pycs= → =writing-cs-commands=
+  - =authoring-skills= mentions =dblock-authoring= only as an example
+    phrasing, not as a prerequisite, so it is excluded.
+
+*On the original question, "is there some form of layering?":* yes, two.
+1. The *purpose* tree, which is the figure's skeleton.
+2. A *prerequisite* layering inside the ecosystem skills:
+   =seeded-cs-commands= is the base, then =spread-seeded=, then
+   =walkable= / =cbm=; =writing-cs-commands= sits under =icm-to-pycs=.
+
+*What the figure exposes* (candidates for follow-up; not acted on):
+- *Provisioning ≠ purpose.* All 16 ecosystem skills except =sbom-authoring=
+  live in =bisos-pip/_skills=, including =cbm-authorship=,
+  =sysd-pcs-authorship= and =walkable-tree-planting=, which aren't about pip
+  packages. A project initiated with =--activity=pycs=, =sbom+cap= or
+  =bisos-core= doesn't see them. Conversely, a =bisos-pip= project doesn't
+  see =sbom-authoring=.
+- *General guidance is carried by commands*, not skills: 11 commands vs 1
+  skill.
+- *A prerequisite can be unreachable.* A skill is only usable if its
+  prerequisites are provisioned in the same activity. Today they all are,
+  because everything is in =bisos-pip/=, but that breaks as soon as skills
+  move. Any re-homing (e.g. a shared ecosystem-skills set that several
+  activities link to) must move prerequisite chains together.
+
+*Second cut (same day): split into two graphs* (Mohsen: "too much for one
+graph"). The module was renamed =aiCommandsSkillsTrees-graphviz.pcs= and
+holds two named graphs:
+- =aiGeneralTree=: General → Commands (4 session-phase groups, 11 /bx-*) +
+  Skills (=authoring-skills=). Legend: =mother/=, =aiActivity/=.
+- =aiEcosystemTree=: the digital-ecosystem skills root → 5 area groups → 17
+  skills, plus the prerequisite edges. Legend: =bisos-pip/=, =sbom+cap/=.
+  The commands/skills level is dropped, since every leaf is a skill.
+Shared helpers (=_treeNew=, =_subtree=, =_legend=) and one =lives= table
+keep the two figures consistent. Each legend lists only the locations that
+occur in its figure. The old single-graph outputs were removed (untracked),
+and the =mother/AI-WORKFLOW.org= pointer now names both PNGs. The tree
+outline above still describes the content; it is now drawn as two figures.
+
+*Layout notes:* left to right (29 leaves would be far too wide top to
+bottom). The first render had the ecosystem leaves one level shallower
+than the general ones. Fixed by an explicit "Skills (Claude loads)" level
+under the ecosystem branch, which is also accurate, since every ecosystem
+leaf is a skill. The legend is anchored below the last group so it doesn't
+split the branch edges.
 
 ** TODO [#A] <<14.4>> Improve the aiActivity.cs by providing valid values for tempalte parameter
 SCHEDULED: <2026-09-23 Wed>
@@ -486,6 +693,87 @@ Renames touch the templates tree, every =AI-WORKFLOW.org= reference, the
 README, and users' habits. Decide which are worth it, rename in one pass,
 and document the convention in =AI-WORKFLOW.org=.
 ----- Results: ------
+
+** TODO [#A] <<14.13>> aiStartupWorkflow figure --- setup lifecycle, companion to aiUsageWorkflow
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:REPO: bisos/defaults (_nonTemplate_/images/)
+:END:
+Show the aiActivity.cs -i commands for initiate, the template files in the
+templates dir, and /bx-context-trim. Scope: creating and shaping a setup;
+[[14.2]] (aiUsageWorkflow) covers using one.
+----- Results: ------
+
+*First cut (2026-10-07), awaiting review.*
+=_nonTemplate_/images/aiStartupWorkflow-graphviz.pcs= + all outputs.
+- *Same visual language as =aiUsageWorkflow=*: stage labels on the left,
+  a straight main path, left of the main path = shared (outside this repo,
+  grey), right = this repo. Same fills (read/write/read-write) and borders
+  (always/perhaps).
+- *Stages:*
+  1. Discover: =aiActivity.cs= examples menu
+  2. Install: =-i initiate= / =-i initiateSub= / =--noLink= /
+     =/bx-initiate=
+  3. Inspect: =listClaudesPath=, =startupClaudeTokens=
+  4. Trim: =/bx-context-trim=
+  5. Use: a hand-off node to =aiUsageWorkflow=
+  6. Maintain: =refresh=, =aiSuspend= / =aiResume=, =deClaudify=
+- *Subjects:*
+  - Left: =mother/= and =<activity>/= with their template files.
+  - Right: Symlinks (→ templates) and Safe-copies (yours).
+  - cwdConfig was dropped as an auto-persist detail already in the
+    structure figure.
+- *Writers:* a new colour for =aiActivity.cs= writes (green, matching the
+  engine node in the structure figure; dashed = symlink, solid = copy),
+  alongside red = Claude. Grey hollow arrows mark the templates as source.
+- *=/bx-context-trim=* writes in both directions on its own row: a /shared
+  edit (confirmed separately)/ to =<activity>/AI-Activity.org + its
+  imports= on the left, and /local trims/ to WorkPlan/DevStatus (via
+  =/bx-archive=, =/bx-update-status=) on the right. That is the
+  local/shared distinction the command enforces.
+- *Loop*: =chain grew= from Usage back to Inspect, through left
+  waypoints.
+- *Layout lesson:* the first render drew Trim and Maintain writes as long
+  back-edges to subjects at the top, and they tangled. Fixed with
+  /reference nodes/: each later stage gets thin-bordered nodes on its own
+  rank that stand for a subject drawn above. Every write edge is then
+  short. The legend explains the thin border.
+- =mother/AI-WORKFLOW.org=: pointer added in "How These Files Are Set Up".
+
+** DONE [#A] <<14.14>> Include the four templates figures in README.org
+CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:REPO: this
+:END:
+----- Results: ------
+*Copies, not links.* Rendered PNGs only, in =py3/images/fromTemplates/=. The
+=.pcs= sources stay single-sourced in =bisos/defaults/ai-templates/_nonTemplate_/images/=.
+- The README of an engine version carries a snapshot that matches it.
+- The subdirectory is named =fromTemplates/=, not =templates/=, which would
+  read like a templates tree.
+- =fromTemplates/README.org= records each file's source, the copy date and
+  commit (=fe6d1c8= + that day's uncommitted work), and the one-line
+  refresh command. Refreshing is an item for the Stage 15 sync loop.
+PyPI rendering is not a concern: per Mohsen, the PyPI README will be
+different.
+
+*Placement in =README.org=:*
+- =aiEcosystemTree= → /The Templates as Collaborative, Cumulative Domain
+  Knowledge/. Framed per Mohsen as a *pattern to emulate*, not something
+  the reader uses: "You will not use these skills; they encode /our/
+  ecosystem. The pattern is what transfers ... Write them down the same
+  way ... This is the work that makes the templates valuable."
+- =aiStartupWorkflow= → end of /Install Templates Into a Project/, as "the
+  setup lifecycle", with the stages listed in prose.
+- =aiUsageWorkflow= → new subsection /The Session Workflow at a Glance/
+  before /Table of Commands/ (TOC entry added). It calls out "only Work
+  touches your repo content" and "Claude never commits".
+- =aiGeneralTree= → /Skills/, as the general tree, with a pointer to the
+  ecosystem tree. This *replaced a stale list*: /Skills/ said "the
+  =bisos-pip= activity currently ships five skills", but there are now 16
+  there (17 ecosystem skills in total with =sbom-authoring=).
 
 ** TODO [#C] <<14.12>> Token-weighted startup-context figure: startupClaudeTokens --graph
 SCHEDULED: <2026-10-07 Wed>
