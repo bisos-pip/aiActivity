@@ -406,6 +406,26 @@ It should show up under bx-ai-activity in the moded drop down.
 It should have a bx-ai-activity -> WorkPlan -> "aiAndMe"
 ----- Results: ------
 
+** TODO [#B] <<14.10>> Isolate the Claude binding constants in aiActivity.cs :ai:
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Claude
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+
+=CLAUDE.md= is hardcoded ~53 times in =aiActivity.cs=, plus =.claude= /
+=_claude= / =CLAUDE.md.dormant= / =mother/initiateSub/CLAUDE.md=. Gather
+these into one place (entry filename, harness dir name, templates-side dir
+name) so the binding is visible and a second one could be added later.
+*Isolate, don't abstract* --- no =--agent= param, no multi-agent support
+until a second agent is actually in use. Pure refactor; =verify.sh= must
+pass unchanged. Related: =listClaudesPath= stops at the git root while
+Claude Code walks up to =/= ([[16.1]]); fix while in there.
+----- Results: ------
+
 
 
 ** -
@@ -426,6 +446,185 @@ Some TODOs like Stage 0 [[0.1]]
 ----- AI Results: ------
 
 ** -
+
+* Stage 16: Addition of -i aiStatus (or -i aiInTokensEval)
+
+<<Stage 16>>
+
+Goal: Before starting a new session with the AI-Model, the User can know what tokens AI-Model is being read by the Model.
+
+A starting point outline is in place at ./py3/bisos/aiActivity/aiStatusOutine.py
+
+It can become a _csu.py to be imported by ./py3/bin/aiActivity.cs
+
+
+* Stage 16 TODOs
+** +
+** DONE [#A] <<16.1>> Decide on the right name for the CS-Cmnd -- aiInTokens
+CLOSED: [2026-10-07 Wed] SCHEDULED:<2026-10-07 Wed 18:07>
+Consider the ones mentioned in [[Stage 16]]
+Discuss the concept and decide on the right name.
+----- Results: ------
+
+Name decided: *=startupClaudeTokens=* (module =startupClaudeTokens_csu.py=).
+=aiStatus= rejected (too close to =/bx-status=); =aiInTokens= was the runner-up.
+First chosen as =startupTokens=, then renamed (same day) after a discussion of
+Claude specificity: the command encodes only Claude Code's loading rules, so a
+generic name would overclaim. It is part of the /Claude binding/, alongside
+=listClaudesPath= and =deClaudify= (see the design decision in =AI-DevStatus.org=).
+
+Concept: a static estimate of the tokens Claude Code loads *at session
+start* from a given cwd, broken down by source, so the human can reshape
+the chain (archive, move into a subdir, trim an =AI-Activity.org=) before
+paying for it. Not telemetry --- no runtime observation.
+
+Design decisions (agreed), each correcting the =aiStatusOutine.py= outline:
+- *Follow =@= imports* recursively instead of counting a fixed 5-file
+  list. The bulk of the cost is in imports (=bisos-pip/AI-Activity.org=
+  pulls in ~6 panels).
+- *Separate "startup" from "on demand".* Subdirectory =CLAUDE.md= files
+  below cwd load only when Claude touches that subtree --- listed
+  separately, not summed into the startup total.
+- *Include all startup sources*: managed policy, user =~/.claude/=, the
+  walk-up chain, rules, auto-memory =MEMORY.md=, skill/command descriptions.
+  System prompt + tool definitions mentioned as fixed overhead, not measured.
+- *Drop the cache-status section.* Prompt caching is server-side and
+  prefix-keyed; file mtimes say nothing about it.
+- chars/4 estimate, labelled as such.
+
+Claude Code loading rules verified against the official memory/skills docs
+(code.claude.com/docs/en/memory.md, skills.md) on 2026-10-07:
+- Walk-up goes from cwd to the *filesystem root*, not the git root;
+  =CLAUDE.local.md= appended after =CLAUDE.md= at each level.
+  (=listClaudesPath= stops at git root --- a divergence, noted for Stage 14.)
+- =@= imports: anywhere in a line, relative to the importing file, =~=
+  supported, max 4 hops, skipped inside markdown code spans / fenced blocks.
+- Auto-memory =MEMORY.md=: first 200 lines or 25KB.
+- Skills: only frontmatter description (+ =when_to_use=, capped 1,536
+  chars) at startup; discovered from cwd up to the repo root.
+- Unconfirmed in docs: whether =.claude/commands/*.md= descriptions load at
+  startup (treated like skills).
+
+** DONE [#A] <<16.2>> Based on [[16.1]] Convert aiStatusOutine.py to aiInTokens_csu.py and test it.
+CLOSED: [2026-10-07 Wed] SCHEDULED:<2026-10-07 Wed 18:07>
+Import it in aiActivity.cs and use it and see how useful it is.
+----- Results: ------
+
+Written as =py3/bisos/aiActivity/startupClaudeTokens_csu.py= (name per [[16.1]]),
+a rewrite rather than a port of the outline. Wired into =aiActivity.cs=:
+added to the elisp =csuList= block and the =csuListProc= body, and its
+=examples_csu()= is called after =listClaudesPath= in =examples=.
+- *NOTE:* =py-dblock.cs= has no =csuListProc= handler, so the generated
+  body was hand-edited to match the generator's output. Regenerate in Blee
+  to confirm.
+
+Usage: =aiActivity.cs -i startupClaudeTokens= (no params; operates on cwd;
+read-only). The output has these sections, in Claude Code's load order:
+- managed policy
+- user =~/.claude=
+- walk-up chain (=/= → cwd) with the =@=-import tree indented by hop
+- auto-memory =MEMORY.md=
+- skill + command descriptions
+- on-demand files (=CLAUDE.md= overlays below cwd, path-scoped rules,
+  =AI-Outputs.org=), listed but not summed into the startup total
+- heaviest-5 with percentage share, then the startup total
+
+=opResults= is a dict (=startupTokens=, =onDemandTokens=, =bySection=).
+Shared files are counted once; repeats are shown as =already loaded=.
+
+Tested (2026-10-07):
+- repo root: ~76K tokens at startup, ~13K on demand
+- =py3/tests/=: ~78K
+- an empty dir: 0
+- parser checks: email addresses, code spans, fenced blocks and escaped
+  spaces handled correctly
+
+*How useful --- first findings from this repo:*
+- ~74K of the ~76K comes from the walk-up chain, and ~59K of that is
+  =bisos-pip/AI-Activity.org='s 12 =@= imports. Only ~4.5K is the file
+  itself. The three heaviest are the terminology panel (~9K),
+  =bxGenesis/start/README.org= (~7.7K, CI/CD pointer) and the bisos-pip
+  panel list (~7.6K). These are candidates for "mention, don't import"
+  (drop the =@=; Claude Code skips only /markdown/ code spans, so org
+  markup is not a reliable way to suppress an import) or moving into a
+  skill.
+- =AI-DevStatus.org= is ~8.5K, the second-heaviest item. It is worth
+  trimming at the next =/bx-update-status=.
+- Skill + command descriptions cost only ~2K for 26 entries. Skills are
+  cheap at startup, which supports moving content out of
+  =AI-Activity.org= into skills.
+- *It found a real defect:* =py3/tests/CLAUDE.md= is still a *legacy
+  symlink* (pre-Stage-11). Its =@./AI-Activity.org= etc. resolve into
+  =mother/=, the exact Stage 11 bug. The tool flags this with
+  =!! resolved via symlink into ...=. Fix: =aiActivity.cs -i refresh=
+  in =py3/tests/=.
+
+=aiStatusOutine.py= is superseded but left in place (untracked). Delete
+when convenient.
+
+Follow-up (same day, Mohsen's request): skill/command lines used to name
+only the =.claude= dir, which hid that =.claude/skills= and
+=.claude/commands= are symlinks into the templates tree. Each directory
+now gets a header line that shows its symlink target and subtotal, e.g.
+=.claude/skills -> .../ai-templates/bisos-pip/_skills=, with its entries
+indented below. That makes it visible which templates tree and activity
+supplied them. Headers are excluded from the section total and from the
+heaviest-5 list.
+
+** DONE [#A] <<16.3>> Document [[16.2]] in README.org and perhaps in the graph
+CLOSED: [2026-10-07 Wed] SCHEDULED:<2026-10-07 Wed 18:07>
+Describe how it fits in the overall workflow.
+- Also add a README section on Claude specificity: the AI-*.org files are
+  the agent-neutral payload; =CLAUDE.md= + =.claude/= (+ =startupClaudeTokens=,
+  =listClaudesPath=, =deClaudify=) are the /Claude binding/. Say plainly that
+  only the Claude binding exists today, and what a second binding would need
+  (an entry file the agent loads, walk-up, and =@= imports or a generated
+  concatenation). See the design decision in =AI-DevStatus.org=.
+----- Results: ------
+
+=README.org= changes:
+- *New top-level section* "Claude Specificity: Agent-Neutral Content, Claude
+  Binding", placed after "Two-Part Architecture". It covers:
+  - the agent-neutral content and engine logic vs the Claude binding
+  - the three Claude Code behaviors the design relies on
+  - that only the Claude binding exists today
+  - what a second binding would need: an entry file, walk-up, imports.
+    Imports are the real dependency, since concatenation would give up
+    shared-template propagation.
+  - the "isolate, not abstract" policy
+  A one-line pointer to it was added at the end of "Two-Part Architecture".
+- *Usage → Table of Commands*: new "Inspection commands" group.
+  =listClaudesPath= moved there from the lifecycle table, and
+  =startupClaudeTokens= added.
+- *New Usage subsection* "Inspect the Startup Context:
+  =startupClaudeTokens=". It covers:
+  - what the command reports, in Claude Code's load order
+  - startup vs on-demand
+  - an abridged real output excerpt from this repo
+  - how to read it (59K of 76K is =AI-Activity.org='s imports)
+  - remedies: mention instead of import, move to a skill, archive
+  - the symlink-resolution diagnostic
+  - where it fits in the workflow
+  - that counts are estimates
+- *Key Files*: added =startupClaudeTokens_csu.py=, and corrected the stale
+  command list for =aiActivity.cs=.
+- *TOC* entries added by hand; toc-org will regenerate them on the next
+  save in Emacs.
+
+Two corrections made while writing:
+- "Wrap in backticks" is not a valid way to mention without importing in
+  org files (Claude Code skips only markdown code spans). The README says
+  "drop the =@=", and the 16.2 results are fixed to match.
+- Starting a session inside an =initiateSub= overlay does not reduce
+  startup tokens, because the ancestors still load. The README says so
+  explicitly.
+
+The figure is not done here. It belongs with the =py3/images= TODOs
+(12.2, 14.2).
+
+
+** -
+
 
 
 

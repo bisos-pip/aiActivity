@@ -578,6 +578,28 @@ not defined.
   walk-up under templatesBase; =AI-WORKFLOW.org= is still symlinked
   (it has no back-imports, so symlink resolution is harmless).
 
+- *Agent-neutral in content, Claude-bound in loader; the binding is
+  isolated, not abstracted* (decided 2026-10-07). The value --- the
+  AI-*.org files, the templates tree, the lifecycle logic --- is
+  agent-neutral. Everything that touches the agent is Claude Code:
+  - the entry file =CLAUDE.md=, and the =@= import syntax that pulls in
+    the org files
+  - =.claude/=: =settings.json= permissions format, slash commands, skills
+  - behaviors the design relies on: symlinks resolved before reading
+    (hence the safe-copied =CLAUDE.md=), ancestor walk-up loading (which
+    =initiateSub= depends on), lazy loading of subdirectory overlays
+  The real lock-in is the =@= imports + walk-up, not the filenames: an
+  agent without imports would need a generated, concatenated entry file,
+  which breaks the "edit the shared template, every project sees it"
+  property of symlinks. Policy:
+  1. Claude-specific commands say so in their name (=startupClaudeTokens=,
+     =listClaudesPath=, =deClaudify=).
+  2. Binding constants are to be gathered in one place (Stage 14 TODO
+     14.10).
+  3. No =--agent= param or multi-agent support until a second agent is
+     actually in use --- designing a second binding with zero users would
+     be designing in the dark.
+
 - *Provenance is inert text, not a dblock.* The provenance line
   written by =initiate= / =initiateSub= into =AI-DevStatus.org= and
   =AI-WorkPlan.org= (date, user, templates base, =sys.argv=) is a
