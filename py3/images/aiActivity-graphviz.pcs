@@ -37,9 +37,14 @@ namedGraphsList = [
                "templates, parameters, engine, generated files, "
                "and Claude Code as consumer. Yellow-filled nodes "
                "are symlinks to the templates base; pink-filled "
-               "nodes are per-project safe-copies. Purple numbered "
-               "edges (1-5) mark Claude Code's read order from "
-               "walk-up to import fan-out."),
+               "nodes are per-project safe-copies. The engine's "
+               "lifecycle commands write project files; its "
+               "inspection commands only read them. Purple numbered "
+               "edges (1-5) mark Claude Code's startup read order from "
+               "walk-up to import fan-out; AI-Outputs.org is read on "
+               "demand and points outside the templates tree. "
+               "Purple-outlined nodes are the Claude binding; "
+               "everything else is agent-neutral."),
 ]
 
 graphvizSeed.setup(
@@ -68,7 +73,10 @@ def aiActivityFlow(
     #   lightgoldenrod1 = symlink (shared, upstream --- edits propagate)
     #   mistyrose       = safe-copy (per-project, yours to edit)
     #   dodgerblue edge = read/write to a persistent store (bidirectional)
-    #   purple edge     = Claude reads (1 walk-up, 2-5 imports)
+    #   purple edge     = Claude reads (1 walk-up, 2-5 imports; unnumbered = on demand)
+    #   purple outline  = Claude binding (Claude Code-specific); the rest is agent-neutral
+    #   gainsboro       = outside the templates tree (another repo)
+    bindingOutline = {'color': 'purple', 'penwidth': '2.5'}
 
     # ------------------------------------------------------------------
     # Layer 1 (top): Templates layer -- base node + activity folders on
@@ -81,6 +89,11 @@ def aiActivityFlow(
                'Templates Base\n(e.g. ~/aiActivityTemplates or\n/bisos/apps/defaults/ai-templates)',
                shape='rectangle', style='filled', fillcolor='lightyellow')
         s.node('tpl_mother',      'mother/',           shape='folder', style='filled', fillcolor='khaki1')
+        # mother/AI-Outputs.org is itself a symlink OUT of the templates tree,
+        # so the churn of a growing ledger lands in another repo.
+        s.node('ext_outputs',
+               'blee-binders/evolution/\naiActivity-outputs/\n(outside templates)',
+               shape='folder', style='filled', fillcolor='gainsboro')
         s.node('tpl_bisospip',    'bisos-pip/',        shape='folder', style='filled', fillcolor='khaki1')
         s.node('tpl_bleepanels',  'blee-panels/',      shape='folder', style='filled', fillcolor='khaki1')
         s.node('tpl_custom',      'custom/',           shape='folder', style='filled', fillcolor='khaki1')
@@ -89,6 +102,8 @@ def aiActivityFlow(
     # Only one connector from base to a child --- reader generalizes.
     # mother/ chosen because it is the invariant, always-present activity.
     d.edge('tpl_base', 'tpl_mother',     style='dotted', arrowhead='none', constraint='false')
+    d.edge('tpl_mother', 'ext_outputs',  style='dashed', label=' AI-Outputs.org ',
+           fontsize='10', constraint='false')
 
     # ------------------------------------------------------------------
     # Layer 2: Parameters (CLI + persistent stores)
@@ -111,8 +126,19 @@ def aiActivityFlow(
     # ------------------------------------------------------------------
     # Layer 3: The engine
     # ------------------------------------------------------------------
+    # Two compartments: lifecycle commands write project files; inspection
+    # commands only read them (and are Claude-specific).
     d.node('engine',
-           'aiActivity.cs\n\ninitiate  |  initiateSub\nrefresh  |  aiSuspend  |  aiResume\ndeClaudify',
+           '<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">'
+           '<TR><TD><B>aiActivity.cs</B></TD></TR>'
+           '<HR/>'
+           '<TR><TD>initiate  |  initiateSub  |  refresh</TD></TR>'
+           '<TR><TD>aiSuspend  |  aiResume  |  deClaudify</TD></TR>'
+           '<TR><TD><FONT POINT-SIZE="10"><I>lifecycle: writes project files</I></FONT></TD></TR>'
+           '<HR/>'
+           '<TR><TD>listClaudesPath  |  startupClaudeTokens</TD></TR>'
+           '<TR><TD><FONT POINT-SIZE="10"><I>inspection: reads only</I></FONT></TD></TR>'
+           '</TABLE>>',
            shape='rectangle', style='filled,bold', fillcolor='darkseagreen3', fontsize='14')
 
     d.edge('par_activity',   'engine')
@@ -131,7 +157,7 @@ def aiActivityFlow(
     with d.subgraph() as s:
         s.attr(rank='same')
         s.node('gen_claude',    'CLAUDE.md\n[safe-copy]',
-                                shape='note', style='filled', fillcolor='mistyrose')
+                                shape='note', style='filled', fillcolor='mistyrose', **bindingOutline)
         s.node('gen_workflow',  'AI-WORKFLOW.org\n[symlink]',
                                 shape='note', style='filled', fillcolor='lightgoldenrod1')
         s.node('gen_activity',  'AI-Activity.org\n[symlink]',
@@ -140,9 +166,11 @@ def aiActivityFlow(
                                 shape='note', style='filled', fillcolor='mistyrose')
         s.node('gen_workplan',  'AI-WorkPlan.org\n[safe-copy+dblock]',
                                 shape='note', style='filled', fillcolor='mistyrose')
+        s.node('gen_outputs',   'AI-Outputs.org\n[symlink, 2 hops]',
+                                shape='note', style='filled', fillcolor='lightgoldenrod1')
         s.node('gen_claudedir',
                '.claude/\nsettings.json\n[symlink]',
-               shape='folder', style='filled', fillcolor='lightgoldenrod1')
+               shape='folder', style='filled', fillcolor='lightgoldenrod1', **bindingOutline)
 
     # .claude/ subdirectories on their own rank below the generated-files
     # layer. Only commands/ and skills/ are subdirs; settings.json is a
@@ -150,9 +178,9 @@ def aiActivityFlow(
     with d.subgraph() as s:
         s.attr(rank='same')
         s.node('cld_commands', 'commands/\n[symlink]',
-               shape='folder', style='filled', fillcolor='lightgoldenrod1')
+               shape='folder', style='filled', fillcolor='lightgoldenrod1', **bindingOutline)
         s.node('cld_skills',   'skills/\n[symlink]',
-               shape='folder', style='filled', fillcolor='lightgoldenrod1')
+               shape='folder', style='filled', fillcolor='lightgoldenrod1', **bindingOutline)
 
     # Containment: .claude/ holds the two subdirs (thin, non-directional).
     d.edge('gen_claudedir', 'cld_commands', arrowhead='none', style='solid')
@@ -165,6 +193,7 @@ def aiActivityFlow(
     d.edge('engine', 'gen_activity',  style='dashed')          # symlink
     d.edge('engine', 'gen_devstatus')                          # safe-copy
     d.edge('engine', 'gen_workplan')                           # safe-copy
+    d.edge('engine', 'gen_outputs',   style='dashed')          # symlink
     d.edge('engine', 'gen_claudedir', style='dashed')          # symlinks
 
     # ------------------------------------------------------------------
@@ -173,7 +202,7 @@ def aiActivityFlow(
     # ------------------------------------------------------------------
     d.node('claude',
            'Claude Code\n(LLM-AI session)',
-           shape='ellipse', style='filled,bold', fillcolor='thistle', fontsize='13')
+           shape='ellipse', style='filled,bold', fillcolor='thistle', fontsize='13', **bindingOutline)
 
     # (1) Claude walks up from cwd, finds CLAUDE.md.
     d.edge('gen_claude', 'claude', label='  1  ', color='purple', fontcolor='purple', penwidth='1.6')
@@ -182,6 +211,9 @@ def aiActivityFlow(
     d.edge('gen_activity',  'claude', label='  3  ', color='purple', fontcolor='purple', style='dotted')
     d.edge('gen_devstatus', 'claude', label='  4  ', color='purple', fontcolor='purple', style='dotted')
     d.edge('gen_workplan',  'claude', label='  5  ', color='purple', fontcolor='purple', style='dotted')
+    # Not imported: read only when needed (/bx-ai-outputs or a direct open).
+    d.edge('gen_outputs',   'claude', label=' on demand ', color='purple', fontcolor='purple',
+           style='dotted', fontsize='10')
 
     return d
 

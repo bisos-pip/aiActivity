@@ -218,7 +218,10 @@ then the figure.
 | Solid engine → file     | Safe-copy write.                                                        |
 | Dashed engine → file    | Symlink write.                                                          |
 | Blue bidirectional edge | Read/write of a persistent store (=userConfig=, =cwdConfig=).           |
-| Purple edge, numbered   | Claude reads this file. =1= = walk-up to CLAUDE.md; =2=--=5= = imports. |
+| Purple edge, numbered   | Claude reads this file at startup. =1= = walk-up to CLAUDE.md; =2=--=5= = imports. |
+| Purple edge, "on demand" | Claude reads this file only when needed; it is not imported.          |
+| Purple outline          | Claude binding (specific to Claude Code). Everything else is agent-neutral. |
+| Grey fill               | Outside the templates tree (another repo).                              |
 
 [[file:py3/images/aiActivityFlow.png]]
 
@@ -228,19 +231,31 @@ then the figure.
   contains =mother/= (invariants shared by every activity) alongside
   the activity directories (=bisos-pip/=, =blee-panels/=, =custom/=,
   ...). One dotted connector from base to =mother/= stands in for the
-  same relationship to every other child.
+  same relationship to every other child. =mother/AI-Outputs.org= is
+  itself a symlink /out/ of the templates tree, into a separate
+  blee-binders repo (grey). This keeps the growing ledger's churn out
+  of the templates.
 - *Parameters layer.* =--activity=, =--templates=, =--noLink= are
   CLI inputs; =userConfig= and =cwdConfig= are persistent stores that
   supply the same values when the CLI flags are omitted.
-- *Engine.* =aiActivity.cs= with its six operations. All
-  parameter inputs converge here.
+- *Engine.* =aiActivity.cs=, in two compartments. The six
+  *lifecycle* commands write project files. The two *inspection*
+  commands, =listClaudesPath= and =startupClaudeTokens=, only read
+  them. All parameter inputs converge here.
 - *Generated files.* What lands in the project directory when
-  =initiate= runs. Six items --- five org files plus =.claude/=
+  =initiate= runs. Seven items --- six org files plus =.claude/=
   (containing =settings.json=, =commands/=, =skills/=).
+  =AI-Outputs.org= is a two-hop symlink: project → =mother/= →
+  blee-binders.
 - *Claude Code (bottom).* The consumer. On startup Claude Code walks
   up from your working directory, finds =CLAUDE.md= (edge *1*), and
   follows its =@= imports out to the four org files (edges *2*
-  through *5*).
+  through *5*). =AI-Outputs.org= is not imported; Claude reads it on
+  demand, via =/bx-ai-outputs= or when a task calls for it.
+- *Purple outlines.* =CLAUDE.md=, =.claude/= with its
+  subdirectories, and the Claude Code node make up the /Claude
+  binding/: the only parts specific to Claude Code. See
+  [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specificity]].
 
 * Table of Contents     :TOC:
 - [[#the-concept-and-model-of-an-ai-activity][The Concept and Model of an AI-Activity]]
@@ -1036,6 +1051,17 @@ made =CLAUDE.md= a safe-copy (see [[#refresh-claudemd-from-templates][Refresh CL
 directory, after reorganizing a hierarchy (=initiateSub=, moving
 imports, =--noLink=), and before and after a trimming pass to see what
 it bought. It is the token-weighted counterpart of =listClaudesPath=.
+
+*Inside a session* there are three related tools:
+
+- Claude Code's built-in =/context= --- what is in context /now/,
+  measured.
+- =startupClaudeTokens= --- what the /next/ session will load,
+  estimated.
+- =/bx-context-trim= --- runs =startupClaudeTokens=, then has Claude
+  propose concrete trims for this project. It marks each edit as local
+  or shared (a shared template edit affects every project symlinked to
+  it), and changes nothing without confirmation.
 
 Counts are estimates (characters / 4), and the loading rules are Claude
 Code's, taken from its documentation; if those rules change, this

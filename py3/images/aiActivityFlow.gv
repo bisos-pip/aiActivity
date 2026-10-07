@@ -6,12 +6,16 @@ digraph {
 (e.g. ~/aiActivityTemplates or
 /bisos/apps/defaults/ai-templates)" fillcolor=lightyellow shape=rectangle style=filled]
 		tpl_mother [label="mother/" fillcolor=khaki1 shape=folder style=filled]
+		ext_outputs [label="blee-binders/evolution/
+aiActivity-outputs/
+(outside templates)" fillcolor=gainsboro shape=folder style=filled]
 		tpl_bisospip [label="bisos-pip/" fillcolor=khaki1 shape=folder style=filled]
 		tpl_bleepanels [label="blee-panels/" fillcolor=khaki1 shape=folder style=filled]
 		tpl_custom [label="custom/" fillcolor=khaki1 shape=folder style=filled]
 		tpl_dots [label="..." fillcolor=khaki1 shape=folder style=filled]
 	}
 	tpl_base -> tpl_mother [arrowhead=none constraint=false style=dotted]
+	tpl_mother -> ext_outputs [label=" AI-Outputs.org " constraint=false fontsize=10 style=dashed]
 	{
 		rank=same
 		par_activity [label="--activity" fillcolor=lightblue shape=rectangle style=filled]
@@ -24,11 +28,7 @@ digraph {
 	}
 	tpl_base -> par_templates [arrowhead=vee style=dashed]
 	tpl_base -> par_activity [arrowhead=vee style=dashed]
-	engine [label="aiActivity.cs
-
-initiate  |  initiateSub
-refresh  |  aiSuspend  |  aiResume
-deClaudify" fillcolor=darkseagreen3 fontsize=14 shape=rectangle style="filled,bold"]
+	engine [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1"><TR><TD><B>aiActivity.cs</B></TD></TR><HR/><TR><TD>initiate  |  initiateSub  |  refresh</TD></TR><TR><TD>aiSuspend  |  aiResume  |  deClaudify</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>lifecycle: writes project files</I></FONT></TD></TR><HR/><TR><TD>listClaudesPath  |  startupClaudeTokens</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>inspection: reads only</I></FONT></TD></TR></TABLE>> fillcolor=darkseagreen3 fontsize=14 shape=rectangle style="filled,bold"]
 	par_activity -> engine
 	par_templates -> engine
 	par_nolink -> engine
@@ -37,7 +37,7 @@ deClaudify" fillcolor=darkseagreen3 fontsize=14 shape=rectangle style="filled,bo
 	{
 		rank=same
 		gen_claude [label="CLAUDE.md
-[safe-copy]" fillcolor=mistyrose shape=note style=filled]
+[safe-copy]" color=purple fillcolor=mistyrose penwidth=2.5 shape=note style=filled]
 		gen_workflow [label="AI-WORKFLOW.org
 [symlink]" fillcolor=lightgoldenrod1 shape=note style=filled]
 		gen_activity [label="AI-Activity.org
@@ -46,16 +46,18 @@ deClaudify" fillcolor=darkseagreen3 fontsize=14 shape=rectangle style="filled,bo
 [safe-copy+dblock]" fillcolor=mistyrose shape=note style=filled]
 		gen_workplan [label="AI-WorkPlan.org
 [safe-copy+dblock]" fillcolor=mistyrose shape=note style=filled]
+		gen_outputs [label="AI-Outputs.org
+[symlink, 2 hops]" fillcolor=lightgoldenrod1 shape=note style=filled]
 		gen_claudedir [label=".claude/
 settings.json
-[symlink]" fillcolor=lightgoldenrod1 shape=folder style=filled]
+[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
 	}
 	{
 		rank=same
 		cld_commands [label="commands/
-[symlink]" fillcolor=lightgoldenrod1 shape=folder style=filled]
+[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
 		cld_skills [label="skills/
-[symlink]" fillcolor=lightgoldenrod1 shape=folder style=filled]
+[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
 	}
 	gen_claudedir -> cld_commands [arrowhead=none style=solid]
 	gen_claudedir -> cld_skills [arrowhead=none style=solid]
@@ -64,12 +66,14 @@ settings.json
 	engine -> gen_activity [style=dashed]
 	engine -> gen_devstatus
 	engine -> gen_workplan
+	engine -> gen_outputs [style=dashed]
 	engine -> gen_claudedir [style=dashed]
 	claude [label="Claude Code
-(LLM-AI session)" fillcolor=thistle fontsize=13 shape=ellipse style="filled,bold"]
+(LLM-AI session)" color=purple fillcolor=thistle fontsize=13 penwidth=2.5 shape=ellipse style="filled,bold"]
 	gen_claude -> claude [label="  1  " color=purple fontcolor=purple penwidth=1.6]
 	gen_workflow -> claude [label="  2  " color=purple fontcolor=purple style=dotted]
 	gen_activity -> claude [label="  3  " color=purple fontcolor=purple style=dotted]
 	gen_devstatus -> claude [label="  4  " color=purple fontcolor=purple style=dotted]
 	gen_workplan -> claude [label="  5  " color=purple fontcolor=purple style=dotted]
+	gen_outputs -> claude [label=" on demand " color=purple fontcolor=purple fontsize=10 style=dotted]
 }

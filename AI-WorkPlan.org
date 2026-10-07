@@ -284,10 +284,39 @@ ship it, e.g. =bxexamples=/=rana-notes= today):
   Cross-Project Findings Ledger" section), plus a new table row and a
   =/bx-ai-outputs= row in the slash-commands table.
 
-** TODO [#A] <<12.2>> Update py3/images to include AI-Outputs.org
-SCHEDULED: <2026-09-23 Wed>
+** DONE [#A] <<12.2>> Update py3/images to include AI-Outputs.org
+CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-09-23 Wed>
 - Show that it is symlinked to outside of templates
 ----- AI Results: ------
+
+Done together with [[14.2.1]] and the startupClaudeTokens figure update (Stage 16), in
+=py3/images/aiActivity-graphviz.pcs= (=aiActivityFlow=):
+- =AI-Outputs.org= added to the generated-files row as a yellow symlink, labelled
+  =[symlink, 2 hops]=. It has a dashed engine edge, and an unnumbered purple
+  dotted edge to Claude Code labelled /on demand/, since it is not imported.
+- *Symlinked outside templates:* a new grey folder node,
+  =blee-binders/evolution/aiActivity-outputs/ (outside templates)=, sits on
+  the templates row. A dashed =mother/ → blee-binders= edge labelled
+  =AI-Outputs.org= connects them. Grey (=gainsboro=) is a new semantic
+  colour: "another repo, outside the templates tree".
+- Also in the same pass:
+  - the engine box has two compartments: /lifecycle: writes project files/
+    and /inspection: reads only/ (=listClaudesPath=, =startupClaudeTokens=)
+  - Claude binding nodes are outlined in purple: =CLAUDE.md=, =.claude/=,
+    =commands/=, =skills/=, Claude Code
+- Caption (=ng(..., caption=)=) updated. All formats regenerated: png, pdf,
+  svg, jpg, gv, title, caption. =aiActivityFlow.odg= is hand-made, not
+  generated, and is now stale.
+- =README.org= "Structure at a Glance": three legend rows added (on-demand
+  edge, purple outline, grey fill), and the walkthrough updated (two-hop
+  symlink, engine compartments, binding outline).
+
+*Render workaround:* the installed =bisos.graphviz= in =/bisos/venv/py3/bisos3=
+is an older non-editable 0.29 copy whose =namedGraph()= lacks the =title= /
+=caption= kwargs added in graphviz-cs. Every render of this file fails
+there, independent of today's change. Rendered with
+=PYTHONPATH=/bisos/git/bxRepos/bisos-pip/graphviz-cs/py3= prepended. The
+fix is to =pip install -e= graphviz-cs into bisos3 (not done; the venv is shared).
 
 ** -
 
@@ -324,9 +353,14 @@ SCHEDULED: <2026-09-23 Wed>
 = Somehow mark the commands as to if they are "always" or "perhaps"
 ----- AI Results: ------
 
-* TODO [#A] <<14.2.1>> As in [[12.2]] Update py3/images to include AI-Outputs.org
-SCHEDULED: <2026-09-23 Wed>
+* DONE [#A] <<14.2.1>> As in [[12.2]] Update py3/images to include AI-Outputs.org
+CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-09-23 Wed>
 ------ AI Results: ------
+Done as part of [[12.2]]. The figure for [[14.2]] (the workflow of /commands)
+is still open; it belongs in the templates repo, and =/bx-context-trim=
+goes in its bottom (housekeeping) layer next to =/bx-archive= and
+=/bx-update-status=.
+
 
 
 ** TODO [#A] <<14.3>> in py3/images perhaps add a new image for ByStar Skills
@@ -424,6 +458,49 @@ name) so the binding is visible and a second one could be added later.
 until a second agent is actually in use. Pure refactor; =verify.sh= must
 pass unchanged. Related: =listClaudesPath= stops at the git root while
 Claude Code walks up to =/= ([[16.1]]); fix while in there.
+----- Results: ------
+
+** TODO [#B] <<14.11>> Command naming convention: object first, then verb :aiAndMe:
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: bisos/defaults (templates commands) + this (CLI)
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+
+Convention, adopted with =/bx-context-trim= ([[16.4]]): a command name is the
+subject or object first, then the verb. You know the domain you're in, and
+completion offers the verbs. =aiSuspend= / =aiResume= already follow it.
+
+Names that don't follow it today:
+- Slash commands:
+  - =/bx-update-status= → =/bx-status-update=
+  - =/bx-import-archive= → =/bx-archive-import=
+  - =/bx-commit-msg= reads as an object; a verb could be added
+    (=/bx-commit-msg-write=), though that may be over-applying the rule
+- CLI: =listClaudesPath= → e.g. =claudesPathList=
+
+Renames touch the templates tree, every =AI-WORKFLOW.org= reference, the
+README, and users' habits. Decide which are worth it, rename in one pass,
+and document the convention in =AI-WORKFLOW.org=.
+----- Results: ------
+
+** TODO [#C] <<14.12>> Token-weighted startup-context figure: startupClaudeTokens --graph
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Claude
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+Have =startupClaudeTokens= optionally emit a =.gv= of the import tree, with
+node width or edge penwidth proportional to tokens, so the cost
+distribution of /your/ project is visible at a glance. For example, this
+repo's 59K of =AI-Activity.org= panel imports. A generated per-project
+figure is better than a static picture of one repo.
 ----- Results: ------
 
 
@@ -621,6 +698,51 @@ Two corrections made while writing:
 
 The figure is not done here. It belongs with the =py3/images= TODOs
 (12.2, 14.2).
+
+** DONE [#A] <<16.4>> Add /bx-context-trim --- in-session counterpart of startupClaudeTokens
+CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:REPO: bisos/defaults (templates: mother/_claude/commands/) + this (README)
+:END:
+Originally floated as =/bx-aiStatus-tokens=. Named =/bx-context-trim= per the
+object-then-verb convention (see [[14.11]]).
+----- Results: ------
+
+What it does and does not do:
+- It does *not* report the current session's context. Claude Code's built-in
+  =/context= already does that, measured. A model cannot inspect its own
+  context, so anything it reported would be a worse estimate.
+- The gap it fills is the *next* session plus judgment. It runs
+  =aiActivity.cs -i startupClaudeTokens=, then Claude ranks trim candidates:
+  - heavy =@= imports: drop the =@= or move into a skill
+  - DONE subtrees: =/bx-archive=
+  - stale DevStatus sections: =/bx-update-status=
+  - =!! resolved via symlink=: =refresh=
+  - truncated auto-memory
+- Each candidate gets its real path, repo, and *shared/local* status. A shared
+  template edit (e.g. an activity's =AI-Activity.org=) affects every project
+  symlinked to it, and is confirmed separately.
+- An optional argument sets a target token budget.
+- It changes nothing without confirmation. Afterwards it re-runs the CLI and
+  reports the actual saving.
+
+Files:
+- =mother/_claude/commands/bx-context-trim.md= (templates tree, =bisos/defaults=
+  repo). Every initiated project has it via the =.claude/commands= symlink.
+  No settings change was needed: =aiActivity.cs *= is already pre-authorized
+  in =mother/_claude/settings.json=.
+- =mother/AI-WORKFLOW.org=: new row in the slash-commands table (shared file,
+  =bisos/defaults= repo).
+- =README.org=: an "Inside a session" paragraph in the startupClaudeTokens
+  section separating =/context= (now, measured), =startupClaudeTokens=
+  (next, estimated) and =/bx-context-trim= (advice).
+
+Not yet done:
+- Propagation to =bxexamples/aiActivityTemplates= (Stage 15 sync).
+- A live run. Claude Code picked the command up mid-session (it appeared in
+  the skill list right after the file was written), so it can be tried at
+  once.
 
 
 ** -
