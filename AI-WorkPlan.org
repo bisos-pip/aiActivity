@@ -754,7 +754,7 @@ CLOSED: [2026-10-07 Wed] SCHEDULED: <2026-10-07 Wed>
 - The subdirectory is named =fromTemplates/=, not =templates/=, which would
   read like a templates tree.
 - =fromTemplates/README.org= records each file's source, the copy date and
-  commit (=fe6d1c8= + that day's uncommitted work), and the one-line
+  commit (=bisos/defaults= =3748edf=), and the one-line
   refresh command. Refreshing is an item for the Stage 15 sync loop.
 PyPI rendering is not a concern: per Mohsen, the PyPI README will be
 different.
@@ -770,8 +770,20 @@ different.
 - =aiUsageWorkflow= → new subsection /The Session Workflow at a Glance/
   before /Table of Commands/ (TOC entry added). It calls out "only Work
   touches your repo content" and "Claude never commits".
-- =aiGeneralTree= → /Skills/, as the general tree, with a pointer to the
-  ecosystem tree. This *replaced a stale list*: /Skills/ said "the
+- *Revised placement (same day, Mohsen):* the ecosystem figure came too
+  early, in the concept sections before the reader had seen the engine.
+  - Both trees moved into a new subsection, /An Example to Mimic: The
+    BISOS Templates/, at the end of /Overview/, right after /Structure at
+    a Glance/ (=aiActivityFlow=).
+  - The order is now: engine figure first, then the BISOS example as two
+    trees. The general tree is framed "take it as-is", the ecosystem tree
+    "build your own equivalent".
+  - The /Templates as ... Domain Knowledge/ section keeps a one-line
+    forward pointer. /Skills/ describes the two kinds of skills in prose
+    and links to the example, so the images aren't embedded twice.
+  - TOC entry added.
+- (Superseded by the revision above) =aiGeneralTree= → /Skills/, as the
+  general tree, with a pointer to the ecosystem tree. This *replaced a stale list*: /Skills/ said "the
   =bisos-pip= activity currently ships five skills", but there are now 16
   there (17 ecosystem skills in total with =sbom-authoring=).
 
