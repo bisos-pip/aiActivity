@@ -24,3 +24,8 @@ Refresh (part of the Stage 15 templates-sync loop):
 S=/bisos/git/bxRepos/bisos/defaults/ai-templates/_nonTemplate_/images
 cp -p $S/{aiStartupWorkflow,aiUsageWorkflow,aiGeneralTree,aiEcosystemTree}.png .
 #+end_src
+
+Also inlined, not copied as a file: the read/write table from
+=$S/aiUsageWorkflow.org= is in the top-level =README.org= under /The Session
+Workflow at a Glance/, below the figure. On refresh, re-paste the table if
+the source changed. An org comment above it in the README names the source.

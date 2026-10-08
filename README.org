@@ -684,6 +684,29 @@ Two things worth noticing:
 =AI-Outputs.org= sits on the left because it is outside this repo: one
 ledger shared by every project.
 
+The figure draws only the writes. The table gives the full map: what each
+step reads (R) and writes (W).
+
+# Copied from bisos/defaults ai-templates/_nonTemplate_/images/aiUsageWorkflow.org
+# (the source, next to the figure). Refresh together with fromTemplates/*.png.
+| Step                           | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
+|--------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
+| =/bx-confirm0=                 |              |                  | R                              | R                |                |
+| =/bx-confirm-here=             |              |                  | R                              | R                |                |
+| =/bx-status=                   |              |                  | R                              | R                |                |
+| =/bx-import-archive=           |              |                  | R (=_archive=)                 |                  |                |
+| Work on the selected TODO      | RW           |                  | R                              |                  |                |
+| /You:/ =git add=, =git commit= | R            | W                |                                |                  |                |
+| =/bx-commit-msg=               | R (staged)   | W (message only) |                                |                  |                |
+| =/bx-ai-outputs= (index)       |              |                  |                                |                  | R              |
+| =/bx-ai-outputs= (capture)     |              |                  |                                |                  | W              |
+| =/bx-done <anchor>=            |              |                  | W                              |                  |                |
+| =/bx-update-status=            |              |                  | R                              | W                |                |
+| =/bx-archive=                  |              |                  | RW (+ W =_archive=)            |                  |                |
+
+The confirm commands actually read the whole =CLAUDE.md= import chain.
+The table shows only the per-project files that change.
+
 ** Table of Commands
 
 The command surface falls into two groups. *Config commands* read and
