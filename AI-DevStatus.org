@@ -62,9 +62,11 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
 - *README.org.*
   - Sections on Claude specificity, inspecting the startup context, and
     the session workflow.
-  - /An Example to Mimic: The BISOS Templates/ right after the engine
-    figure: the general tree "take it as-is", the ecosystem tree "build
-    your own equivalent".
+  - A top-level /Templates/ section (after /Two-Part Architecture/, in the
+    TOC) is the single home for the two trees: /General/ "take it as-is"
+    and /Digital-Ecosystem Specific: BISOS / Blee / ByStar Skills/ "build
+    your own equivalent". The Overview only mentions the two kinds and
+    links there ([[14.15]]).
   - A stale "five skills" list replaced.
 
 *Earlier milestones, one line each* (full detail in git history and

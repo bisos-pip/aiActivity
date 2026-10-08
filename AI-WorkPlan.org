@@ -453,8 +453,8 @@ repo's 59K of =AI-Activity.org= panel imports. A generated per-project
 figure is better than a static picture of one repo.
 ----- Results: ------
 
-** TODO [#A] <<14.15>> README.org Improvements -- New Templates Section in TOC
-SCHEDULED: <2026-10-07 Wed>
+** DONE [#A] <<14.15>> README.org Improvements -- New Templates Section in TOC
+CLOSED: [2026-10-08 Thu] SCHEDULED: <2026-10-07 Wed>
 :PROPERTIES:
 :ORIGIN: Mohsen
 :IMPORTANCE: High
@@ -469,6 +469,27 @@ And that there are DE specific skills such as BISOS/Blee/ByStar's
 Then later There should be a "Templates" Section in which there
 is General and BISOS DE Skills.
 ----- Results: ------
+Done as specified, with two placement choices agreed beforehand:
+- *Overview*: the /An Example to Mimic/ subsection was removed. In its
+  place is a short mention after "The lasting value is in the templates
+  tree": templates are meant to be mimicked, in two kinds, /general/ ones
+  that drive the workflow (=/bx-*= commands, general skills; take as-is)
+  and /digital-ecosystem specific/ skills (BISOS / Blee / ByStar's; build
+  your own equivalent). It ends with a link to /Templates/.
+- *New top-level =* Templates=*, placed right after /Two-Part
+  Architecture/, because that section's /Part 2 --- the templates/ is
+  where readers first meet the templates. Two subsections:
+  - /General: Workflow Commands and Skills/ (=aiGeneralTree=, plus a link
+    to the session workflow)
+  - /Digital-Ecosystem Specific: BISOS / Blee / ByStar Skills/
+    (=aiEcosystemTree= + the "build your own equivalent" text)
+  The moved text is verbatim apart from its intro.
+- *Single home*: each tree image now appears once. The concept section,
+  /Part 2/ and /Usage → Skills/ each point to =#templates=. There are no
+  remaining links to the old anchor.
+- TOC updated: /Templates/ and its two subsections added, the old entry
+  removed. =AI-DevStatus.org='s README note updated.
+- Backup from before the change: scratchpad =README.org.pre-14.15=.
 
 
 

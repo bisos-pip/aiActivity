@@ -151,7 +151,7 @@ The =AI-Activity.org= files are the primary artifact.
 =aiActivity.cs= installs them; Claude reads them; collaborators refine them.
 That cycle --- shared, cumulative, and version-controlled --- is the point.
 What it looks like once it has accumulated is shown, using our own BISOS
-templates, in [[#an-example-to-mimic-the-bisos-templates][An Example to Mimic: The BISOS Templates]] after the Overview.
+templates, in [[#templates][Templates]].
 
 * Overview
 
@@ -190,6 +190,15 @@ inherited from an ancestor via the same walk-up, avoiding duplication.
 The lasting value is in the templates tree: each =AI-Activity.org= distils
 domain-specific conventions that any Claude session in that context inherits
 immediately. The commands below manage that inheritance.
+
+The templates are meant to be mimicked, and they come in two kinds:
+- *General* ones that drive the workflow: the =/bx-*= slash commands and
+  general skills. They are the same for everyone; take them as-is.
+- *Digital-ecosystem specific* skills that encode an organization's ways
+  of doing things. Ours are BISOS / Blee / ByStar's; build your own
+  equivalent.
+
+Both are shown, with our tree as the example, in [[#templates][Templates]].
 
 bisos.aiActivity is a python package that uses the [[https://github.com/bisos-pip/pycs][PyCS-Framework]].
 It provides the =aiActivity.cs= command with the following operations:
@@ -259,38 +268,6 @@ then the figure.
   binding/: the only parts specific to Claude Code. See
   [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specificity]].
 
-** An Example to Mimic: The BISOS Templates
-
-The figure above is the engine. What it installs is only as good as the
-templates tree behind it. Here, as an example, is what our own tree, the
-BISOS templates, contains on the commands-and-skills side, as two trees.
-
-*General: take it as-is.* The =/bx-*= commands that drive a session, and
-general skills such as =authoring-skills=. They guide the workflow and
-are the same for everyone. The commands live in =mother/=, so every
-project gets them.
-
-[[file:py3/images/fromTemplates/aiGeneralTree.png]]
-
-*Digital-ecosystem specific: build your own equivalent.* The BISOS /
-Blee / ByStar ways of doing things, written down as skills that Claude
-loads when a task calls for them. There are seventeen skills in five
-areas, some building on others (dotted arrows: "load this one first"),
-each placed in the activity whose projects need it.
-
-[[file:py3/images/fromTemplates/aiEcosystemTree.png]]
-
-You will not use these skills; they encode /our/ ecosystem. The pattern is
-what transfers. Your organization has its own equivalents: an authorship
-model, a command framework, packaging and release rules, internal lookups.
-Write them down the same way, as skills grouped by area and placed in the
-activities whose projects need them, and every project initiated from your
-templates gets them. This is the work that makes the templates valuable.
-The engine only delivers it.
-
-In both trees, fill colour shows where each item lives in the templates
-tree, which is also which projects see it.
-
 * Table of Contents     :TOC:
 - [[#the-concept-and-model-of-an-ai-activity][The Concept and Model of an AI-Activity]]
 - [[#collaboration-across-people-and-across-sessions][Collaboration Across People and Across Sessions]]
@@ -298,13 +275,15 @@ tree, which is also which projects see it.
 - [[#the-templates-as-collaborative-cumulative-domain-knowledge][The Templates as Collaborative, Cumulative Domain Knowledge]]
 - [[#overview][Overview]]
   - [[#structure-at-a-glance][Structure at a Glance]]
-  - [[#an-example-to-mimic-the-bisos-templates][An Example to Mimic: The BISOS Templates]]
 - [[#part-of-bisos--bystar-internet-services-operating-system][Part of BISOS — ByStar Internet Services Operating System]]
 - [[#bisosstartaiactivity-is-a-command-only-pycs-facility][bisos.aiActivity is a Command-Only PyCS Facility]]
 - [[#two-part-architecture-execution-engine--templates][Two-Part Architecture: Execution Engine + Templates]]
   - [[#part-1-----the-execution-engine-this-package][Part 1 --- the execution engine (this package)]]
   - [[#part-2-----the-templates-a-separate-repo-you-clone][Part 2 --- the templates (a separate repo you clone)]]
   - [[#auto-detection-two-canonical-locations][Auto-detection: two canonical locations]]
+- [[#templates][Templates]]
+  - [[#general-workflow-commands-and-skills][General: Workflow Commands and Skills]]
+  - [[#digital-ecosystem-specific-bisos--blee--bystar-skills][Digital-Ecosystem Specific: BISOS / Blee / ByStar Skills]]
 - [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specificity: Agent-Neutral Content, Claude Binding]]
 - [[#dynamic-block-content-in-installed-files][Dynamic Block Content in Installed Files]]
 - [[#post-installation-setup][Post-Installation Setup]]
@@ -428,6 +407,9 @@ Because the templates are versioned separately from the engine, you can:
   bisos.aiActivity= and =git pull= on your templates clone are two
   separate operations with separate cadences.
 
+What a templates tree contains, with ours as the example, is shown in
+[[#templates][Templates]] below.
+
 The split has a second, orthogonal seam: between the agent-neutral
 content and the Claude-specific loader. See *Claude Specificity* below.
 
@@ -451,6 +433,42 @@ The precedence is *user-first, system-second*: a personal clone at
 present. This lets a user working on a BISOS system point the engine at
 their own fork simply by cloning it to the canonical name, with no
 =userConfig_set= call needed.
+
+* Templates
+
+The engine is only as good as the templates tree behind it. Below is
+what our own tree, the BISOS templates, contains on the commands-and-skills
+side, as two trees: what you take as-is, and what you build your own
+equivalent of. In both trees, fill colour shows where each item lives in
+the templates tree, which is also which projects see it.
+
+** General: Workflow Commands and Skills
+
+*Take it as-is.* The =/bx-*= commands that drive a session, and general
+skills such as =authoring-skills=. They guide the workflow and are the
+same for everyone. The commands live in =mother/=, so every project gets
+them. How a session uses them is shown under
+[[#the-session-workflow-at-a-glance][The Session Workflow at a Glance]].
+
+[[file:py3/images/fromTemplates/aiGeneralTree.png]]
+
+** Digital-Ecosystem Specific: BISOS / Blee / ByStar Skills
+
+*Build your own equivalent.* The BISOS / Blee / ByStar ways of doing
+things, written down as skills that Claude loads when a task calls for
+them. There are seventeen skills in five areas, some building on others
+(dotted arrows: "load this one first"), each placed in the activity whose
+projects need it.
+
+[[file:py3/images/fromTemplates/aiEcosystemTree.png]]
+
+You will not use these skills; they encode /our/ ecosystem. The pattern is
+what transfers. Your organization has its own equivalents: an authorship
+model, a command framework, packaging and release rules, internal lookups.
+Write them down the same way, as skills grouped by area and placed in the
+activities whose projects need them, and every project initiated from your
+templates gets them. This is the work that makes the templates valuable.
+The engine only delivers it.
 
 * Claude Specificity: Agent-Neutral Content, Claude Binding
 
@@ -916,7 +934,7 @@ Skills come in two kinds:
   =writing-cs-commands= and =dblock-authoring= to =bisos-pip-release=.
 
 Both are drawn as trees, with where each one lives, in
-[[#an-example-to-mimic-the-bisos-templates][An Example to Mimic: The BISOS Templates]].
+[[#templates][Templates]].
 
 To author a new skill, add a folder under the appropriate templates
 directory:
