@@ -22,23 +22,45 @@ architecture, what works, what is untested and the design decisions made so far.
 This file is maintained by Claude. Updates are typically triggered by the
 =/bx-update-status= slash command, after major interactions, or before a release.
 
-Note to a fresh Claude: this file is intentionally sparse at project start.
-Fill in the sections below when asked to update, following the structure provided.
-
 * Current State
-  [To be filled in by Claude after first substantive interaction]
+
+As of 2026-10-07: =aiActivityFlow= (the engine's structure figure) is
+current. It shows the lifecycle/inspection split, the Claude binding and
+=AI-Outputs.org=. =fromTemplates/= holds PNG copies of the four templates
+workflow figures used by the top-level =README.org=. Stages 1--5 are done
+(see =AI-WorkPlan.org=).
+
+Note: the particulars dblocks in this file and in =AI-WorkPlan.org= still
+show =startAiActivity= paths, left over from before the rename. They are
+dblock-generated; regenerate them rather than hand-edit.
 
 * Architecture
-  [Key components, file structure, entry points]
+
+- =aiActivity-graphviz.pcs= --- one named graph, =aiActivityFlow=. The
+  outputs (png, pdf, svg, jpg, gv, title, caption) sit alongside it and
+  are committed.
+- =fromTemplates/= --- copies only. The sources are in
+  =bisos/defaults/ai-templates/_nonTemplate_/images/=, and its
+  =README.org= gives provenance and the refresh command.
+- =aiActivityFlow.odg= --- a hand-made earlier drawing; stale.
 
 * What Works
-  [Verified functionality]
+
+- =PYTHONPATH=/bisos/git/bxRepos/bisos-pip/graphviz-cs/py3 ./aiActivity-graphviz.pcs --format=all -i ngProcess aiActivityFlow=
+  regenerates everything.
 
 * What Is Untested
-  [Known gaps]
+
+- Rendering without the =PYTHONPATH= prefix, once bisos3 has a current
+  =bisos.graphviz=.
 
 * Key Design Decisions
-  [Non-obvious choices and their rationale]
+
+- The structure figure lives here, with the engine. The workflow and
+  skills figures live with the templates and are only copied here; see the
+  parent =AI-DevStatus.org=.
+- Colour and edge conventions are documented in the top-level README's
+  /Structure at a Glance/ legend.
 
 # Local Variables:
 # eval: (setq-local toc-org-max-depth 4)

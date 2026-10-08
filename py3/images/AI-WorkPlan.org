@@ -201,6 +201,40 @@ to document the new =title= / =caption= kwargs and the =--format=lcnt=
 sidecar convention.
 ** -
 
+* Stage 5: aiActivityFlow update and copies of the templates figures
+
+Goal: keep this directory's figures in step with the engine and the templates
+(driven from the parent =AI-WorkPlan.org=: [[12.2]], [[14.14]]).
+
+* Stage 5 TODOs
+** +
+** DONE [#A] Update aiActivityFlow for startupClaudeTokens, the Claude binding and AI-Outputs.org :aiAndMe:
+CLOSED: [2026-10-07 Wed]
+----- Results: ------
+=aiActivity-graphviz.pcs= (=aiActivityFlow=); all outputs regenerated:
+- Engine box split into two compartments: /lifecycle: writes project
+  files/ and /inspection: reads only/ (=listClaudesPath=,
+  =startupClaudeTokens=). This uses an HTML-like label with =<HR/>=.
+- The Claude binding is outlined in purple: =CLAUDE.md=, =.claude/=,
+  =commands/=, =skills/=, Claude Code.
+- =AI-Outputs.org= added: a two-hop symlink, with an /on demand/ edge to
+  Claude. A grey =blee-binders/...= node outside the templates sits on the
+  templates row.
+- =aiActivityFlow.odg= is hand-made and now stale.
+- Render workaround: the bisos3 venv has an old =bisos.graphviz= (0.29)
+  without =title= / =caption=. Prepend
+  =PYTHONPATH=/bisos/git/bxRepos/bisos-pip/graphviz-cs/py3=.
+
+** DONE [#A] Add fromTemplates/ with PNG copies of the four templates figures :aiAndMe:
+CLOSED: [2026-10-07 Wed]
+----- Results: ------
+=fromTemplates/=: =aiStartupWorkflow=, =aiUsageWorkflow=, =aiGeneralTree=,
+=aiEcosystemTree= (PNG only), plus a =README.org= with provenance
+(=bisos/defaults= =3748edf=) and the refresh command. The sources live in
+=bisos/defaults/ai-templates/_nonTemplate_/images/=; do not edit the
+copies.
+** -
+
 
 
 # Local Variables:
