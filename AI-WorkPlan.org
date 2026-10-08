@@ -453,6 +453,23 @@ repo's 59K of =AI-Activity.org= panel imports. A generated per-project
 figure is better than a static picture of one repo.
 ----- Results: ------
 
+** TODO [#A] <<14.15>> README.org Improvements -- New Templates Section in TOC
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: High
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+The templates text in the overview is misplaced.
+The overview should mention that we have temaples that can be mimiced.
+That there are general ones for driving the workflow.
+And that there are DE specific skills such as BISOS/Blee/ByStar's
+Then later There should be a "Templates" Section in which there
+is General and BISOS DE Skills.
+----- Results: ------
+
 
 
 ** -
