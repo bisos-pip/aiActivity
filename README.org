@@ -1,4 +1,4 @@
-#+title: bisos.aiActivity: Bootstrap an AI-Activity
+#+title: bisos.aiActivity: For Managing Your AI-Activity
 #+DATE: <2026-07-12 Sat>
 #+AUTHOR: Mohsen BANAN
 #+OPTIONS: toc:4
@@ -276,7 +276,7 @@ then the figure.
 - [[#overview][Overview]]
   - [[#structure-at-a-glance][Structure at a Glance]]
 - [[#part-of-bisos--bystar-internet-services-operating-system][Part of BISOS — ByStar Internet Services Operating System]]
-- [[#bisosstartaiactivity-is-a-command-only-pycs-facility][bisos.aiActivity is a Command-Only PyCS Facility]]
+- [[#bisosaiactivity-is-a-command-only-pycs-facility][bisos.aiActivity is a Command-Only PyCS Facility]]
 - [[#two-part-architecture-execution-engine--templates][Two-Part Architecture: Execution Engine + Templates]]
   - [[#part-1-----the-execution-engine-this-package][Part 1 --- the execution engine (this package)]]
   - [[#part-2-----the-templates-a-separate-repo-you-clone][Part 2 --- the templates (a separate repo you clone)]]
@@ -311,11 +311,11 @@ then the figure.
     - [[#hierarchical-vs-lateral][Hierarchical vs Lateral]]
   - [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context: =startupClaudeTokens=]]
 - [[#key-files][Key Files]]
-    - [[#startaiactivitycs][aiActivity.cs]]
+    - [[#aiactivitycs][aiActivity.cs]]
     - [[#startupclaudetokens_csupy][startupClaudeTokens_csu.py]]
     - [[#pypi-and-github-packaging][PyPi and Github Packaging]]
 - [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
-  - [[#bisosstartaiactivity-blee-panels][bisos.aiActivity Blee-Panels]]
+  - [[#bisosaiactivity-blee-panels][bisos.aiActivity Blee-Panels]]
 - [[#support][Support]]
 - [[#planned-improvements][Planned Improvements]]
 
