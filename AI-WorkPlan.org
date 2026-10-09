@@ -280,6 +280,7 @@ figure is better than a static picture of one repo.
 
 ** -
 
+
 * Stage 15: Sync ai-templates accross  bisos/examples/other
 
 Goal: Make sure relevant common activities, commands and skills are consistent across:
@@ -287,6 +288,7 @@ Goal: Make sure relevant common activities, commands and skills are consistent a
 - /bisos/apps/defaults/ai-templates/
 - /bxRepos/bxexamples/aiActivityTemplates/
 - Others  /de/active/aiTemplates
+
 
 * Stage 15 TODOs
 ** +
@@ -316,6 +318,7 @@ Some TODOs like Stage 0 [[0.1]]
   =py3/images/fromTemplates/README.org=).
 
 ** -
+
 
 * Stage 16: Addition of -i aiStatus (or -i aiInTokensEval)
 

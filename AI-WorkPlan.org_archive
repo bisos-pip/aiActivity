@@ -2128,3 +2128,48 @@ Not yet done:
 - A live run. Claude Code picked the command up mid-session (it appeared in
   the skill list right after the file was written), so it can be tried at
   once.
+
+* DONE [#A] <<14.16>> Make the -i examples location context based :aiAndMe:
+CLOSED: [2026-10-09 Fri 18:28] SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: High
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-09 Fri 17:42>
+:ARCHIVE_TIME: 2026-10-09 Fri 18:30
+:ARCHIVE_FILE: /bxRepos/bisos-pip/aiActivity/AI-WorkPlan.org
+:ARCHIVE_OLPATH: Stage 14 TODOs
+:ARCHIVE_CATEGORY: AI-WorkPlan
+:ARCHIVE_TODO: DONE
+:END:
+This is all towards simplifying user experience. To not show the user what is not relevant.
+- At the root of a git repo, with no args: show only the =initiate= section;
+  the =initiateSub= section has just =aiActivity.cs -i examples=.
+- In a git repo but not at its root, with no args: show only the
+  =initiateSub= section; the =initiate= section has just =aiActivity.cs -i examples=.
+- =aiActivity.cs -i examples=: show both, as before.
+- Outside any git repo, with no args: show both, and above the =initiate= and
+  =initiateSub= sections say that there is no repo.
+- Whether or not the directory is already initiated, the rule above applies;
+  mark the activity that is here (from the =AI-Activity.org= symlink, else
+  cwdConfig).
+- The "Based on CWD Setting" section follows the same rule.
+- Where =initiateSub= is shown but no initiated parent exists, say so.
+----- Results: ------
+
+Implemented in the =examples= cmnd of =py3/bin/aiActivity.cs= (body after
+=####+END:=, no dblock touched), with two new helpers, =_gitRepoRoot()= and
+=_activityHere()=.
+- Bare vs =-i examples=: both run the same class (=noCmndEntry=examples=), but
+  =cs.G.icmRunArgsGet().invokes= is =None= on a bare run and =['examples']=
+  otherwise. Testing =invokes= (not argv length) keeps =aiActivity.cs -v 30=
+  a bare run.
+- Repo root: =git rev-parse --show-toplevel=, so a nested repo or submodule
+  is its own root. =listClaudesPath= still has its own copy; fold it into
+  =_gitRepoRoot()= with [[14.10]].
+- Marker: =<== activity here= on the matching =initiate= / =initiateSub= line.
+- Verified by hand (repo root, =py3/=, =py3/images/= sub, outside a repo, a
+  fresh repo with no initiated parent, =-i examples=, =-v 30=) and by new
+  =verify.sh= cases; =verify.sh= ran clean on 2026-10-09.
+- Not done: the Blee panel and README don't describe the context menu yet.

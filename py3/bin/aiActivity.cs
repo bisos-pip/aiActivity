@@ -296,6 +296,35 @@ def _findInitiatedAncestor(
         parent = parent.parent
 
 
+def _gitRepoRoot(
+        targetDir: pathlib.Path,
+) -> typing.Optional[pathlib.Path]:
+    """The git work-tree root containing =targetDir= (=git rev-parse
+    --show-toplevel=), resolved, or None if not in a git repo or git is
+    missing. A nested repo or submodule is its own root.
+    """
+    try:
+        r = subprocess.run(
+            ['git', 'rev-parse', '--show-toplevel'],
+            cwd=targetDir, capture_output=True, text=True)
+    except OSError:
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    return pathlib.Path(r.stdout.strip()).resolve()
+
+
+def _activityHere(
+        targetDir: pathlib.Path,
+) -> typing.Optional[str]:
+    """The activity =targetDir= was initiated with: the =AI-Activity.org=
+    symlink target's activity, else cwdConfig's =activity= (covers
+    =--noLink=AI-Activity.org= installs, where the file is a copy).
+    """
+    _, activity = _deduceCwdConfig(targetDir)
+    return activity or cwdConfig_csu.parGet('activity')
+
+
 def _resolveTemplatesBaseSub(
         cliOverride: typing.Optional[str],
         targetDir: pathlib.Path,
@@ -563,11 +592,25 @@ class examples(cs.Cmnd):
         # Read cwdConfig to decide whether initiate/initiateSub can be invoked bare.
         cwdActivity = cwdConfig_csu.parGet('activity')
 
-        cs.examples.menuChapter('=initiate= -- install AI templates into current directory')
+        # Location context ([[14.16]]). A bare run (no -i) shows only what fits
+        # where cwd is: initiate at a git repo root, initiateSub below it. An
+        # explicit -i examples, or a cwd outside any git repo, shows both.
+        cwd = pathlib.Path.cwd()
+        fullMenu = bool(cs.G.icmRunArgsGet().invokes)
+        repoRoot = _gitRepoRoot(cwd)
+        if fullMenu or repoRoot is None:
+            showInitiate = showInitiateSub = True
+        else:
+            showInitiate = cwd.resolve() == repoRoot
+            showInitiateSub = not showInitiate
+        activityHere = _activityHere(cwd)
+        hereMark = "  <== activity here"
+        fullMenuComment = "# Full menu: both initiate and initiateSub"
+
+        if repoRoot is None and not fullMenu:
+            cs.examples.menuChapter('=No Git Repo= -- cwd is not in a git repo; both initiate and initiateSub shown')
+
         if templatesBaseStr is None:
-            cmnd('initiate',
-                 pars=od([('activity', '<activity>')]),
-                 comment="# templates not set — run userConfig_set --parName=templates first")
             activities = []
         else:
             templatesBase = pathlib.Path(templatesBaseStr)
@@ -575,39 +618,58 @@ class examples(cs.Cmnd):
                 d.name for d in templatesBase.iterdir()
                 if d.is_dir() and d.name not in nonActivityDirs and not d.name.startswith('.')
             ])
+
+        cs.examples.menuChapter('=initiate= -- install AI templates into current directory')
+        if not showInitiate:
+            cmnd('examples', pars=od([]), comment=f"{fullMenuComment} (not at repo root {repoRoot})")
+        elif templatesBaseStr is None:
+            cmnd('initiate',
+                 pars=od([('activity', '<activity>')]),
+                 comment="# templates not set — run userConfig_set --parName=templates first")
+        else:
             for activity in activities:
                 cmnd('initiate',
                      pars=od([('activity', activity)]),
-                     comment=f"# Install {activity} templates (auto-persists activity to cwdConfig)")
+                     comment=f"# Install {activity} templates (auto-persists activity to cwdConfig)"
+                     + (hereMark if activity == activityHere else ""))
                 if activity == 'custom':
                     cmnd('initiate',
                          pars=od([('activity', activity), ('noLink', 'AI-Activity.org')]),
                          comment=f"# Same, but safe-copy AI-Activity.org (project-specific, editable)")
 
         cs.examples.menuChapter('=initiateSub= -- slim subproject overlay (requires initiated parent)')
-        if templatesBaseStr is None:
-            cmnd('initiateSub',
-                 pars=od([('activity', '<activity>')]),
-                 comment="# templates not set — run userConfig_set --parName=templates first")
+        if not showInitiateSub:
+            cmnd('examples', pars=od([]), comment=f"{fullMenuComment} (at repo root)")
         else:
-            for activity in activities:
+            if _findInitiatedAncestor(cwd) is None:
+                literal("# NOTE: no initiated parent found; initiateSub will refuse"
+                        + (f" --- initiate at {repoRoot} first" if repoRoot is not None else ""))
+            if templatesBaseStr is None:
                 cmnd('initiateSub',
-                     pars=od([('activity', activity)]),
-                     comment=f"# Install slim {activity} overlay (auto-persists activity to cwdConfig)")
-                if activity == 'custom':
+                     pars=od([('activity', '<activity>')]),
+                     comment="# templates not set — run userConfig_set --parName=templates first")
+            else:
+                for activity in activities:
                     cmnd('initiateSub',
-                         pars=od([('activity', activity), ('noLink', 'AI-Activity.org')]),
-                         comment=f"# Same, but safe-copy AI-Activity.org (project-specific, editable)")
+                         pars=od([('activity', activity)]),
+                         comment=f"# Install slim {activity} overlay (auto-persists activity to cwdConfig)"
+                         + (hereMark if activity == activityHere else ""))
+                    if activity == 'custom':
+                        cmnd('initiateSub',
+                             pars=od([('activity', activity), ('noLink', 'AI-Activity.org')]),
+                             comment=f"# Same, but safe-copy AI-Activity.org (project-specific, editable)")
 
         if cwdActivity:
             cs.examples.menuChapter('=initiate/initiateSub Based on CWD Setting= -- Based on ./.aiActivity.cs')
             # cwdConfig supplies activity — But dont show the bare invocation.
-            cmnd('initiate',
-                 pars=od([('activity', f"{cwdActivity}"), ('templates', f"{templatesBaseStr}"),]),
-                 comment=f"# from cwdConfig")
-            cmnd('initiateSub',
-                 pars=od([('activity', f"{cwdActivity}"), ('templates', f"{templatesBaseStr}"),]),
-                 comment=f"# from cwdConfig")
+            if showInitiate:
+                cmnd('initiate',
+                     pars=od([('activity', f"{cwdActivity}"), ('templates', f"{templatesBaseStr}"),]),
+                     comment=f"# from cwdConfig")
+            if showInitiateSub:
+                cmnd('initiateSub',
+                     pars=od([('activity', f"{cwdActivity}"), ('templates', f"{templatesBaseStr}"),]),
+                     comment=f"# from cwdConfig")
 
         cs.examples.menuChapter('=listClaudesPath= -- show AI Activities in effect from cwd to repo root')
         cmnd('listClaudesPath',

@@ -101,3 +101,20 @@ lpDo popd
 lpDo popd
 lpDo eval rm -rf "$HOMOG"
 lpDo aiActivity.cs -i userConfig_set --parName="templates" --parValue="/bisos/apps/defaults/ai-templates"           # restore BISOS DEFAULT
+
+# Location-context examples menu ([[14.16]]). A bare run shows initiate only at
+# a git repo root, initiateSub only below it; -i examples, or no repo, shows both.
+CTX=$(mktemp -d)
+lpDo pushd "$CTX"
+lpDo eval "aiActivity.cs 2>&1 | grep -c -- '-i initiate --activity'"           # EXPECT: >0 (outside a repo: both shown)
+lpDo eval "aiActivity.cs 2>&1 | grep -c -- '=No Git Repo='"           # EXPECT: 1
+lpDo eval git init -q . \&\& mkdir -p sub
+lpDo eval "aiActivity.cs 2>&1 | grep -c -- '-i initiateSub --activity'"           # EXPECT: 0 (repo root: initiate only)
+lpDo aiActivity.cs -i initiate --activity="xu-single" --templates="/bisos/apps/defaults/ai-templates"
+lpDo eval "aiActivity.cs 2>&1 | grep -- '<== activity here'"           # EXPECT: the initiate xu-single line
+lpDo pushd sub
+lpDo eval "aiActivity.cs 2>&1 | grep -c -- '-i initiate --activity'"           # EXPECT: 0 (below repo root: initiateSub only)
+lpDo eval "aiActivity.cs -i examples 2>&1 | grep -c -- '-i initiate --activity'"           # EXPECT: >0 (explicit -i examples: both)
+lpDo popd
+lpDo popd
+lpDo eval rm -rf "$CTX"
