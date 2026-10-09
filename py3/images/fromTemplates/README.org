@@ -16,7 +16,10 @@ engine version, so it carries a snapshot that matches it. Only rendered
 PNGs are copied; the =.pcs= sources stay single-sourced in the templates
 tree.
 
-Last copied: 2026-10-07, from =bisos/defaults= at =3748edf=.
+Last copied: 2026-10-07, from =bisos/defaults= at =3748edf=. On 2026-10-09
+=aiStartupWorkflow.png= alone was re-copied after =aiSuspend= / =aiResume= were
+retired (that source change is in the working tree of =bisos/defaults= until
+committed).
 
 Refresh (part of the Stage 15 templates-sync loop):
 

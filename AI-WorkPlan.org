@@ -301,15 +301,15 @@ Some TODOs like Stage 0 [[0.1]]
 - =_nonTemplate_/= (new: the four figures + =aiUsageWorkflow.org=) →
   bxexamples. Forks need an =aiActivity.cs= that has =nonActivityDirs=, or
   =_nonTemplate_= shows up in their =examples= menu.
-- *aiSuspend / aiResume retired in the engine (2026-10-08); templates still
-  describe them* (=bisos/defaults=, shared, so not edited yet):
-  =aiActivity/AI-Activity.org= (lines ~25, 83--84, section "aiSuspend and
-  aiResume", ~233, ~249, ~345), =bisos-pip/_skills/writing-cs-commands/SKILL.md=
-  (~186), and the figure source =_nonTemplate_/images/aiStartupWorkflow-graphviz.pcs=
-  (~176, the /maintain/ node; then re-render and refresh the =fromTemplates/= PNG).
-  The Blee panel =py3/panels/.../fullUsagePanel-en.org= also has an "aiSuspend
-  and aiResume" section and mentions (lines ~102, 123--129, 144, 157); it is
-  dblock-based, so regenerate it in Blee rather than hand-editing.
+- *aiSuspend / aiResume retired in the engine (2026-10-08).* The text in
+  =bisos/defaults= was updated on 2026-10-09 in its working tree, to be
+  committed by Mohsen: =aiActivity/AI-Activity.org= (lifecycle, Homogeneous
+  default, AI-Outputs in subs, precedence), =bisos-pip/_skills/writing-cs-commands/SKILL.md=,
+  and =_nonTemplate_/images/aiStartupWorkflow= (re-rendered; its PNG was
+  re-copied into =py3/images/fromTemplates/=). The Blee panel
+  =py3/panels/.../fullUsagePanel-en.org= still has the "aiSuspend and
+  aiResume" sections (lines ~102, 123--129, 144, 157); it is dblock-based,
+  so regenerate it in Blee rather than hand-editing.
 - Engine-side copies: refresh =py3/images/fromTemplates/*.png= from
   =_nonTemplate_/images/= whenever the figures change (one-line command in
   =py3/images/fromTemplates/README.org=).

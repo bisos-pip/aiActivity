@@ -19,55 +19,51 @@ This file is maintained by Claude. Updates are typically triggered by the
 
 * Current State
 
-As of 2026-10-07: Stages 1--12 and 16 are complete; Stage 14 is partly
-done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work is in
-=AI-WorkPlan.org= Stage 14 (14.9, 14.10, 14.12) and the Stage 15 sync loop
-(15.1, which now lists today's pending sync items).
+As of 2026-10-09: Stages 1--12 and 16 are complete and archived. Stage 14
+is partly done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15
+DONE); open: 14.9 (yasnippets, a Blee job), 14.10 (isolate the Claude
+binding constants), 14.12 (=startupClaudeTokens --graph=), plus the
+Stage 15 sync loop (15.1). Template-maintenance TODOs moved to the
+templates repo's own WorkPlan (its Stage 2, =<<2.1>>=--=<<2.4>>=).
 
-*Done on 2026-10-07* (details under each TODO's Results in =AI-WorkPlan.org=):
+*Done on 2026-10-08/09* (details under each TODO's Results in
+=AI-WorkPlan.org= and =AI-WorkPlan.org_archive=):
 
-- *=startupClaudeTokens= (Stage 16).* New CSU
-  =py3/bisos/aiActivity/startupClaudeTokens_csu.py=, in =aiActivity.cs='s
-  =csuList=. A static estimate (chars/4) of what Claude Code loads at
-  session start from cwd, in load order:
-  - managed policy, user =~/.claude=
-  - the walk-up chain (=/= → cwd) with its =@= import tree, max 4 hops
-  - auto-memory =MEMORY.md=
-  - skill and command descriptions, grouped by directory with the symlink
-    target shown
-  On-demand files are listed separately and not summed. It flags relative
-  imports inside symlinked files (=!! resolved via symlink into ...=), the
-  Stage 11 bug class. In this repo it reports ~77K startup tokens; ~59K of
-  that is the 12 panel imports of =bisos-pip/AI-Activity.org=.
-- *=/bx-context-trim=* (templates, =mother/_claude/commands/=). Runs
-  =startupClaudeTokens=, then proposes trims, marking each edit as local
-  or shared. It changes nothing without confirmation. For the /current/
-  session, the built-in =/context= is the right tool.
-- *Claude specificity made explicit.* The README has a section, and there
-  is a design decision below. The command is named =startupClaudeTokens=,
-  not =startupTokens=, for that reason.
-- *=nonActivityDirs = {'mother', 'test', '_nonTemplate_'}=* in
-  =aiActivity.cs=. It replaces the =examples=-only list and is now also
-  refused as =--activity= by =initiate= and =initiateSub=.
-  Previously =--activity=mother= was accepted.
-- *Figures.*
-  - =py3/images/aiActivityFlow= updated ([[12.2]]): engine split into
-    lifecycle and inspection commands, the Claude binding outlined,
-    =AI-Outputs.org= as an on-demand two-hop symlink.
-  - Four new figures in the templates repo under
-    =ai-templates/_nonTemplate_/images/=: =aiStartupWorkflow=,
-    =aiUsageWorkflow= (+ =aiUsageWorkflow.org= read/write table),
-    =aiGeneralTree=, =aiEcosystemTree=. PNG copies are in
-    =py3/images/fromTemplates/= (provenance: =bisos/defaults= =3748edf=).
-- *README.org.*
-  - Sections on Claude specificity, inspecting the startup context, and
-    the session workflow.
-  - A top-level /Templates/ section (after /Two-Part Architecture/, in the
-    TOC) is the single home for the two trees: /General/ "take it as-is"
-    and /Digital-Ecosystem Specific: BISOS / Blee / ByStar Skills/ "build
-    your own equivalent". The Overview only mentions the two kinds and
-    links there ([[14.15]]).
-  - A stale "five skills" list replaced.
+- *Templates base follows the repo.* =initiateSub=, =refresh= and the
+  =examples= menu resolve templates as CLI → cwdConfig → nearest initiated
+  ancestor → userConfig → auto-detect. Homogeneous is the default;
+  heterogeneous (a sub on another tree) is explicit and honoured with a
+  =HETEROGENEOUS= note. Base vs sub is decided by a directory's own
+  =AI-WORKFLOW.org= symlink. Fixes [[14.1]] and [[14.4]]; see the design
+  decision below.
+- *=AI-Outputs.org= in every directory.* =initiateSub= now creates the
+  symlink and =refresh= backfills it in subs ([[14.5]]); before, subs never
+  had it and =/bx-ai-outputs= stopped there.
+- *=aiSuspend= / =aiResume= retired* (never used). =deClaudify= warns
+  before deleting =AI-DevStatus.org= / =AI-WorkPlan.org= that git doesn't
+  have. Templates text, figure, README and the engine figure updated;
+  the Blee panel is not (see Known Gaps).
+- *=parSuggestions= in =bisos.b=* feeds the =userConfig_set= /
+  =cwdConfig_set= example menus; =aiActivity.cs= suggests the ancestor's
+  base, =~/aiActivityTemplates= and =/bisos/apps/defaults/ai-templates=
+  when they exist.
+- *=verify.sh=* gained homogeneous and heterogeneous sub cases and ran to
+  exit 0 against the source engine. =py3/tests/= is meant to start and end
+  clean, so it now has a =.gitignore= for everything an install creates.
+- *Templates repo (=bisos/defaults=)* is itself an AI-Activity: root
+  =initiate=-d with =basic=, =ai-templates/= =initiateSub=-d with
+  =aiActivity=; its DevStatus/WorkPlan content was merged back after an
+  overwrite. Its text for the retired commands is updated in the working
+  tree, uncommitted until Mohsen commits ([[15.1]]).
+- *WorkPlan housekeeping:* 8 DONE TODOs archived; =aiStartupWorkflow=
+  re-rendered and its PNG re-copied into =py3/images/fromTemplates/=.
+
+*Done on 2026-10-07* (one line each): =startupClaudeTokens= (chars/4
+estimate of the Claude Code startup load; ~77K tokens here, ~59K from the
+12 panel imports of =bisos-pip/AI-Activity.org=), =/bx-context-trim=,
+Claude specificity made explicit, =nonActivityDirs=, four new templates
+figures plus the updated =aiActivityFlow=, README Templates section and
+session-workflow sections.
 
 *Earlier milestones, one line each* (full detail in git history and
 =AI-WorkPlan.org_archive=):
@@ -90,7 +86,7 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
   version control): =ai-templates/_nonTemplate_/images/= (figure sources +
   outputs) and =mother/AI-WORKFLOW.org= (figure pointers, the
   =/bx-context-trim= row). Pending propagation to bxexamples and the rana
-  fork is listed in [[15.1]].
+  fork, and the uncommitted retired-command text edits, are in [[15.1]].
 - Claude Code loading rules used by =startupClaudeTokens= were verified
   against code.claude.com/docs/en/memory.md and skills.md on 2026-10-07.
   Re-verify if Claude Code changes its loading behaviour.
@@ -104,7 +100,9 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
 - Config: =userConfig_get/set= (=~/.config/bisos/aiActivity.cs/fps/=),
   =cwdConfig_get/set= (=./.aiActivity.cs/fps/=), =cwdConfig_record=.
   Templates base precedence: CLI → cwdConfig → userConfig → auto-detect
-  (=~/aiActivityTemplates=, then =/bisos/apps/defaults/ai-templates=).
+  (=~/aiActivityTemplates=, then =/bisos/apps/defaults/ai-templates=); for
+  a sub, the nearest initiated ancestor's base sits before userConfig.
+  The =*Config_set= examples show suggested values (=parSuggestions=).
 - =initiate= / =initiateSub= operate on cwd; =activity= comes from the CLI
   or cwdConfig and is auto-persisted on success. =CLAUDE.md= is
   safe-copied; =AI-WORKFLOW.org=, =AI-Activity.org=, =AI-Outputs.org= (if
@@ -124,8 +122,9 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
 - Inspection: =listClaudesPath=; =startupClaudeTokens= (verified from the
   repo root ~77K, from =py3/tests/= ~78K, and from an empty dir 0; parser
   checks for emails, code spans, fenced blocks, escaped spaces).
-- =py3/tests/verify.sh= exercises the full lifecycle surface and exits 0
-  (see Known Gaps for the venv caveat).
+- =py3/tests/verify.sh= exercises the full lifecycle surface, including
+  homogeneous and heterogeneous subs, and exited 0 on 2026-10-09 (see
+  Known Gaps for the venv caveat).
 
 * What Is Untested
 
@@ -142,6 +141,13 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
   logic is generic but only =bisos-pip= was exercised interactively).
 - Lifecycle commands where =.claude/= holds non-symlink files such as
   =settings.local.json= (meant to be left intact).
+- =/bx-ai-outputs= (index and capture) live in a sub-project after a
+  =refresh=.
+- Heterogeneous subs against a real second templates tree (only a minimal
+  scratch tree was used), and =refresh= over the existing subs.
+- =parSuggestions=: no =bisos.b= tests were run; the =(current)= marker
+  and a package other than aiActivity using it are unexercised.
+- =deClaudify='s git warning where =git= is missing.
 
 * Known Gaps (not bugs --- areas for future work)
 
@@ -172,14 +178,32 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
   edit already matched the generator, or that block wasn't regenerated.
   Confirm by running that one dblock in Blee.
 - *=verify.sh= venv issue.* =#!/bin/bash -i= activates =tmoBisos= on BISOS
-  machines, which lacks =bisos.pyDblock=. Fix: install it there, or pin
-  verify.sh to the BISOS venv.
+  machines, which lacks =bisos.pyDblock=. It passed on 2026-10-09 in a shell
+  where =devbin= led the PATH (=hash -r= was needed). Fix: install it in
+  tmoBisos, or pin verify.sh to the BISOS venv. It deletes
+  =py3/tests/CLAUDE.md= (tracked until =git rm=; now gitignored).
 - *Templates content is uneven.* =bisos-pip= has 16 skills and a rich
   orientation file; most other activities are skeletal.
 - *The Blee panel is behind.* =py3/panels/bisos.aiActivity/.../fullUsagePanel-en.org=
-  has no sections for =listClaudesPath=, =refresh=, =startupClaudeTokens=,
-  =cwdConfig_*=, or the figures. It needs dblock-based sections (the
+  still has "aiSuspend and aiResume" sections (retired) and none for
+  =listClaudesPath=, =refresh=, =startupClaudeTokens=, =cwdConfig_*=, or
+  the figures. It needs dblock-based sections (the
   blee-panel-authorship skill); hand-writing them is not appropriate.
+- *Incomplete templates tree → raw traceback.* =initiateSub= on a tree
+  missing =mother/AI-DevStatus.org= dies with =FileNotFoundError= rather
+  than a usage error.
+- *=aiActivityFlow.odg= is hand-made and stale* (not generated with the
+  other formats), more so after the suspend/resume removal.
+- *=startupClaudeTokens= treats =.claude/commands/*.md= descriptions like
+  skills; the docs don't confirm they load at startup.* The Claude Code
+  rules otherwise verified 2026-10-07 include: walk-up to the filesystem
+  root, skills discovered only up to the repo root, auto-memory capped at
+  200 lines / 25KB.
+- *Design negative results (=startupClaudeTokens=).* A cache-status
+  section was dropped: prompt caching is server-side and prefix-keyed, so
+  file mtimes say nothing. Names rejected: =aiStatus= (too close to
+  =/bx-status=), =startupTokens= (overclaims; the rules are Claude's),
+  =aiInTokens= was the runner-up.
 - *No contribution/governance story* for how template improvements flow
   back between forks.
 - *Two-part install friction*: the pip package plus a separately cloned
@@ -191,8 +215,10 @@ done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work
 py3/
   bin/
     aiActivity.cs              --- main csxu: initiate, initiateSub, refresh,
-                                   deClaudify,
-                                   cwdConfig_record, listClaudesPath, examples;
+                                   deClaudify, cwdConfig_record,
+                                   listClaudesPath, examples; helpers
+                                   _findInitiatedAncestor,
+                                   _resolveTemplatesBaseSub, _suggestTemplates;
                                    nonActivityDirs; csuList = userConfig_csu,
                                    cwdConfig_csu, startupClaudeTokens_csu
   bisos/aiActivity/
@@ -202,7 +228,8 @@ py3/
     fromTemplates/             --- PNG copies of the four templates figures
                                    (README.org there = provenance + refresh)
   tests/
-    verify.sh                  --- end-to-end harness (bash -i, lpDo)
+    verify.sh                  --- end-to-end harness (bash -i, lpDo); starts
+                                   and ends clean, installs are gitignored
   panels/bisos.aiActivity/_nodeBase_/fullUsagePanel-en.org --- Blee panel
 README.org                     --- the only authored README
 #+end_example
@@ -210,7 +237,7 @@ README.org                     --- the only authored README
 Key external dependencies (not bundled):
 
 - =bisos.b= --- PyCS-Core (=cs=, =b_io=, =fp=, =b.op=), plus
-  =userConfig_csu= and =cwdConfig_csu=.
+  =userConfig_csu= and =cwdConfig_csu= and =parSuggestions= on =parDictAdd=.
 - =bisos.pyDblock= --- the dblock engine (=updateDblock=,
   =dblock_particulars=), used at install time.
 - =bisos.graphviz= --- for rendering figures (see the venv WORKAROUND
