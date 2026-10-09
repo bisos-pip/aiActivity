@@ -30,11 +30,7 @@ lpDo ls -a -C -F           # EXPECT: AI-Outputs.org removed
 # Bare initiate — activity resolved from cwdConfig (no --activity flag).
 lpDo aiActivity.cs -i initiate           # EXPECT: uses activity=xu-single from cwdConfig
 lpDo ls -a -C -F
-lpDo aiActivity.cs -i aiSuspend
-lpDo ls -a -C -F           # EXPECT: AI-Outputs.org removed
-lpDo aiActivity.cs -i aiResume
-lpDo ls -a -C -F
-lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (reinstalled by aiResume)
+lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (reinstalled by bare initiate)
 
 # refresh coverage — backfill: simulate a project initiated before
 # AI-Outputs.org existed in templates (unlink it), then refresh should
@@ -58,7 +54,8 @@ lpDo ls -a -C -F
 lpDo aiActivity.cs -i deClaudify           # Remove AI files from current directory
 lpDo ls -a -C -F
 lpDo aiActivity.cs -i initiateSub --activity="xu-single"
-lpDo ls -a -C -F           # EXPECT: no AI-Outputs.org here — inherited from parent, like AI-WORKFLOW.org
+lpDo readlink AI-Outputs.org           # EXPECT: mother/AI-Outputs.org (installed by initiateSub)
+lpDo ls -a -C -F           # EXPECT: AI-Outputs.org IS here (symlinked) — unlike AI-WORKFLOW.org it is not @-imported, so walk-up won't find a parent's
 
 # refresh coverage — sub mode: parent walk-up should detect sub, re-copy from
 # mother/initiateSub/CLAUDE.md.
@@ -77,3 +74,30 @@ lpDo aiActivity.cs -i initiateSub --activity="xu-single"           # EXPECT REFU
 lpDo ls -a -C -F
 lpDo popd
 lpDo eval rm -rf "$TMPDIR"
+
+# Homogeneous repo: a sub follows its initiated ancestor's templates base, even
+# when userConfig names a different tree (e.g. a fork).
+lpDo aiActivity.cs -i userConfig_set --parName="templates" --parValue="/nonexistent/forkTemplates"           # simulate a userConfig pointing elsewhere
+HOMOG=$(mktemp -d)
+lpDo pushd "$HOMOG"
+lpDo eval mkdir -p proj/sub
+lpDo pushd proj
+lpDo aiActivity.cs -i initiate --activity="xu-single" --templates="/bisos/apps/defaults/ai-templates"
+lpDo pushd sub
+lpDo aiActivity.cs -i initiateSub --activity="xu-single"           # EXPECT: success; templates taken from the ancestor, not userConfig
+lpDo aiActivity.cs -i refresh           # EXPECT: MODE: sub
+lpDo eval rm -f CLAUDE.md AI-Activity.org AI-DevStatus.org AI-WorkPlan.org
+lpDo eval rm -rf .aiActivity.cs
+# Heterogeneous: an explicit --templates naming another tree is honoured (a minimal second tree).
+lpDo eval mkdir -p "$HOMOG/tplB/xu-single" "$HOMOG/tplB/mother/initiateSub"
+lpDo eval cp /bisos/apps/defaults/ai-templates/mother/initiateSub/CLAUDE.md "$HOMOG/tplB/mother/initiateSub/"
+lpDo eval cp /bisos/apps/defaults/ai-templates/xu-single/* "$HOMOG/tplB/xu-single/"
+lpDo eval cp /bisos/apps/defaults/ai-templates/mother/AI-DevStatus.org /bisos/apps/defaults/ai-templates/mother/AI-WorkPlan.org "$HOMOG/tplB/mother/"
+lpDo aiActivity.cs -i initiateSub --activity="xu-single" --templates="$HOMOG/tplB"           # EXPECT: success, note HETEROGENEOUS; AI-Activity.org links into tplB
+lpDo readlink AI-Activity.org
+lpDo aiActivity.cs -i refresh           # EXPECT: MODE: sub (cwdConfig now names tplB)
+lpDo popd
+lpDo popd
+lpDo popd
+lpDo eval rm -rf "$HOMOG"
+lpDo aiActivity.cs -i userConfig_set --parName="templates" --parValue="/bisos/apps/defaults/ai-templates"           # restore BISOS DEFAULT

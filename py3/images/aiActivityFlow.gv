@@ -1,79 +1,287 @@
 digraph {
-	rankdir=TB
+	graph [bb="0,0,1255.5,472.16",
+		rankdir=TB
+	];
+	node [label="\N"];
 	{
-		rank=same
-		tpl_base [label="Templates Base
+		graph [rank=same];
+		tpl_base	[fillcolor=lightyellow,
+			height=0.73611,
+			label="Templates Base
 (e.g. ~/aiActivityTemplates or
-/bisos/apps/defaults/ai-templates)" fillcolor=lightyellow shape=rectangle style=filled]
-		tpl_mother [label="mother/" fillcolor=khaki1 shape=folder style=filled]
-		ext_outputs [label="blee-binders/evolution/
+/bisos/apps/defaults/ai-templates)",
+			pos="349.5,445.66",
+			shape=rectangle,
+			style=filled,
+			width=3.5694];
+		tpl_mother	[fillcolor=khaki1,
+			height=0.5,
+			label="mother/",
+			pos="550.5,445.66",
+			shape=folder,
+			style=filled,
+			width=1.0139];
+		ext_outputs	[fillcolor=gainsboro,
+			height=0.73611,
+			label="blee-binders/evolution/
 aiActivity-outputs/
-(outside templates)" fillcolor=gainsboro shape=folder style=filled]
-		tpl_bisospip [label="bisos-pip/" fillcolor=khaki1 shape=folder style=filled]
-		tpl_bleepanels [label="blee-panels/" fillcolor=khaki1 shape=folder style=filled]
-		tpl_custom [label="custom/" fillcolor=khaki1 shape=folder style=filled]
-		tpl_dots [label="..." fillcolor=khaki1 shape=folder style=filled]
+(outside templates)",
+			pos="777.5,445.66",
+			shape=folder,
+			style=filled,
+			width=2.5];
+		tpl_bisospip	[fillcolor=khaki1,
+			height=0.5,
+			label="bisos-pip/",
+			pos="928.5,445.66",
+			shape=folder,
+			style=filled,
+			width=1.1806];
+		tpl_bleepanels	[fillcolor=khaki1,
+			height=0.5,
+			label="blee-panels/",
+			pos="1040.5,445.66",
+			shape=folder,
+			style=filled,
+			width=1.4167];
+		tpl_custom	[fillcolor=khaki1,
+			height=0.5,
+			label="custom/",
+			pos="1146.5,445.66",
+			shape=folder,
+			style=filled,
+			width=1.0139];
+		tpl_dots	[fillcolor=khaki1,
+			height=0.5,
+			label="...",
+			pos="1228.5,445.66",
+			shape=folder,
+			style=filled,
+			width=0.75];
 	}
-	tpl_base -> tpl_mother [arrowhead=none constraint=false style=dotted]
-	tpl_mother -> ext_outputs [label=" AI-Outputs.org " constraint=false fontsize=10 style=dashed]
 	{
-		rank=same
-		par_activity [label="--activity" fillcolor=lightblue shape=rectangle style=filled]
-		par_templates [label="--templates" fillcolor=lightblue shape=rectangle style=filled]
-		par_nolink [label="--noLink" fillcolor=lightblue shape=rectangle style=filled]
-		par_userconfig [label="userConfig
-(~/.config/bisos/…)" fillcolor=lightsteelblue shape=cylinder style=filled]
-		par_cwdconfig [label="cwdConfig
-(./.aiActivity.cs/…)" fillcolor=lightsteelblue shape=cylinder style=filled]
+		graph [rank=same];
+		par_activity	[fillcolor=lightblue,
+			height=0.5,
+			label="--activity",
+			pos="297.5,356.04",
+			shape=rectangle,
+			style=filled,
+			width=1.0972];
+		par_templates	[fillcolor=lightblue,
+			height=0.5,
+			label="--templates",
+			pos="403.5,356.04",
+			shape=rectangle,
+			style=filled,
+			width=1.3472];
+		par_nolink	[fillcolor=lightblue,
+			height=0.5,
+			label="--noLink",
+			pos="507.5,356.04",
+			shape=rectangle,
+			style=filled,
+			width=1.0278];
+		par_userconfig	[fillcolor=lightsteelblue,
+			height=0.72569,
+			label="userConfig
+(~/.config/bisos/…)",
+			pos="638.5,356.04",
+			shape=cylinder,
+			style=filled,
+			width=2.0972];
+		par_cwdconfig	[fillcolor=lightsteelblue,
+			height=0.72569,
+			label="cwdConfig
+(./.aiActivity.cs/…)",
+			pos="804.5,356.04",
+			shape=cylinder,
+			style=filled,
+			width=2];
 	}
-	tpl_base -> par_templates [arrowhead=vee style=dashed]
-	tpl_base -> par_activity [arrowhead=vee style=dashed]
-	engine [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1"><TR><TD><B>aiActivity.cs</B></TD></TR><HR/><TR><TD>initiate  |  initiateSub  |  refresh</TD></TR><TR><TD>aiSuspend  |  aiResume  |  deClaudify</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>lifecycle: writes project files</I></FONT></TD></TR><HR/><TR><TD>listClaudesPath  |  startupClaudeTokens</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>inspection: reads only</I></FONT></TD></TR></TABLE>> fillcolor=darkseagreen3 fontsize=14 shape=rectangle style="filled,bold"]
-	par_activity -> engine
-	par_templates -> engine
-	par_nolink -> engine
-	par_userconfig -> engine [color=dodgerblue dir=both]
-	par_cwdconfig -> engine [color=dodgerblue dir=both]
 	{
-		rank=same
-		gen_claude [label="CLAUDE.md
-[safe-copy]" color=purple fillcolor=mistyrose penwidth=2.5 shape=note style=filled]
-		gen_workflow [label="AI-WORKFLOW.org
-[symlink]" fillcolor=lightgoldenrod1 shape=note style=filled]
-		gen_activity [label="AI-Activity.org
-[symlink]" fillcolor=lightgoldenrod1 shape=note style=filled]
-		gen_devstatus [label="AI-DevStatus.org
-[safe-copy+dblock]" fillcolor=mistyrose shape=note style=filled]
-		gen_workplan [label="AI-WorkPlan.org
-[safe-copy+dblock]" fillcolor=mistyrose shape=note style=filled]
-		gen_outputs [label="AI-Outputs.org
-[symlink, 2 hops]" fillcolor=lightgoldenrod1 shape=note style=filled]
-		gen_claudedir [label=".claude/
+		graph [rank=same];
+		gen_claude	[color=purple,
+			fillcolor=mistyrose,
+			height=0.52778,
+			label="CLAUDE.md
+[safe-copy]",
+			penwidth=2.5,
+			pos="53.5,128.41",
+			shape=note,
+			style=filled,
+			width=1.4861];
+		gen_workflow	[fillcolor=lightgoldenrod1,
+			height=0.52778,
+			label="AI-WORKFLOW.org
+[symlink]",
+			pos="201.5,128.41",
+			shape=note,
+			style=filled,
+			width=2.1111];
+		gen_activity	[fillcolor=lightgoldenrod1,
+			height=0.52778,
+			label="AI-Activity.org
+[symlink]",
+			pos="354.5,128.41",
+			shape=note,
+			style=filled,
+			width=1.625];
+		gen_devstatus	[fillcolor=mistyrose,
+			height=0.52778,
+			label="AI-DevStatus.org
+[safe-copy+dblock]",
+			pos="507.5,128.41",
+			shape=note,
+			style=filled,
+			width=2.1111];
+		gen_workplan	[fillcolor=mistyrose,
+			height=0.52778,
+			label="AI-WorkPlan.org
+[safe-copy+dblock]",
+			pos="677.5,128.41",
+			shape=note,
+			style=filled,
+			width=2.1111];
+		gen_outputs	[fillcolor=lightgoldenrod1,
+			height=0.52778,
+			label="AI-Outputs.org
+[symlink, 2 hops]",
+			pos="841.5,128.41",
+			shape=note,
+			style=filled,
+			width=1.9306];
+		gen_claudedir	[color=purple,
+			fillcolor=lightgoldenrod1,
+			height=0.73611,
+			label=".claude/
 settings.json
-[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
+[symlink]",
+			penwidth=2.5,
+			pos="983.5,128.41",
+			shape=folder,
+			style=filled,
+			width=1.5];
 	}
 	{
-		rank=same
-		cld_commands [label="commands/
-[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
-		cld_skills [label="skills/
-[symlink]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
+		graph [rank=same];
+		cld_commands	[color=purple,
+			fillcolor=lightgoldenrod1,
+			height=0.52778,
+			label="commands/
+[symlink]",
+			penwidth=2.5,
+			pos="928.5,25.456",
+			shape=folder,
+			style=filled,
+			width=1.3611];
+		cld_skills	[color=purple,
+			fillcolor=lightgoldenrod1,
+			height=0.52778,
+			label="skills/
+[symlink]",
+			penwidth=2.5,
+			pos="1037.5,25.456",
+			shape=folder,
+			style=filled,
+			width=1.1528];
 	}
-	gen_claudedir -> cld_commands [arrowhead=none style=solid]
-	gen_claudedir -> cld_skills [arrowhead=none style=solid]
-	engine -> gen_claude
-	engine -> gen_workflow [style=dashed]
-	engine -> gen_activity [style=dashed]
-	engine -> gen_devstatus
-	engine -> gen_workplan
-	engine -> gen_outputs [style=dashed]
-	engine -> gen_claudedir [style=dashed]
-	claude [label="Claude Code
-(LLM-AI session)" color=purple fillcolor=thistle fontsize=13 penwidth=2.5 shape=ellipse style="filled,bold"]
-	gen_claude -> claude [label="  1  " color=purple fontcolor=purple penwidth=1.6]
-	gen_workflow -> claude [label="  2  " color=purple fontcolor=purple style=dotted]
-	gen_activity -> claude [label="  3  " color=purple fontcolor=purple style=dotted]
-	gen_devstatus -> claude [label="  4  " color=purple fontcolor=purple style=dotted]
-	gen_workplan -> claude [label="  5  " color=purple fontcolor=purple style=dotted]
-	gen_outputs -> claude [label=" on demand " color=purple fontcolor=purple fontsize=10 style=dotted]
+	tpl_base -> tpl_mother	[arrowhead=none,
+		constraint=false,
+		pos="478.27,445.66 490.12,445.66 501.97,445.66 513.82,445.66",
+		style=dotted];
+	tpl_base -> par_activity	[arrowhead=vee,
+		pos="e,307.62,374.09 334.18,418.85 327.42,407.45 319.49,394.1 312.74,382.72",
+		style=dashed];
+	tpl_base -> par_templates	[arrowhead=vee,
+		pos="e,392.99,374.09 365.41,418.85 372.43,407.45 380.66,394.1 387.67,382.72",
+		style=dashed];
+	tpl_mother -> ext_outputs	[constraint=false,
+		fontsize=10,
+		label=" AI-Outputs.org ",
+		lp="637.25,454.16",
+		pos="e,687.42,445.66 587.22,445.66 611.68,445.66 645.09,445.66 677.09,445.66",
+		style=dashed];
+	engine	[fillcolor=darkseagreen3,
+		fontsize=14,
+		height=1.4028,
+		label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1"><TR><TD><B>aiActivity.cs</B></TD></TR><HR/><TR><TD>initiate  |  initiateSub  |  refresh  |  deClaudify</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>lifecycle: writes project files</I></FONT></TD></TR><HR/><TR><TD>listClaudesPath  |  startupClaudeTokens</TD></TR><TR><TD><FONT POINT-SIZE="10"><I>inspection: reads only</I></FONT></TD></TR></TABLE>>,
+		pos="507.5,242.41",
+		shape=rectangle,
+		style="filled,bold",
+		width=4.8333];
+	par_activity -> engine	[pos="e,414.25,292.98 329.85,337.84 350.3,326.97 377.97,312.26 405.37,297.7"];
+	par_templates -> engine	[pos="e,461.28,293.02 419.75,337.6 429.2,327.45 441.7,314.04 454.29,300.52"];
+	par_nolink -> engine	[pos="e,507.5,293.02 507.5,337.6 507.5,328.11 507.5,315.76 507.5,303.15"];
+	par_userconfig -> engine	[color=dodgerblue,
+		dir=both,
+		pos="s,608.77,329.71 e,565.78,293.07 601.02,323.1 592.44,315.79 583.06,307.79 573.66,299.79"];
+	par_cwdconfig -> engine	[color=dodgerblue,
+		dir=both,
+		pos="s,741.15,331.23 e,639.48,293.01 731.52,327.61 706.54,318.22 677.67,307.37 649.13,296.64"];
+	engine -> gen_claude	[pos="e,95.509,147.54 333.12,209.33 264.89,195.1 186.38,176.62 116.5,154.91 112.74,153.74 108.89,152.45 105.04,151.08"];
+	engine -> gen_workflow	[pos="e,250.81,147.46 371.95,191.8 332.83,177.48 292.17,162.6 260.38,150.96",
+		style=dashed];
+	engine -> gen_activity	[pos="e,379.44,147.67 439.5,191.63 421.45,178.42 402.77,164.75 387.53,153.59",
+		style=dashed];
+	engine -> gen_devstatus	[pos="e,507.5,147.67 507.5,191.63 507.5,180.01 507.5,168.03 507.5,157.72"];
+	engine -> gen_workplan	[pos="e,649.79,147.67 583.05,191.63 603.29,178.3 624.25,164.49 641.27,153.28"];
+	engine -> gen_outputs	[pos="e,787.68,147.46 655.46,191.8 698.52,177.36 743.29,162.34 778.13,150.66",
+		style=dashed];
+	engine -> gen_claudedir	[pos="e,929.42,152.01 681.54,212.1 753.16,198.27 836.77,179.86 919.83,154.92",
+		style=dashed];
+	claude	[color=purple,
+		fillcolor=thistle,
+		fontsize=13,
+		height=0.70711,
+		label="Claude Code
+(LLM-AI session)",
+		penwidth=2.5,
+		pos="393.5,25.456",
+		shape=ellipse,
+		style="filled,bold",
+		width=2.5731];
+	gen_claude -> claude	[color=purple,
+		fontcolor=purple,
+		label="  1  ",
+		lp="236.5,76.412",
+		penwidth=1.6,
+		pos="e,325.09,42.685 96.284,109.3 103,106.69 109.9,104.14 116.5,101.91 182.66,79.598 259.36,59.11 315.25,45.131"];
+	gen_workflow -> claude	[color=purple,
+		fontcolor=purple,
+		label="  2  ",
+		lp="323.5,76.412",
+		pos="e,351.78,48.394 235.83,109.36 265.5,93.758 308.82,70.984 342.54,53.251",
+		style=dotted];
+	gen_activity -> claude	[color=purple,
+		fontcolor=purple,
+		label="  3  ",
+		lp="390.5,76.412",
+		pos="e,384.1,50.798 361.47,109.36 366.7,95.836 374,76.922 380.32,60.574",
+		style=dotted];
+	gen_devstatus -> claude	[color=purple,
+		fontcolor=purple,
+		label="  4  ",
+		lp="471.5,76.412",
+		pos="e,420.14,50.05 487.12,109.36 470.68,94.807 447.2,74.013 427.87,56.892",
+		style=dotted];
+	gen_workplan -> claude	[color=purple,
+		fontcolor=purple,
+		label="  5  ",
+		lp="567.5,76.412",
+		pos="e,448.68,46.073 626.73,109.36 579.66,92.632 509.41,67.66 458.31,49.496",
+		style=dotted];
+	gen_outputs -> claude	[color=purple,
+		fontcolor=purple,
+		fontsize=10,
+		label=" on demand ",
+		lp="714.5,76.412",
+		pos="e,470.75,39.683 788.19,109.32 779.65,106.68 770.86,104.11 762.5,101.91 667.02,76.823 555.83,55.083 480.65,41.468",
+		style=dotted];
+	gen_claudedir -> cld_commands	[arrowhead=none,
+		pos="969.48,101.68 959.74,83.799 947,60.422 938.33,44.506",
+		style=solid];
+	gen_claudedir -> cld_skills	[arrowhead=none,
+		pos="997.27,101.68 1006.8,83.799 1019.3,60.422 1027.8,44.506",
+		style=solid];
 }

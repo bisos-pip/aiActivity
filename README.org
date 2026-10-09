@@ -205,8 +205,7 @@ It provides the =aiActivity.cs= command with the following operations:
 =userConfig_set/get= (global user persistent config), =cwdConfig_set/get=
 (per-directory persistent config), =cwdConfig_record= (deduce
 per-directory config from local symlinks and record it), =initiate= (base
-install), =initiateSub= (slim subproject overlay), =aiSuspend= /
-=aiResume= (reversible pause/restore), =refresh= (re-copy =CLAUDE.md= from
+install), =initiateSub= (slim subproject overlay), =refresh= (re-copy =CLAUDE.md= from
 templates), =deClaudify= (permanent removal), and =examples= (all
 invocations with the current templates base and cwdConfig state). A
 comprehensive command table appears under
@@ -304,7 +303,6 @@ then the figure.
   - [[#customizing-a-shared-template-file---nolink][Customizing a Shared Template File: =--noLink=]]
   - [[#skills][Skills]]
   - [[#refresh-claudemd-from-templates][Refresh CLAUDE.md From Templates]]
-  - [[#suspend-and-resume-ai-collaboration][Suspend and Resume AI Collaboration]]
   - [[#remove-ai-collaboration-files][Remove AI Collaboration Files]]
   - [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology: Homogeneous, Heterogeneous, Hierarchical, Lateral]]
     - [[#homogeneous-vs-heterogeneous][Homogeneous vs Heterogeneous]]
@@ -485,8 +483,8 @@ Claude Code. It is worth being precise about where that line falls.
 - The templates tree --- the =mother/= baseline plus activity
   overlays, and which files are symlinked (shared) versus safe-copied
   (owned by the project).
-- The lifecycle logic --- =initiate=, =initiateSub=, =aiSuspend= /
-  =aiResume=, =refresh=, =deClaudify= --- together with the config
+- The lifecycle logic --- =initiate=, =initiateSub=, =refresh=,
+  =deClaudify= --- together with the config
   stores, provenance, and dblock expansion. Only the file names they
   handle are Claude's.
 
@@ -731,9 +729,7 @@ manage, and remove AI-collaboration state in a project directory.
 | =initiate=      | Install AI-collaboration templates into cwd (base install).                | =--activity=, =--templates=, =--noLink=<file>= |
 | =initiateSub=   | Install a slim subproject overlay in cwd (requires an =initiate=-d parent).| =--activity=, =--templates=, =--noLink=<file>= |
 | =refresh=       | Re-copy safe-copied invariants (currently =CLAUDE.md=) from templates.     |                       |
-| =aiSuspend=     | Suspend AI collaboration --- stash editable files as =.dormant=, remove symlinks + =.claude/=. Reversible. |    |
-| =aiResume=      | Restore a suspended install.                                               |                       |
-| =deClaudify=      | Permanently remove all AI-collaboration files. Irreversible.               |                       |
+| =deClaudify=      | Permanently remove all AI-collaboration files. Irreversible; warns first if =AI-DevStatus.org= / =AI-WorkPlan.org= are not committed. |                       |
 | =examples=        | Print the self-documenting examples menu. Default when no =-i= is passed.  |                       |
 
 *Inspection commands* (read-only; both are part of the Claude binding ---
@@ -751,8 +747,7 @@ Template File]] below for when to use it.
 
 Both =initiate= and =initiateSub= *auto-record* the templates base
 and activity actually used into cwdConfig on success, so subsequent
-invocations in the same directory (=refresh=, =aiSuspend= /
-=aiResume=, or a second =initiate= after =deClaudify=) can run with
+invocations in the same directory (=refresh=, or a second =initiate= after =deClaudify=) can run with
 no CLI flags.
 
 ** Set Templates Base Directory
@@ -819,7 +814,7 @@ aiActivity.cs -i initiate --activity=bisos-pip
 
 On success, =initiate= *auto-persists* =activity= to cwdConfig at
 =./.aiActivity.cs/fps/activity/value=. Subsequent invocations in
-the same directory (=refresh=, =aiSuspend=/=aiResume=, or a second
+the same directory (=refresh=, or a second
 =initiate= after =deClaudify=) can then run bare, no CLI flags needed:
 
 #+begin_src bash
@@ -857,7 +852,7 @@ figure shows the whole lifecycle:
    =startupClaudeTokens=.
 4. *Trim* it with =/bx-context-trim=.
 5. *Use* it (see the session workflow under [[#table-of-commands][Table of Commands]]).
-6. *Maintain* it with =refresh=, =aiSuspend= / =aiResume= and =deClaudify=.
+6. *Maintain* it with =refresh= and =deClaudify=.
 
 Green arrows are writes by =aiActivity.cs= (dashed = symlink, solid =
 copy); red arrows are writes by Claude.
@@ -875,8 +870,10 @@ aiActivity.cs -i initiateSub --activity=bisos-pip
 #+end_src
 
 This installs only the subproject-specific state — a slim =CLAUDE.md=
-(symlinked to =mother/initiateSub/CLAUDE.md=), =AI-Activity.org= symlink,
-and safe-copies of =AI-DevStatus.org= and =AI-WorkPlan.org=. It does NOT
+(copied from =mother/initiateSub/CLAUDE.md=), =AI-Activity.org= and
+=AI-Outputs.org= symlinks, and safe-copies of =AI-DevStatus.org= and
+=AI-WorkPlan.org=. =AI-Outputs.org= is installed in every directory because
+it is not imported, so the walk-up cannot supply a parent's copy. It does NOT
 install =AI-WORKFLOW.org=, or =.claude/= — those are
 inherited from an ancestor directory via Claude Code's =CLAUDE.md= walk-up.
 
@@ -892,9 +889,10 @@ activity from its parent (e.g., a =blee-panels= subproject inside a
 Nested =initiateSub= is supported: a subproject's =CLAUDE.md= satisfies
 the walk-up precondition for a sub-subproject.
 
-=aiSuspend= / =aiResume= / =deClaudify= all work correctly on subproject
-overlays. =aiResume= detects sub vs. base mode from the stashed
-=CLAUDE.md.dormant= symlink target.
+=refresh= and =deClaudify= work on subproject overlays. =refresh= detects
+sub vs. base mode from an initiated ancestor's =AI-WORKFLOW.org= symlink,
+and =initiateSub= follows that ancestor's templates base unless you
+explicitly name another one (a Heterogeneous sub).
 
 ** Customizing a Shared Template File: =--noLink=
 
@@ -998,36 +996,16 @@ files (=AI-DevStatus.org=, =AI-WorkPlan.org=, and files installed with
 symlink from the pre-safe-copy era: it unlinks the symlink and copies in
 its place.
 
-** Suspend and Resume AI Collaboration
-
-When AI collaboration on a project needs to be paused temporarily, use
-=aiSuspend= to enter a dormant state and =aiResume= to restore it.
-
-=aiSuspend= removes the constant symlinks (=CLAUDE.md=,
-=AI-WORKFLOW.org=, =AI-Activity.org=) and the =.claude/= entries, and renames
-the editable files =AI-DevStatus.org= and =AI-WorkPlan.org= to =.dormant=
-suffixes so that the collaboration state survives.
-
-#+begin_src bash
-aiActivity.cs -i aiSuspend
-#+end_src
-
-=aiResume= restores the =.dormant= files, re-installs the symlinks, and
-re-installs =.claude/=. The activity is inferred from the =AI-Activity.org=
-symlink target or from the =Activity:= header inside =AI-WorkPlan.org=.
-
-#+begin_src bash
-aiActivity.cs -i aiResume
-#+end_src
-
-Both commands operate on the current directory.
-
 ** Remove AI Collaboration Files
 
 To permanently remove all AI collaboration files from a project, use
-=deClaudify=. Unlike =aiSuspend=, this is irreversible — it deletes the
-editable =AI-DevStatus.org= and =AI-WorkPlan.org= files along with the
-symlinks and =.claude/= entries.
+=deClaudify=. It is irreversible --- it deletes the editable
+=AI-DevStatus.org= and =AI-WorkPlan.org= files along with the symlinks and
+=.claude/= entries. If you are only not using AI for a while, leave the files
+where they are; they cost nothing until Claude is started there. Before
+deleting, =deClaudify= warns if either file is untracked or modified
+relative to git (or the directory is not in a repo), since git then has no
+copy. A bare =initiate= afterwards restores everything else from cwdConfig.
 
 #+begin_src bash
 aiActivity.cs -i deClaudify
@@ -1061,10 +1039,16 @@ directory's =AI-WORKFLOW.org= symlink points to a different templates
 tree, so a fresh Claude session in each picks up the correct conventions
 automatically.
 
-The =--templates= parameter (overrides the user-config default for a
-single invocation) and the per-directory
-=.aiActivity.cs/fps/templates= override (see *Per-Directory Templates
-Override* above) are the mechanisms that enable Heterogeneous topologies.
+*Homogeneous is the default.* =initiateSub= (and =refresh=) in a
+subdirectory of an initiated directory use that ancestor's templates base,
+even when your global user-config names another tree. Heterogeneous is
+always /explicit/: the =--templates= parameter (for a single invocation) or
+the per-directory =.aiActivity.cs/fps/templates= override (see *Per-Directory
+Templates Override* above) names the different tree, and =initiateSub=
+reports =HETEROGENEOUS= and proceeds. Whether a directory is a base or a
+sub is decided by its own =AI-WORKFLOW.org= symlink (base installs have one,
+subs inherit the ancestor's), so a base install nested inside another
+initiated project is still recognised as a base.
 
 *** Hierarchical vs Lateral
 
@@ -1185,7 +1169,7 @@ An overview of the relevant files of the bisos.aiActivity package:
 *** aiActivity.cs
 
 =py3/bin/aiActivity.cs=: The main CS-MU (Command-Services Multi-Unit). Provides the
-lifecycle commands (=initiate=, =initiateSub=, =refresh=, =aiSuspend=, =aiResume=,
+lifecycle commands (=initiate=, =initiateSub=, =refresh=,
 =deClaudify=), =cwdConfig_record=, =listClaudesPath= and =examples=. Uses
 =bisos.b.userConfig_csu= and =bisos.b.cwdConfig_csu= for persistent parameter management
 (=userConfig_get/set=, =cwdConfig_get/set=).

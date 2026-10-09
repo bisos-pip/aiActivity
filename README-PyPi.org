@@ -92,7 +92,7 @@ inherited from an ancestor via the same walk-up, avoiding duplication.
 bisos.aiActivity is a python package that uses the [[https://github.com/bisos-pip/pycs][PyCS-Framework]].
 It provides the =aiActivity.cs= command with the following operations:
 =userConfig_set/get= (persistent config), =initiate= (base install), =initiateSub=
-(slim subproject overlay), =aiSuspend= / =aiResume= (reversible pause/restore),
+(slim subproject overlay), =refresh=,
 =deClaudify= (permanent removal), and =examples= (all invocations with the current
 templates base).
 

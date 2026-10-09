@@ -87,6 +87,7 @@ import datetime
 import os
 import pathlib
 import shutil
+import subprocess
 import sys
 import typing
 
@@ -158,6 +159,28 @@ def _detectTemplatesDefault() -> typing.Optional[str]:
     return None
 
 
+def _suggestTemplates() -> typing.List[str]:
+    """Values the examples menu suggests for =templates=, in resolver
+    precedence: the nearest initiated ancestor's base (when cwd is below
+    one), then ~/aiActivityTemplates and /bisos/apps/defaults/ai-templates,
+    each only if it exists. Suggestions only: not validated, not persisted.
+    The ancestor is shown in a well-known spelling when it is the same tree
+    (the symlinked /bisos/apps path, not its resolved target).
+    """
+    known = [
+        pathlib.Path('~/aiActivityTemplates').expanduser(),
+        pathlib.Path('/bisos/apps/defaults/ai-templates'),
+    ]
+    known = [each for each in known if each.is_dir()]
+    suggestions: typing.List[str] = []
+    ancestor = _findInitiatedAncestor(pathlib.Path.cwd())
+    if ancestor is not None:
+        base = ancestor[1]
+        suggestions.append(next((str(each) for each in known if each.resolve() == base), str(base)))
+    suggestions.extend(str(each) for each in known)
+    return suggestions
+
+
 def _resolveTemplatesBase(cliOverride: typing.Optional[str]) -> typing.Optional[str]:
     """Resolve the templates base with precedence:
 
@@ -203,7 +226,7 @@ def _resolveActivity(cliOverride: typing.Optional[str]) -> typing.Optional[str]:
 #                      about the templates tree (images, docs, ...) that is
 #                      neither a template nor installed.
 # Used both for listing activities (examples) and for refusing them as
-# --activity values (initiate, initiateSub, aiResume).
+# --activity values (initiate, initiateSub).
 nonActivityDirs = {'mother', 'test', '_nonTemplate_'}
 
 
@@ -247,6 +270,76 @@ def _deduceCwdConfig(
             templatesBase = str(aTarget.parent.parent)
 
     return (templatesBase, activity)
+
+
+def _findInitiatedAncestor(
+        targetDir: pathlib.Path,
+) -> typing.Optional[typing.Tuple[pathlib.Path, pathlib.Path]]:
+    """Walk up from the parent of =targetDir= to / for the nearest initiated
+    directory, i.e. one whose =AI-WORKFLOW.org= is a symlink to
+    =<templatesBase>/mother/AI-WORKFLOW.org=.
+
+    Returns =(ancestorDir, templatesBase)=, both resolved, or None.
+    """
+    parent = targetDir.parent
+    while True:
+        wf = parent / 'AI-WORKFLOW.org'
+        if wf.is_symlink():
+            wfTarget = pathlib.Path(wf.readlink())
+            if not wfTarget.is_absolute():
+                wfTarget = wf.parent / wfTarget
+            wfTarget = wfTarget.resolve()
+            if wfTarget.parent.name == 'mother':
+                return (parent, wfTarget.parent.parent)
+        if parent.parent == parent:
+            return None
+        parent = parent.parent
+
+
+def _resolveTemplatesBaseSub(
+        cliOverride: typing.Optional[str],
+        targetDir: pathlib.Path,
+) -> typing.Optional[str]:
+    """Like _resolveTemplatesBase, for commands that may run in a sub install.
+
+    Homogeneous is the default: a sub follows the templates base its
+    initiated ancestor was installed from. Heterogeneous is explicit: a CLI
+    --templates or a cwdConfig value overrides it. Precedence: CLI,
+    cwdConfig, nearest initiated ancestor, userConfig, auto-detect. The
+    ancestor outranks the global userConfig, which says nothing about this
+    repo.
+    """
+    if cliOverride:
+        return cliOverride
+    cwdStored = cwdConfig_csu.parGet('templates')
+    if cwdStored:
+        return cwdStored
+    ancestor = _findInitiatedAncestor(targetDir)
+    if ancestor is not None:
+        return str(ancestor[1])
+    return _resolveTemplatesBase(None)
+
+
+def _uncommittedLocalFiles(targetDir: pathlib.Path) -> typing.List[str]:
+    """Which of AI-DevStatus.org / AI-WorkPlan.org would be lost for good by
+    deleting them: present, and either not in a git work tree, untracked,
+    or modified relative to HEAD. Returns descriptions, empty if none."""
+    lost: typing.List[str] = []
+    for fname in ['AI-DevStatus.org', 'AI-WorkPlan.org']:
+        if not (targetDir / fname).is_file():
+            continue
+        try:
+            r = subprocess.run(
+                ['git', 'status', '--porcelain', '--', fname],
+                cwd=targetDir, capture_output=True, text=True)
+        except OSError:
+            lost.append(f"{fname} (git not available)")
+            continue
+        if r.returncode != 0:
+            lost.append(f"{fname} (not under git)")
+        elif r.stdout.strip():
+            lost.append(f"{fname} (untracked or modified: {r.stdout.strip()[:2].strip()})")
+    return lost
 
 
 def _recordCwdConfig(
@@ -380,6 +473,7 @@ def commonParamsSpecify(
         argparseShortOpt=None,
         argparseLongOpt='--templates',
         parPermanence=["userConfig", "cwdConfig"],
+        parSuggestions=_suggestTemplates,  # examples menu only; see CmndParam.parSuggestionsGet
     )
     csParams.parDictAdd(
         parName='noLink',
@@ -442,7 +536,7 @@ class examples(cs.Cmnd):
         cmnd = cs.examples.cmndEnter
         literal = cs.examples.execInsert
 
-        templatesBaseStr = _resolveTemplatesBase(None)
+        templatesBaseStr = _resolveTemplatesBaseSub(None, pathlib.Path.cwd())
 
         cs.examples.myName(cs.G.icmMyName(), cs.G.icmMyFullName())
         cs.examples.commonBrief()
@@ -454,14 +548,6 @@ class examples(cs.Cmnd):
         cmnd('cwdConfig_record',
              pars=od([]),
              comment="# Deduce templates/activity from symlinks; write to ./.aiActivity.cs/")
-
-        cs.examples.menuChapter('=aiSuspend= / =aiResume= -- suspend and resume AI collaboration')
-        cmnd('aiSuspend',
-             pars=od([]),
-             comment="# Remove symlinks/.claude, rename WorkPlan/DevStatus to .dormant")
-        cmnd('aiResume',
-             pars=od([]),
-             comment="# Restore .dormant files and re-install symlinks/.claude")
 
         cs.examples.menuChapter('=refresh= -- re-copy safe-copied invariants (CLAUDE.md) from templates')
         cmnd('refresh',
@@ -744,8 +830,9 @@ class initiateSub(cs.Cmnd):
 ####+END:
         self.cmndDocStr(f""" #+begin_org
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Install subproject AI-collaboration overlay.
-Installs only AI-Activity.org (symlink), AI-DevStatus.org (safe-copy),
-AI-WorkPlan.org (safe-copy), and a slim CLAUDE.md (symlink to
+Installs only AI-Activity.org (symlink), AI-Outputs.org (symlink, if the
+templates ship it), AI-DevStatus.org (safe-copy), AI-WorkPlan.org
+(safe-copy), and a slim CLAUDE.md (copied from
 mother/initiateSub/CLAUDE.md) that imports only the local trio.
 Does NOT install AI-WORKFLOW.org or .claude/ — those are inherited
 from a parent directory that was previously initiated.
@@ -763,7 +850,7 @@ already has a CLAUDE.md.
                 "aiActivity.cs -i cwdConfig_set --parName=activity --parValue=<name>")
             return failed(cmndOutcome)
 
-        templatesBaseStr = _resolveTemplatesBase(templates)
+        templatesBaseStr = _resolveTemplatesBaseSub(templates, pathlib.Path.cwd())
         if templatesBaseStr is None:
             b_io.eh.problem_usageError(
                 "templates not configured. Run: aiActivity.cs -i userConfig_set --parName=templates --parValue=/path/to/templates")
@@ -794,39 +881,25 @@ already has a CLAUDE.md.
                 "Run deClaudify first if you meant to reinstall.")
             return failed(cmndOutcome)
 
-        # Precondition: walk up looking for a aiActivity-signature parent.
-        # CLAUDE.md is now safe-copied (not a symlink), so we can't identify a
-        # parent by symlink target. Instead we look for the AI-WORKFLOW.org
-        # symlink (still an invariant symlink), whose target must land under
-        # templatesBase. If not found, refuse — initiateSub requires an
-        # initiated parent.
-        parent = targetDir.parent
-        foundBase = None
-        while True:
-            parentWorkflow = parent / 'AI-WORKFLOW.org'
-            if parentWorkflow.is_symlink():
-                linkTarget = pathlib.Path(parentWorkflow.readlink())
-                if not linkTarget.is_absolute():
-                    linkTarget = (parentWorkflow.parent / linkTarget).resolve()
-                else:
-                    linkTarget = linkTarget.resolve()
-                try:
-                    linkTarget.relative_to(templatesBase)
-                    foundBase = parent
-                    break
-                except ValueError:
-                    pass  # symlink target isn't under templatesBase — keep walking
-            if parent.parent == parent:
-                break  # reached filesystem root
-            parent = parent.parent
-
-        if foundBase is None:
+        # Precondition: an initiated ancestor (AI-WORKFLOW.org symlink to
+        # <base>/mother/). CLAUDE.md is safe-copied, so the symlink is the
+        # signature. Homogeneous is the default: with no explicit templates
+        # the base is the ancestor's (see _resolveTemplatesBaseSub).
+        # Heterogeneous is allowed: an explicit --templates or cwdConfig
+        # naming a different tree is honoured, with a note.
+        ancestor = _findInitiatedAncestor(targetDir)
+        if ancestor is None:
             b_io.eh.problem_usageError(
                 f"No initiated parent found for {targetDir}. "
-                f"Walked up to / looking for an AI-WORKFLOW.org symlink pointing under {templatesBase}. "
+                "Walked up to / looking for an AI-WORKFLOW.org symlink into a templates tree's mother/. "
                 "Run 'initiate' at a parent directory first, or use 'initiate' here "
                 "if this should be the base.")
             return failed(cmndOutcome)
+        foundBase, ancestorTemplates = ancestor
+        if ancestorTemplates != templatesBase:
+            b_io.ann.note(
+                f"HETEROGENEOUS: initiated parent {foundBase} uses {ancestorTemplates}; "
+                f"this sub uses {templatesBase}")
 
         b_io.ann.note(f"Initiated parent found at: {foundBase}")
 
@@ -858,8 +931,25 @@ already has a CLAUDE.md.
             activityDst.symlink_to(activitySrc)
             b_io.ann.note(f"SYMLINKED: {activityDst} -> {activitySrc}")
 
-        # Initial files — safe-copied from activity/, falling back to mother/
+        # AI-Outputs.org — symlinked from mother/ into every initiated
+        # directory, subs included: it is not @-imported, so Claude Code's
+        # walk-up never finds a parent's copy and /bx-ai-outputs reads
+        # ./AI-Outputs.org. Optional: skipped if the templates tree lacks it.
         motherDir = templatesBase / 'mother'
+        outputsSrc = motherDir / 'AI-Outputs.org'
+        outputsDst = targetDir / 'AI-Outputs.org'
+        if not outputsSrc.exists() and not outputsSrc.is_symlink():
+            b_io.ann.note(f"SKIP (no such file in templates): {outputsSrc}")
+        elif outputsDst.exists() or outputsDst.is_symlink():
+            b_io.ann.note(f"SKIP (exists): {outputsDst}")
+        elif noLink == 'AI-Outputs.org':
+            shutil.copy2(outputsSrc, outputsDst)
+            b_io.ann.note(f"COPIED (--noLink=AI-Outputs.org): {outputsSrc} -> {outputsDst}")
+        else:
+            outputsDst.symlink_to(outputsSrc)
+            b_io.ann.note(f"SYMLINKED: {outputsDst} -> {outputsSrc}")
+
+        # Initial files — safe-copied from activity/, falling back to mother/
         initialFiles = ['AI-DevStatus.org', 'AI-WorkPlan.org']
         for fname in initialFiles:
             activityFileSrc = activityDir / fname
@@ -879,307 +969,6 @@ already has a CLAUDE.md.
         return cmndOutcome.set(
             opError=b.op.OpError.Success,
             opResults=f"Subproject AI-collaboration overlay installed for activity={activity} at {targetDir} (inherits from {foundBase})",
-        )
-
-
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "aiSuspend" :comment "Suspend AI collaboration: remove symlinks/.claude, stash editable files" :extent "verify" :ro "cli" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
-""" #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiSuspend>>  *Suspend AI collaboration: remove symlinks/.claude, stash editable files*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
-#+end_org """
-class aiSuspend(cs.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ ]
-    cmndArgsLen = {'Min': 0, 'Max': 0,}
-
-    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-             rtInv: cs.RtInvoker,
-             cmndOutcome: b.op.Outcome,
-    ) -> b.op.Outcome:
-        """Suspend AI collaboration: remove symlinks/.claude, stash editable files"""
-        failed = b_io.eh.badOutcome
-        callParamsDict = {}
-        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
-            return failed(cmndOutcome)
-####+END:
-        self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Suspend AI collaboration in current directory.
-Removes symlinks (AI-WORKFLOW.org, AI-Outputs.org, AI-Activity.org, plus
-any legacy AI-AGENTS.org from pre-merge projects) and =.claude/= entries.
-Stashes =CLAUDE.md= as =CLAUDE.md.dormant= (rename; CLAUDE.md is now a
-safe-copy, not a symlink). Renames AI-DevStatus.org and AI-WorkPlan.org
-to .dormant so they survive and can be restored by aiResume.
-        #+end_org """)
-
-        targetDir = pathlib.Path.cwd()
-
-        # Stash CLAUDE.md as CLAUDE.md.dormant. CLAUDE.md is now a safe-copy
-        # (see initiate/initiateSub) — rename it aside. aiResume renames it
-        # back or re-copies from templates if missing.
-        claudeLive = targetDir / 'CLAUDE.md'
-        claudeDormant = targetDir / 'CLAUDE.md.dormant'
-        if claudeLive.is_symlink():
-            # Legacy install: previously symlinked CLAUDE.md. Just remove it.
-            claudeLive.unlink()
-            b_io.ann.note(f"REMOVED legacy symlink: {claudeLive}")
-        elif claudeLive.is_file():
-            if claudeDormant.exists() or claudeDormant.is_symlink():
-                b_io.ann.note(f"SKIP stash (dormant already exists): {claudeDormant}")
-            else:
-                claudeLive.rename(claudeDormant)
-                b_io.ann.note(f"STASHED: {claudeLive} -> {claudeDormant}")
-        else:
-            b_io.ann.note(f"SKIP (not present): {claudeLive}")
-
-        # Remove the other symlinks (no dormant preservation needed — they're
-        # reinstalled from templates based on the CLAUDE.md.dormant signature).
-        # AI-AGENTS.org is retained as legacy cleanup — pre-merge projects
-        # have this symlink and aiSuspend should still remove it.
-        symlinkFiles = ['AI-AGENTS.org', 'AI-WORKFLOW.org', 'AI-Activity.org', 'AI-Outputs.org']
-        for fname in symlinkFiles:
-            dst = targetDir / fname
-            if dst.is_symlink():
-                dst.unlink()
-                b_io.ann.note(f"REMOVED symlink: {dst}")
-            elif dst.exists():
-                b_io.ann.note(f"SKIP (not a symlink, leaving intact): {dst}")
-            else:
-                b_io.ann.note(f"SKIP (not present): {dst}")
-
-        # Stash editable files by renaming to .dormant
-        stashFiles = ['AI-DevStatus.org', 'AI-WorkPlan.org']
-        for fname in stashFiles:
-            src = targetDir / fname
-            dst = targetDir / (fname + '.dormant')
-            if src.is_file() and not src.is_symlink():
-                if dst.exists():
-                    b_io.ann.note(f"SKIP stash (dormant already exists): {dst}")
-                else:
-                    src.rename(dst)
-                    b_io.ann.note(f"STASHED: {src} -> {dst}")
-            elif src.is_symlink():
-                b_io.ann.note(f"SKIP stash (is a symlink, leaving intact): {src}")
-            else:
-                b_io.ann.note(f"SKIP stash (not present): {src}")
-
-        # Remove .claude/ symlinked entries
-        claudeDstDir = targetDir / '.claude'
-        for claudeEntry in ['settings.json', 'commands', 'skills']:
-            claudeDst = claudeDstDir / claudeEntry
-            if claudeDst.is_symlink():
-                claudeDst.unlink()
-                b_io.ann.note(f"REMOVED symlink: {claudeDst}")
-            elif claudeDst.exists():
-                b_io.ann.note(f"SKIP (not a symlink, leaving intact): {claudeDst}")
-            else:
-                b_io.ann.note(f"SKIP (not present): {claudeDst}")
-
-        if claudeDstDir.is_dir() and not any(claudeDstDir.iterdir()):
-            claudeDstDir.rmdir()
-            b_io.ann.note(f"REMOVED empty directory: {claudeDstDir}")
-
-        return cmndOutcome.set(
-            opError=b.op.OpError.Success,
-            opResults=f"aiSuspend complete at {targetDir}",
-        )
-
-
-####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "aiResume" :comment "Resume AI collaboration: restore .dormant files and re-install symlinks/.claude" :extent "verify" :ro "cli" :parsMand "" :parsOpt "templates" :argsMin 0 :argsMax 0 :pyInv ""
-""" #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<aiResume>>  *Resume AI collaboration: restore .dormant files and re-install symlinks/.claude*  =verify= parsOpt=templates ro=cli   [[elisp:(org-cycle)][| ]]
-#+end_org """
-class aiResume(cs.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'templates', ]
-    cmndArgsLen = {'Min': 0, 'Max': 0,}
-
-    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-             rtInv: cs.RtInvoker,
-             cmndOutcome: b.op.Outcome,
-             templates: typing.Optional[str]=None,  # Cs Optional Param
-    ) -> b.op.Outcome:
-        """Resume AI collaboration: restore .dormant files and re-install symlinks/.claude"""
-        failed = b_io.eh.badOutcome
-        callParamsDict = {'templates': templates, }
-        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
-            return failed(cmndOutcome)
-        templates = csParam.mappedValue('templates', templates)
-####+END:
-        self.cmndDocStr(f""" #+begin_org
-** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Resume AI collaboration in current directory.
-Restores AI-DevStatus.org and AI-WorkPlan.org from their .dormant copies.
-Detects base vs sub mode by walking up looking for a parent
-=AI-WORKFLOW.org= symlink under templatesBase: if found, this is a sub
-install (slim CLAUDE.md only; AI-WORKFLOW.org and =.claude/= inherited
-from parent). Otherwise base. CLAUDE.md is re-copied (safe-copy)
-from =mother/initiateSub/CLAUDE.md= (sub) or =mother/CLAUDE.md= (base)
-if =CLAUDE.md.dormant= is not present; otherwise the dormant copy is
-promoted back. Activity is inferred from the =AI-Activity.org= symlink
-target or the =Activity:= header in =AI-WorkPlan.org=.
-        #+end_org """)
-
-        targetDir = pathlib.Path.cwd()
-
-        # Restore .dormant files
-        stashFiles = ['AI-DevStatus.org', 'AI-WorkPlan.org']
-        for fname in stashFiles:
-            src = targetDir / (fname + '.dormant')
-            dst = targetDir / fname
-            if src.exists():
-                if dst.exists() or dst.is_symlink():
-                    b_io.ann.note(f"SKIP restore (already exists): {dst}")
-                else:
-                    src.rename(dst)
-                    b_io.ann.note(f"RESTORED: {src} -> {dst}")
-            else:
-                b_io.ann.note(f"SKIP restore (dormant not found): {src}")
-
-        # Determine templates base
-        templatesBaseStr = _resolveTemplatesBase(templates)
-        if templatesBaseStr is None:
-            b_io.eh.problem_usageError(
-                "templates not configured. Run: aiActivity.cs -i userConfig_set --parName=templates --parValue=/path/to/templates")
-            return failed(cmndOutcome)
-        templatesBase = pathlib.Path(templatesBaseStr).resolve()
-        motherDir = templatesBase / 'mother'
-
-        # Detect base vs sub mode by walking up for a parent AI-WORKFLOW.org
-        # symlink that points under templatesBase.
-        subMode = False
-        parent = targetDir.parent
-        while True:
-            parentWorkflow = parent / 'AI-WORKFLOW.org'
-            if parentWorkflow.is_symlink():
-                linkTarget = pathlib.Path(parentWorkflow.readlink())
-                if not linkTarget.is_absolute():
-                    linkTarget = (parentWorkflow.parent / linkTarget).resolve()
-                else:
-                    linkTarget = linkTarget.resolve()
-                try:
-                    linkTarget.relative_to(templatesBase)
-                    subMode = True
-                    b_io.ann.note(f"MODE: sub (parent AI-WORKFLOW.org found at {parent})")
-                    break
-                except ValueError:
-                    pass
-            if parent.parent == parent:
-                break
-            parent = parent.parent
-        if not subMode:
-            b_io.ann.note("MODE: base (no initiated parent found)")
-
-        claudeDormant = targetDir / 'CLAUDE.md.dormant'
-
-        # Infer activity from AI-Activity.org symlink target if it still exists,
-        # otherwise from the restored AI-WorkPlan.org dblock header, otherwise fail.
-        activityOrg = targetDir / 'AI-Activity.org'
-        activity = None
-        if activityOrg.is_symlink():
-            # target is <templatesBase>/<activity>/AI-Activity.org
-            target = pathlib.Path(activityOrg.readlink())
-            activity = target.parent.name
-        else:
-            # try to read Activity: line from AI-WorkPlan.org dblock header
-            workPlan = targetDir / 'AI-WorkPlan.org'
-            if workPlan.exists():
-                for line in workPlan.read_text().splitlines():
-                    if line.strip().startswith('Activity:'):
-                        activity = line.split(':', 1)[1].strip()
-                        break
-
-        if activity is None:
-            b_io.eh.problem_usageError(
-                "Cannot infer activity. Ensure AI-Activity.org symlink or AI-WorkPlan.org with Activity: header is present.")
-            return failed(cmndOutcome)
-
-        if activity in nonActivityDirs:
-            b_io.eh.problem_usageError(
-                f"Not an activity: {activity} (reserved: {', '.join(sorted(nonActivityDirs))})")
-            return failed(cmndOutcome)
-        activityDir = templatesBase / activity
-        if not activityDir.is_dir():
-            b_io.eh.problem_usageError(f"Activity directory not found: {activityDir}")
-            return failed(cmndOutcome)
-
-        b_io.ann.note(f"Inferred activity: {activity}")
-
-        # Re-install CLAUDE.md — safe-copy (never a symlink). Promote
-        # CLAUDE.md.dormant back if present; otherwise re-copy from templates
-        # based on the detected mode.
-        claudeLive = targetDir / 'CLAUDE.md'
-        claudeSrc = (motherDir / 'initiateSub' / 'CLAUDE.md') if subMode else (motherDir / 'CLAUDE.md')
-        if claudeLive.exists() or claudeLive.is_symlink():
-            b_io.ann.note(f"SKIP (exists): {claudeLive}")
-        elif claudeDormant.is_file() and not claudeDormant.is_symlink():
-            claudeDormant.rename(claudeLive)
-            b_io.ann.note(f"PROMOTED: {claudeDormant} -> {claudeLive}")
-        else:
-            shutil.copy2(claudeSrc, claudeLive)
-            b_io.ann.note(f"COPIED: {claudeSrc} -> {claudeLive}")
-
-        # AI-WORKFLOW.org / AI-Outputs.org: base mode only; subs inherit from
-        # parent. AI-Outputs.org is optional in the templates tree.
-        if not subMode:
-            for fname in ['AI-WORKFLOW.org', 'AI-Outputs.org']:
-                src = motherDir / fname
-                dst = targetDir / fname
-                if not src.exists() and not src.is_symlink():
-                    b_io.ann.note(f"SKIP (no such file in templates): {src}")
-                    continue
-                if dst.exists() or dst.is_symlink():
-                    b_io.ann.note(f"SKIP (exists): {dst}")
-                else:
-                    dst.symlink_to(src)
-                    b_io.ann.note(f"SYMLINKED: {dst} -> {src}")
-
-        # Re-install AI-Activity.org symlink (both modes)
-        activitySrc = activityDir / 'AI-Activity.org'
-        activityDst = targetDir / 'AI-Activity.org'
-        if activityDst.exists() or activityDst.is_symlink():
-            b_io.ann.note(f"SKIP (exists): {activityDst}")
-        else:
-            activityDst.symlink_to(activitySrc)
-            b_io.ann.note(f"SYMLINKED: {activityDst} -> {activitySrc}")
-
-        # .claude/ entries: base mode only; subs inherit from parent.
-        if subMode:
-            return cmndOutcome.set(
-                opError=b.op.OpError.Success,
-                opResults=f"aiResume complete at {targetDir} (activity={activity}, mode=sub)",
-            )
-
-        # Re-install .claude/ symlinked entries
-        claudeDstDir = targetDir / '.claude'
-        claudeDstDir.mkdir(exist_ok=True)
-        for claudeEntry in ['settings.json', 'commands']:
-            activityClaudeSrc = activityDir / '_claude' / claudeEntry
-            motherClaudeSrc = motherDir / '_claude' / claudeEntry
-            claudeSrc = activityClaudeSrc if activityClaudeSrc.exists() else motherClaudeSrc
-            if not claudeSrc.exists():
-                continue
-            claudeDst = claudeDstDir / claudeEntry
-            if claudeDst.exists() or claudeDst.is_symlink():
-                b_io.ann.note(f"SKIP (exists): {claudeDst}")
-            else:
-                claudeDst.symlink_to(claudeSrc)
-                b_io.ann.note(f"SYMLINKED: {claudeDst} -> {claudeSrc}")
-
-        # Re-install .claude/skills/ symlink
-        activitySkillsSrc = activityDir / '_skills'
-        motherSkillsSrc = motherDir / '_skills'
-        skillsSrc = activitySkillsSrc if activitySkillsSrc.exists() else motherSkillsSrc
-        if skillsSrc.exists():
-            skillsDst = claudeDstDir / 'skills'
-            if skillsDst.exists() or skillsDst.is_symlink():
-                b_io.ann.note(f"SKIP (exists): {skillsDst}")
-            else:
-                skillsDst.symlink_to(skillsSrc)
-                b_io.ann.note(f"SYMLINKED: {skillsDst} -> {skillsSrc}")
-
-        return cmndOutcome.set(
-            opError=b.op.OpError.Success,
-            opResults=f"aiResume complete at {targetDir} (activity={activity}, mode=base)",
         )
 
 
@@ -1209,12 +998,13 @@ class refresh(cs.Cmnd):
 ** [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Re-copy safe-copied invariant files from templates,
 and create any missing invariant symlinks (e.g. =AI-Outputs.org= on a
 project =initiate=-d before that symlink existed in the templates tree).
-Detects base vs sub mode by walking up for a parent =AI-WORKFLOW.org=
-symlink under templatesBase: if found, this is a sub install and
+Detects base vs sub mode: a directory with its own =AI-WORKFLOW.org=
+symlink is a base install; one without it, below an initiated ancestor
+(of any templates base), is a sub install and
 =CLAUDE.md= is re-copied from =mother/initiateSub/CLAUDE.md=; otherwise
-from =mother/CLAUDE.md=. Missing-symlink backfill (=AI-Outputs.org=) is
-base-mode only — subs inherit it from the parent, same as
-=AI-WORKFLOW.org=.
+from =mother/CLAUDE.md=. Missing-symlink backfill (=AI-Outputs.org=) applies
+to base and sub alike: it is not @-imported, so a parent's copy is never
+found by walk-up and every directory needs its own symlink.
 Upgrades legacy symlinked =CLAUDE.md= installs by unlinking then copying.
 Never touches per-project files (AI-DevStatus.org, AI-WorkPlan.org, or
 files installed with =--noLink=). No provenance line: CLAUDE.md is meant
@@ -1224,7 +1014,7 @@ to be the equivalent of a symlink.
         targetDir = pathlib.Path.cwd()
 
         # Resolve templates base.
-        templatesBaseStr = _resolveTemplatesBase(templates)
+        templatesBaseStr = _resolveTemplatesBaseSub(templates, pathlib.Path.cwd())
         if templatesBaseStr is None:
             b_io.eh.problem_usageError(
                 "templates not configured. Run: aiActivity.cs -i userConfig_set --parName=templates --parValue=/path/to/templates")
@@ -1232,30 +1022,16 @@ to be the equivalent of a symlink.
         templatesBase = pathlib.Path(templatesBaseStr).resolve()
         motherDir = templatesBase / 'mother'
 
-        # Detect base vs sub mode by walking up for a parent AI-WORKFLOW.org
-        # symlink that points under templatesBase.
+        # Detect base vs sub mode: a base install carries its own AI-WORKFLOW.org
+        # symlink; a sub does not, and has an initiated ancestor (of any
+        # templates base, so heterogeneous subs are recognised too).
         subMode = False
-        parent = targetDir.parent
-        while True:
-            parentWorkflow = parent / 'AI-WORKFLOW.org'
-            if parentWorkflow.is_symlink():
-                linkTarget = pathlib.Path(parentWorkflow.readlink())
-                if not linkTarget.is_absolute():
-                    linkTarget = (parentWorkflow.parent / linkTarget).resolve()
-                else:
-                    linkTarget = linkTarget.resolve()
-                try:
-                    linkTarget.relative_to(templatesBase)
-                    subMode = True
-                    b_io.ann.note(f"MODE: sub (parent AI-WORKFLOW.org found at {parent})")
-                    break
-                except ValueError:
-                    pass
-            if parent.parent == parent:
-                break
-            parent = parent.parent
+        ancestor = _findInitiatedAncestor(targetDir)
+        if ancestor is not None and not (targetDir / 'AI-WORKFLOW.org').is_symlink():
+            subMode = True
+            b_io.ann.note(f"MODE: sub (parent AI-WORKFLOW.org found at {ancestor[0]})")
         if not subMode:
-            b_io.ann.note("MODE: base (no initiated parent found)")
+            b_io.ann.note("MODE: base (own AI-WORKFLOW.org, or no initiated parent)")
 
         claudeSrc = (motherDir / 'initiateSub' / 'CLAUDE.md') if subMode else (motherDir / 'CLAUDE.md')
         if not claudeSrc.exists():
@@ -1275,22 +1051,22 @@ to be the equivalent of a symlink.
             shutil.copy2(claudeSrc, claudeDst)
             b_io.ann.note(f"COPIED (was not present): {claudeSrc} -> {claudeDst}")
 
-        # Backfill missing invariant symlinks — base mode only; subs inherit
-        # from parent. Handles projects initiated before AI-Outputs.org
-        # existed in the templates tree. Optional: skipped if the templates
-        # tree doesn't ship it (e.g. bxexamples, rana-notes as of this writing).
-        if not subMode:
-            for fname in ['AI-Outputs.org']:
-                src = motherDir / fname
-                dst = targetDir / fname
-                if not src.exists() and not src.is_symlink():
-                    b_io.ann.note(f"SKIP (no such file in templates): {src}")
-                    continue
-                if dst.exists() or dst.is_symlink():
-                    b_io.ann.note(f"SKIP (exists): {dst}")
-                else:
-                    dst.symlink_to(src)
-                    b_io.ann.note(f"SYMLINKED (backfilled): {dst} -> {src}")
+        # Backfill missing invariant symlinks, in base and sub mode alike
+        # (AI-Outputs.org is read from the current directory, never found by
+        # walk-up). Handles projects initiated before AI-Outputs.org existed
+        # in the templates tree. Optional: skipped if the templates tree
+        # doesn't ship it (e.g. bxexamples, rana-notes as of this writing).
+        for fname in ['AI-Outputs.org']:
+            src = motherDir / fname
+            dst = targetDir / fname
+            if not src.exists() and not src.is_symlink():
+                b_io.ann.note(f"SKIP (no such file in templates): {src}")
+                continue
+            if dst.exists() or dst.is_symlink():
+                b_io.ann.note(f"SKIP (exists): {dst}")
+            else:
+                dst.symlink_to(src)
+                b_io.ann.note(f"SYMLINKED (backfilled): {dst} -> {src}")
 
         return cmndOutcome.set(
             opError=b.op.OpError.Success,
@@ -1466,12 +1242,16 @@ Deletes symlinks: CLAUDE.md, AI-WORKFLOW.org, AI-Outputs.org, AI-Activity.org,
 from pre-merge projects, if present).
 Deletes copied files: AI-DevStatus.org, AI-WorkPlan.org.
 Removes .claude/ directory if it becomes empty.
+Warns first, and still proceeds, if AI-DevStatus.org or AI-WorkPlan.org
+holds changes that git does not have (untracked, modified or not in a repo).
         #+end_org """)
 
         targetDir = pathlib.Path.cwd()
 
-        # Symlinked constant files and activity file (includes CLAUDE.md.dormant
-        # in case deClaudify runs while a session is suspended).
+        for _w in _uncommittedLocalFiles(targetDir):
+            b_io.ann.note(f"WARNING: deleting {_w}, which git does not have in its current form")
+
+        # Symlinked constant files.
         # AI-AGENTS.org is retained here as a legacy cleanup — pre-merge
         # projects have an AI-AGENTS.org symlink that deClaudify should
         # still remove even though initiate no longer installs it.
@@ -1493,7 +1273,7 @@ Removes .claude/ directory if it becomes empty.
         # AI-Activity.org may be either a symlink (default install) or a
         # regular file (--noLink=AI-Activity.org install). Remove either form
         # for both. AI-DevStatus.org / AI-WorkPlan.org are always safe-copies.
-        # Includes .dormant copies in case deClaudify runs while a session is suspended.
+        # The .dormant copies are legacy: left by the retired aiSuspend.
         removableFiles = ['CLAUDE.md', 'CLAUDE.md.dormant',
                           'AI-Activity.org', 'AI-Activity.org.dormant',
                           'AI-DevStatus.org', 'AI-WorkPlan.org',

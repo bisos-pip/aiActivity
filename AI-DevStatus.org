@@ -20,8 +20,8 @@ This file is maintained by Claude. Updates are typically triggered by the
 * Current State
 
 As of 2026-10-07: Stages 1--12 and 16 are complete; Stage 14 is partly
-done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
-=AI-WorkPlan.org= Stage 14 (14.1, 14.4--14.12) and the Stage 15 sync loop
+done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15 DONE). Open work is in
+=AI-WorkPlan.org= Stage 14 (14.9, 14.10, 14.12) and the Stage 15 sync loop
 (15.1, which now lists today's pending sync items).
 
 *Done on 2026-10-07* (details under each TODO's Results in =AI-WorkPlan.org=):
@@ -48,7 +48,7 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
   not =startupTokens=, for that reason.
 - *=nonActivityDirs = {'mother', 'test', '_nonTemplate_'}=* in
   =aiActivity.cs=. It replaces the =examples=-only list and is now also
-  refused as =--activity= by =initiate=, =initiateSub= and =aiResume=.
+  refused as =--activity= by =initiate= and =initiateSub=.
   Previously =--activity=mother= was accepted.
 - *Figures.*
   - =py3/images/aiActivityFlow= updated ([[12.2]]): engine split into
@@ -81,9 +81,9 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
 - Stage 10 --- provenance block in safe-copies; =--noLink=; =custom= activity.
 - Stage 8 --- =AI-AGENTS.org= retired (still cleaned up as legacy).
 - Stage 7 --- templates auto-detect, user-first (=~/aiActivityTemplates=, then BISOS).
-- Stage 6 --- =initiateSub= overlays; mode-aware suspend/resume.
+- Stage 6 --- =initiateSub= overlays. (Its suspend/resume was retired 2026-10-08.)
 - Stage 5 --- skills via =.claude/skills= → =<activity>/_skills/=.
-- Stages 2--4 --- engine, docs, =deClaudify= / =aiSuspend= / =aiResume=.
+- Stages 2--4 --- engine, docs, =deClaudify=.
 
 *Pointers to records outside the import chain:*
 - Templates-side work today lives in the =bisos/defaults= repo (under
@@ -112,13 +112,15 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
   symlinked; DevStatus/WorkPlan are safe-copied with provenance and the
   particulars dblock expanded. =--noLink=<file>= safe-copies a would-be
   symlink. =initiateSub= requires an initiated ancestor and installs only
-  the slim overlay.
+  the slim overlay plus an =AI-Outputs.org= symlink (every directory gets
+  one, as it is read from cwd and never found by walk-up; =refresh=
+  backfills it in subs too, fixed 2026-10-08).
 - =--activity= refuses =mother=, =test=, =_nonTemplate_= in =initiate=,
-  =initiateSub= and =aiResume= (verified in a scratch dir; no files
-  created).
+  =initiateSub= (verified in a scratch dir; no files created).
 - =refresh= (re-copy =CLAUDE.md=, upgrade legacy symlinked ones, backfill
-  =AI-Outputs.org=); =aiSuspend= / =aiResume= (mode-aware via
-  =.dormant=); =deClaudify= (also cleans legacy =AI-AGENTS.org=).
+  =AI-Outputs.org=); =deClaudify= (also cleans legacy =AI-AGENTS.org= and
+  =.dormant= files; warns first if =AI-DevStatus.org= / =AI-WorkPlan.org=
+  are untracked or modified in git).
 - Inspection: =listClaudesPath=; =startupClaudeTokens= (verified from the
   repo root ~77K, from =py3/tests/= ~78K, and from an empty dir 0; parser
   checks for emails, code spans, fenced blocks, escaped spaces).
@@ -136,7 +138,7 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
   compared with the built-in =/context= "Memory files" figure on a fresh
   session.
 - The auto-default hook on a machine with neither templates location.
-- Activities other than =bisos-pip= under =initiate= / =aiResume= (the
+- Activities other than =bisos-pip= under =initiate= (the
   logic is generic but only =bisos-pip= was exercised interactively).
 - Lifecycle commands where =.claude/= holds non-symlink files such as
   =settings.local.json= (meant to be left intact).
@@ -169,10 +171,6 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
   on =aiActivity.cs= but changed no =csuListProc= lines. Either the hand
   edit already matched the generator, or that block wasn't regenerated.
   Confirm by running that one dblock in Blee.
-- *=py3/tests/CLAUDE.md= is a legacy symlink* (pre-Stage-11), so its
-  relative imports resolve into =mother/=. Fix: =aiActivity.cs -i refresh=
-  in =py3/tests/=. Also the cause of the 14.1 mode-detection quirk when
-  testing there.
 - *=verify.sh= venv issue.* =#!/bin/bash -i= activates =tmoBisos= on BISOS
   machines, which lacks =bisos.pyDblock=. Fix: install it there, or pin
   verify.sh to the BISOS venv.
@@ -193,7 +191,7 @@ done (14.2, 14.2.1, 14.3, 14.13, 14.14 DONE). Open work is in
 py3/
   bin/
     aiActivity.cs              --- main csxu: initiate, initiateSub, refresh,
-                                   aiSuspend, aiResume, deClaudify,
+                                   deClaudify,
                                    cwdConfig_record, listClaudesPath, examples;
                                    nonActivityDirs; csuList = userConfig_csu,
                                    cwdConfig_csu, startupClaudeTokens_csu
@@ -323,21 +321,17 @@ see [[15.1]].
   in the current templates repo layout. The =excludedDirs= set in =examples=
   uses =mother= accordingly.
 
-- *=deClaudify= vs =aiSuspend= distinction* — =deClaudify= is permanent cleanup
-  (deletes editable files); =aiSuspend= is reversible suspension (renames to
-  =.dormant=). Both operate on the current directory only — no =--root= param,
-  because the files are already present and discoverable.
-
-- *=.dormant= suffix for stashed files* — chosen over a =Stashed-= prefix or
-  a separate directory. The suffix keeps files in the same directory (no path
-  changes), sorts them near their originals, and is unambiguous to both humans
-  and tooling. =aiResume= looks for exactly these suffixed names.
-
-- *Activity inference in =aiResume=* — first tries the =AI-Activity.org= symlink
-  target (parent dir name = activity); falls back to the =Activity:= header line
-  in the =AI-WorkPlan.org= dblock. This means =aiResume= works correctly even
-  after =aiSuspend= has removed the symlink, as long as the =.dormant= WorkPlan
-  is present.
+- *=aiSuspend= / =aiResume= retired* (2026-10-08). Never used in practice:
+  idle AI files cost nothing until Claude is started in that directory. Their
+  only unique property, preserving edited =AI-DevStatus.org= /
+  =AI-WorkPlan.org=, is covered by git. Removed with them: the =.dormant=
+  suffix scheme, activity inference from the =Activity:= header, and the
+  =CLAUDE.md.dormant= symlink-target mode signature. Rather than keep a
+  second mechanism, =deClaudify= now warns before deleting those two files
+  when git does not have them in their current form (untracked, modified,
+  or not in a repo); it still proceeds. =deClaudify= keeps removing legacy
+  =.dormant= files. =deClaudify= and =refresh= operate on the current
+  directory only --- no =--root= param.
 
 - *Skills at activity root, not under =_claude/=* — skills live in
   =<activity>/_skills/=, not =<activity>/_claude/skills/=. Rationale: skills are
@@ -354,14 +348,32 @@ see [[15.1]].
   prompting or session hooks — discovery is fully automatic once files
   are on disk.
 
-- *Symlink-target as mode signature* — =aiSuspend= renames =CLAUDE.md=
-  to =CLAUDE.md.dormant= (preserving the symlink target) rather than
-  removing it. =aiResume= reads the target with =readlink= + resolve and
-  compares against =<templatesBase>/mother/initiateSub/CLAUDE.md= to
-  distinguish base from sub. Chose this over storing mode in a dblock
-  or requiring a =--sub= flag: (a) zero user burden, (b) tolerates
-  hand-edits (only the symlink target matters), (c) survives filesystem
-  copies and git checkouts.
+- *A repo follows its initiated ancestor's templates base* (2026-10-08).
+  =initiateSub= and =refresh= resolve templates as CLI → cwdConfig → nearest
+  initiated ancestor (an =AI-WORKFLOW.org= symlink into some =<base>/mother/=)
+  → userConfig → auto-detect. Before, userConfig outranked the ancestor, so a
+  userConfig naming a fork made =initiateSub= fail ("No initiated parent
+  found") inside a repo initiated from the BISOS tree. An explicit
+  =--templates= or cwdConfig that disagrees with the ancestor makes the
+  sub Heterogeneous: honoured, with a =HETEROGENEOUS= note (a first version
+  refused it as a "Templates mismatch", contradicting the README's topology
+  section; corrected the same day). Homogeneous is the default,
+  heterogeneous always explicit. Base vs sub is decided by the directory's
+  own =AI-WORKFLOW.org= symlink (base has one, sub inherits an ancestor's),
+  so no mode is stored anywhere and a base nested in another initiated
+  project is classified correctly (this is [[14.1]]).
+
+- *=parSuggestions= for the =*Config_set= examples menus* (2026-10-09, in
+  =bisos.b=, shared). A new optional =parDictAdd= / =CmndParam= argument: a
+  list, or a callable evaluated only when a menu is built. It feeds the
+  =userConfig_set= / =cwdConfig_set= example lines (one per suggestion; the
+  =<name-value>= placeholder remains when there are none). Not =parChoices=
+  (argparse would restrict values) and not =parDefault= (persisted by
+  =parDictAdd= in the string-permanence case). Never validated or persisted.
+  =aiActivity.cs= supplies =_suggestTemplates=: nearest initiated ancestor's
+  base (shown in its =/bisos/apps/...= spelling when it is the same tree),
+  then =~/aiActivityTemplates= and =/bisos/apps/defaults/ai-templates= if
+  they exist. Verified in scratch dirs only; =bisos.b= has no tests run for it.
 
 - *=--activity= required on =initiateSub=* — no inheritance-from-parent
   default. Rationale: a subproject can legitimately be a different
@@ -404,8 +416,8 @@ see [[15.1]].
   =AI-WorkPlan.org= directly eliminates one file, one symlink, one
   install step, and one layer of indirection without loss. Legacy
   projects with an =AI-AGENTS.org= symlink still get correctly cleaned
-  up by =deClaudify= and =aiSuspend= (both retain the entry in their
-  cleanup lists with an explanatory comment).
+  up by =deClaudify= (it retains the entry in its cleanup list with an
+  explanatory comment).
 
 - *=--noLink= is a CLI flag, not a per-activity config file.* When
   the need for per-project safe-copy of =AI-Activity.org= (and
@@ -443,7 +455,7 @@ see [[15.1]].
   files (=AI-Activity.org=, etc.); (c) two-level wrapper --- doesn't
   solve the underlying resolution. Trade-off: templates changes to
   CLAUDE.md don't propagate automatically to installed projects ---
-  mitigated by =refresh=. Mode detection in =aiResume= and =initiateSub=
+  mitigated by =refresh=. Mode detection in =refresh= and =initiateSub=
   switched from CLAUDE.md-symlink-target to parent =AI-WORKFLOW.org=
   walk-up under templatesBase; =AI-WORKFLOW.org= is still symlinked
   (it has no back-imports, so symlink resolution is harmless).
