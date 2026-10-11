@@ -15,16 +15,29 @@ machine (which has this repo but NOT the developer's =~=). It captures the
 architecture, what works, what is untested and the design decisions made so far.
 
 This file is maintained by Claude. Updates are typically triggered by the
-=/bx-update-status= slash command, after major interactions, or before a release.
+=/bx-status-update= slash command, after major interactions, or before a release.
 
 * Current State
 
-As of 2026-10-09: Stages 1--12 and 16 are complete and archived. Stage 14
+As of 2026-10-11: Stages 1--12 and 16 are complete and archived. Stage 14
 is partly done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15
 DONE); open: 14.9 (yasnippets, a Blee job), 14.10 (isolate the Claude
 binding constants), 14.12 (=startupClaudeTokens --graph=), plus the
 Stage 15 sync loop (15.1). Template-maintenance TODOs moved to the
 templates repo's own WorkPlan (its Stage 2, =<<2.1>>=--=<<2.4>>=).
+
+*Done on 2026-10-11* (from a bisos-pip/kafka session; no engine code changed):
+
+- *Slash commands renamed in the templates tree* to subject-then-verb groups:
+  =bx-git-commit-msg=, =bx-status-read=, =bx-status-update=, =bx-archive-read=,
+  =bx-archive-update=; new =bx-git-uncommitted-list= and =bx-session-verify=. Recorded in
+  the templates repo (=ai-templates/AI-DevStatus.org=, and its naming-convention TODO).
+  README.org's session-workflow table and Archive bullet follow the new names.
+- *=py3/images/fromTemplates/refreshFromTemplates.sh=* (new) copies the rendered figures in
+  (only those that changed), names the source commit, warns when the source is uncommitted,
+  and reminds that both repos need commit+push. Normally run from the source side by the
+  templates' =aiActivityFiguresPush.sh=. All three workflow figures re-copied.
+- =py3/images/AI-DevStatus.org= (a sample) still has the old =/bx-update-status= boilerplate.
 
 *Done on 2026-10-08/09* (details under each TODO's Results in
 =AI-WorkPlan.org= and =AI-WorkPlan.org_archive=):

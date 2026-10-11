@@ -691,8 +691,8 @@ step reads (R) and writes (W).
 |--------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
 | =/bx-confirm0=                 |              |                  | R                              | R                |                |
 | =/bx-confirm-here=             |              |                  | R                              | R                |                |
-| =/bx-status=                   |              |                  | R                              | R                |                |
-| =/bx-import-archive=           |              |                  | R (=_archive=)                 |                  |                |
+| =/bx-archive-read=           |              |                  | R (=_archive=)                 |                  |                |
+| =/bx-status-read=                |              |                  | R                              | R                |                |
 | Work on the selected TODO      | RW           |                  | R                              |                  |                |
 | /You:/ =git add=, =git commit= | R            | W                |                                |                  |                |
 | =/bx-git-uncommitted-list=     |              | R (session's)    |                                |                  |                |
@@ -700,8 +700,9 @@ step reads (R) and writes (W).
 | =/bx-ai-outputs= (index)       |              |                  |                                |                  | R              |
 | =/bx-ai-outputs= (capture)     |              |                  |                                |                  | W              |
 | =/bx-done <anchor>=            |              |                  | W                              |                  |                |
-| =/bx-update-status=            |              |                  | R                              | W                |                |
-| =/bx-archive=                  |              |                  | RW (+ W =_archive=)            |                  |                |
+| =/bx-status-update=            |              |                  | R                              | W                |                |
+| =/bx-archive-update=                  |              |                  | RW (+ W =_archive=)            |                  |                |
+| =/bx-session-verify=            | R (+ README) | R (session's)    | R                              | R                |                |
 
 The confirm commands actually read the whole =CLAUDE.md= import chain.
 The table shows only the per-project files that change.
@@ -1128,7 +1129,7 @@ That is where trimming pays. The usual remedies:
 - *Move procedural content into a skill* --- skill bodies load only when
   used; the 26 skill and command descriptions above cost about 2K
   together.
-- *Archive* --- =/bx-archive= moves finished TODOs out of
+- *Archive* --- =/bx-archive-update= moves finished TODOs out of
   =AI-WorkPlan.org=, and a shorter =AI-DevStatus.org= is cheaper on
   every session.
 
