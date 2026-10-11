@@ -676,7 +676,7 @@ The column on the right shows what each step writes.
 Two things worth noticing:
 - *Only "Work" touches your repo content.* Every =/bx-*= command manages
   the AI-collaboration state: WorkPlan, DevStatus, AI-Outputs.
-- *Claude never commits.* =/bx-commit-msg= writes only the message file;
+- *Claude never commits.* =/bx-git-commit-msg= writes only the message file;
   =git add= and =git commit= are yours (the dashed black arrow).
 
 =AI-Outputs.org= sits on the left because it is outside this repo: one
@@ -695,7 +695,8 @@ step reads (R) and writes (W).
 | =/bx-import-archive=           |              |                  | R (=_archive=)                 |                  |                |
 | Work on the selected TODO      | RW           |                  | R                              |                  |                |
 | /You:/ =git add=, =git commit= | R            | W                |                                |                  |                |
-| =/bx-commit-msg=               | R (staged)   | W (message only) |                                |                  |                |
+| =/bx-git-uncommitted-list=     |              | R (session's)    |                                |                  |                |
+| =/bx-git-commit-msg=           | R (staged)   | W (message only) |                                |                  |                |
 | =/bx-ai-outputs= (index)       |              |                  |                                |                  | R              |
 | =/bx-ai-outputs= (capture)     |              |                  |                                |                  | W              |
 | =/bx-done <anchor>=            |              |                  | W                              |                  |                |
