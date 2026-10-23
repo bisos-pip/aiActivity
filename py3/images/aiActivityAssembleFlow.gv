@@ -1,0 +1,48 @@
+digraph {
+	nodesep=0.4 rankdir=TB ranksep=0.5
+	node [fontsize=12]
+	{
+		rank=same
+		in_wf [label="aiTemplates-workFlow
+(a repository; a clone anywhere)
+BISOS-AI-Workflow: the /bx-* commands,
+workflow skills, mother/ workflow files,
+generic activities --- the same for everyone" fillcolor=khaki1 shape=folder style="filled,bold"]
+		in_de [label="aiTemplates-DE
+(BISOS's, or an organization's own)
+Digital-Ecosystem skills and activities" fillcolor=gainsboro shape=folder style="filled,bold"]
+	}
+	{
+		rank=same
+		slot_wf [label="<base>/aiTemplates-workFlow
+[symlink: a sibling (committed)
+or per host (gitignored)]" fillcolor=lightgoldenrod1 shape=note style=filled]
+		slot_de [label="<base>/aiTemplates-DE
+[symlink, or a real directory]" fillcolor=lightgoldenrod1 shape=note style=filled]
+	}
+	in_wf -> slot_wf [arrowhead=vee style=dashed]
+	in_de -> slot_de [arrowhead=vee style=dashed]
+	{
+		rank=same
+		engine [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1"><TR><TD COLSPAN="2"><B>aiActivityAssemble.cs</B>  --base=&lt;base&gt;</TD></TR><HR/><TR><TD>assemblyDiff</TD><TD>assemblyCheck</TD></TR><TR><TD COLSPAN="2"><FONT POINT-SIZE="10"><I>read only</I></FONT></TD></TR><HR/><TR><TD COLSPAN="2">assemblyUpdate  (--workFlow, --de: make the input links)</TD></TR><TR><TD COLSPAN="2"><FONT POINT-SIZE="10"><I>writes the base</I></FONT></TD></TR></TABLE>> fillcolor=darkseagreen3 fontsize=13 shape=rectangle style="filled,bold"]
+		rules [label="Deep merge:\l- directories real in the base\l- files: relative links through the input name\l- an input's own symlinks reproduced\lA path in both inputs: refused\lThe base's own files: never touched\lAn input's root files (LICENSE, AI-*.org):\l  its repository's, ignored\lManifest: .aiActivityAssembled\l" fillcolor=white fontsize=10 shape=note style=filled]
+	}
+	engine -> rules [style=invis]
+	slot_wf -> engine
+	slot_de -> engine
+	{
+		rank=same
+		base [label="<base>  (an ai-templates directory)
+mother/, <activity>/  [generated links]
+its own README.org, AI-*.org  [untouched]" fillcolor=khaki1 shape=folder style="filled,bold"]
+		bases [label="Bases:\l- bxexamples/aiActivityTemplates, with its\l  inputs as committed sibling links\l  (clone the three repos side by side);\l  on BISOS, /bisos/apps/defaults/ai-templates\l  is a link to it\l- a fork: its own aiTemplates-DE,\l  the workflow linked per host\l" fillcolor=white fontsize=10 shape=note style=filled]
+	}
+	base -> bases [style=invis]
+	engine -> base [label=" assembles " fontsize=10 penwidth=1.6]
+	proj [label="a project (aiActivity.cs initiate)
+AI-WORKFLOW.org, AI-Activity.org, .claude/{commands, skills}
+[symlinks into the base]" color=purple fillcolor=lightgoldenrod1 penwidth=2.5 shape=folder style=filled]
+	base -> proj [arrowhead=vee style=dashed]
+	legend [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="3"><TR><TD>solid = written by the assembler</TD><TD>dashed = symlink</TD></TR><TR><TD BGCOLOR="khaki1">workflow; the base</TD><TD BGCOLOR="gainsboro">an ecosystem's input</TD></TR></TABLE>> fontsize=10 shape=plaintext]
+	proj -> legend [style=invis]
+}

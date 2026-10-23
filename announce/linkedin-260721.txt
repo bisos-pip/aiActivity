@@ -1,0 +1,61 @@
+Posted on 2026-07-21
+-------------------
+bisos.startAiActivity — Towards Convivial, Team-Oriented AI Collaboration
+
+An alternative to the industrial-individualistic default of today's AI tooling.
+
+Engine (source): https://lnkd.in/gv4z7vjD
+Engine (PyPI): https://lnkd.in/g8CP8n6n
+Templates: https://lnkd.in/gZ_xdiKM
+
+I use "conviviality" in Ivan Illich's sense ("Tools for Conviviality"):
+
+ Convivial tools are those which give each person who uses them
+ the greatest opportunity to enrich the environment with the fruits
+ of his or her vision. Industrial tools deny this possibility to
+ those who use them and allow their designers to determine the
+ meaning and expectations of others.
+
+With AI now in the mix, we get to choose how our interactions with it are
+shaped. The American digital ecosystem's default is proprietary and
+exploitation-oriented — pushing AI usage toward individualistic, industrial
+models. We reject that trajectory. AI belongs inside a cumulative, convivial,
+collaborative environment — not on top of an industrial one.
+
+Unix is convivial; Windows is industrial. Git is inherently collaborative.
+Org-mode is a far richer collaborative substrate than Markdown. Build a base of
+Linux + Git + org-mode first — then shape AI usage within it. Emacs is not
+required; our own use is Emacs-based, but this works with VS Code too.
+
+Real software development and writing work spans many sessions, machines, and
+teammates. Every new Claude Code session re-explains context. A colleague
+picking up your work can read the code, but not how you've been collaborating
+with Claude on it. That's the individualistic default.
+
+The linchpin of our alternative revolves around the concept of "AI-Activity" — a
+durable, collaborative effort between humans and Claude, with state living in
+git-controlled org-mode files rather than session memory. Two files encode it:
+
+• AI-Activity.org — how this kind of work is usually done. Reusable across
+• projects of that kind. AI-WorkPlan.org — this effort's stages and TODOs,
+• paired with AI-DevStatus.org tracking current state.
+
+Human-to-human handoff and human-to-AI resumption are the same problem:
+continuity across a discontinuity. Org-mode makes both work — real TODO state
+machines, anchors, archive, scheduled dates. Markdown can only approximate these
+through convention.
+
+Zero-config setup:
+
+ pipx install bisos.startAiActivity
+ git clone https://lnkd.in/gZ_xdiKM ~/aiActivityTemplates
+ cd yourProject
+ startAiActivity.cs -i initiate --activity=bisos-pip
+
+Claude Code then walks up from your project, reads the CLAUDE.md hierarchy, and
+knows how you work and where the current effort stands. Fork the templates repo
+for your team's conventions. Nest subprojects. Suspend and resume activities.
+
+If you're using Claude Code for real collaborative work, try it. I'd love to hear how it lands.
+
+#ClaudeCode #AI #DeveloperTools #OrgMode #Emacs #OpenSource #BISOS #ByStar

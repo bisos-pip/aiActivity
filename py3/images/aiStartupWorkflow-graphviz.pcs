@@ -1,0 +1,248 @@
+#!/usr/bin/env python
+
+####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
+""" #+begin_org
+* *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
+** This File: /bisos/git/bxRepos/bisos/defaults/ai-templates/_nonTemplate_/images/aiStartupWorkflow-graphviz.pcs
+** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
+#+end_org """
+####+END:
+
+""" #+begin_org
+* Overview and Relevant Pointers
+How an AI-Activity setup comes into being and is kept in shape: discover,
+install from the templates tree, inspect and trim the startup chain, and
+maintain it over the project's life. Companion to =aiUsageWorkflow= (usage of
+an existing setup); same visual language --- left of the main path is shared
+(outside this repo), right is this repo.
+#+end_org """
+
+from bisos import b
+from bisos.b import cs
+
+import graphviz
+
+from bisos.graphviz import graphvizSeed
+ng = graphvizSeed.namedGraph
+
+
+####+BEGIN: b:py3:cs:orgItem/basic :type "=Seed Setup= " :title "*Common Facilities*" :comment "General"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  =Seed Setup=  [[elisp:(outline-show-subtree+toggle)][||]] *Common Facilities* General  [[elisp:(org-cycle)][| ]]
+#+end_org """
+####+END:
+
+namedGraphsList = [
+    # Forward reference: aiStartupWorkflow is defined below this block.
+    ng("aiStartupWorkflow",
+       func=lambda: aiStartupWorkflow(),
+       title="AI-Activity Startup Workflow",
+       caption="How an AI-Activity setup comes into being and is kept in "
+               "shape: discover activities, install from the templates "
+               "tree (left, shared across projects) into this repo "
+               "(right), inspect and trim the startup chain, then use it "
+               "(see the usage workflow) and maintain it. Green arrows "
+               "are writes by aiActivity.cs (dashed = symlink, solid = "
+               "copy); red arrows are writes by Claude; grey arrows mark "
+               "the templates as source. Fill shows read / write / "
+               "read-write; dashed borders are 'perhaps'."),
+]
+
+graphvizSeed.setup(
+    seedType="common",
+    namedGraphsList=namedGraphsList,
+)
+
+####+BEGIN: b:py3:cs:func/typing :funcName "aiStartupWorkflow" :funcType "Typed" :deco "track"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-Typed  [[elisp:(outline-show-subtree+toggle)][||]] /aiStartupWorkflow/  deco=track  [[elisp:(org-cycle)][| ]]
+#+end_org """
+@cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+def aiStartupWorkflow(
+####+END:
+) -> graphviz.Digraph:
+    """ #+begin_org
+** [[elisp:(org-cycle)][| *DocStr | ]  Layered setup lifecycle: discover --> install --> inspect
+    --> trim --> (usage) --> maintain, with templates on the left and installed
+    files on the right.
+    #+end_org """
+
+    d = graphviz.Digraph()
+    d.attr(rankdir='TB', nodesep='0.35', ranksep='0.5')
+    d.attr('node', fontsize='12')
+
+    # Same conventions as aiUsageWorkflow.
+    # Fill = effect on files: blue read, pink write, purple read-write.
+    # Border: solid = always, dashed = perhaps.
+    read = {'style': 'filled', 'fillcolor': 'lightskyblue'}
+    write = {'style': 'filled', 'fillcolor': 'lightpink'}
+    readWrite = {'style': 'filled', 'fillcolor': 'plum'}
+
+    def perhaps(kind: dict) -> dict:
+        return {**kind, 'style': 'filled,dashed'}
+
+    cmndShape = {'shape': 'rectangle'}
+
+    # Subjects. Position carries locality:
+    #   left of the spine  = templates tree, shared across projects (gainsboro)
+    #   right of the spine = this repo (white)
+    outside = {'style': 'filled,bold', 'fillcolor': 'gainsboro', 'fontsize': '11', 'group': 'templates'}
+    subject = {'style': 'filled,bold', 'fillcolor': 'white', 'fontsize': '11', 'group': 'subjects'}
+    # Reference to a subject drawn above: same fill, normal (not bold) border.
+    reference = {'style': 'filled', 'fillcolor': 'white', 'fontsize': '10'}
+    sharedRef = {'fillcolor': 'gainsboro'}
+
+    # Writers:
+    #   darkseagreen4 = aiActivity.cs (the engine, as in the structure figure);
+    #                   dashed = creates a symlink, solid = copies
+    #   crimson       = Claude
+    #   gray50        = templates read as source
+    engineCopy = {'color': 'darkseagreen4', 'penwidth': '1.8'}
+    engineLink = {**engineCopy, 'style': 'dashed'}
+    claudeWrite = {'color': 'crimson', 'penwidth': '1.6', 'fontcolor': 'crimson'}
+    source = {'color': 'gray50', 'arrowhead': 'empty'}
+
+    layerLabels = [
+        ('lyr_discover', 'Discover'),
+        ('lyr_install',  'Install\n(once per directory)'),
+        ('lyr_install2', ''),
+        ('lyr_inspect',  'Inspect'),
+        ('lyr_trim',     'Trim'),
+        ('lyr_usage',    'Use'),
+        ('lyr_maintain', 'Maintain\n(over the project\'s life)'),
+    ]
+    for name, label in layerLabels:
+        d.node(name, label, shape='plaintext', fontsize='11', fontcolor='gray30', group='labels')
+    for (upper, _), (lower, _) in zip(layerLabels, layerLabels[1:]):
+        d.edge(upper, lower, style='invis')
+
+    spine = {'discover', 'install', 'install2', 'inspect', 'trim', 'usage', 'maintain'}
+    loopPoint = {'shape': 'point', 'width': '0.03', 'color': 'darkgreen', 'group': 'loop'}
+
+    def layer(labelNode: str, nodes: list, subjects: list = [], outsides: list = []) -> None:
+        with d.subgraph() as s:
+            s.attr(rank='same')
+            s.node(labelNode)
+            for name, label, attrs in outsides:
+                s.node(name, label, **attrs)
+            for name, label, attrs in nodes:
+                group = {'group': 'spine'} if name in spine else {}
+                shape = {} if 'shape' in attrs else cmndShape
+                s.node(name, label, **shape, **attrs, **group)
+            for name, label, attrs in subjects:
+                s.node(name, label, **attrs)
+
+    layer('lyr_discover', [
+        ('discover', 'aiActivity.cs\n(examples menu: activities,\ncurrent config)', perhaps(read)),
+    ])
+    layer('lyr_install', [
+        ('install', '-i initiate --activity=<activity>\nor -i initiateSub (overlay)\n[--noLink=<file>]\n(or /bx-initiate inside Claude)',
+         {**readWrite, 'style': 'filled,bold'}),
+    ], subjects=[
+        ('subjLinks', 'Symlinks (→ templates)\nAI-WORKFLOW.org  AI-Activity.org\nAI-Outputs.org  .claude/', {**subject, 'shape': 'note'}),
+    ], outsides=[
+        ('tplMother', 'mother/\nCLAUDE.md  AI-WORKFLOW.org\nAI-Outputs.org  _claude/  _skills/\n(an assembled base: links into\naiTemplates-workFlow, -DE)', {**outside, 'shape': 'folder'}),
+    ])
+    # Second install rank: an empty spine slot keeps the column straight
+    # while the second template folder and the copies sit beside it.
+    layer('lyr_install2', [
+        ('install2', '', {'shape': 'point', 'width': '0.01', 'color': 'gray70'}),
+    ], subjects=[
+        ('subjCopies', 'Safe-copies (yours)\nCLAUDE.md  AI-DevStatus.org\nAI-WorkPlan.org', {**subject, 'shape': 'note'}),
+    ], outsides=[
+        ('tplActivity', '<activity>/\nAI-Activity.org  (_skills → mother)\nAI-DevStatus.org  AI-WorkPlan.org\n(seeds)', {**outside, 'shape': 'folder'}),
+    ])
+    layer('lyr_inspect', [
+        ('inspect', '-i listClaudesPath\n-i startupClaudeTokens', perhaps(read)),
+    ])
+    # Later stages touch subjects drawn near the top. Rather than long
+    # back-edges (which tangle), each stage gets small reference nodes on its
+    # own rank, styled like the subject but not bold: "see above".
+    layer('lyr_trim', [
+        ('trim', '/bx-context-trim', perhaps(readWrite)),
+    ], subjects=[
+        ('refLocal', 'AI-WorkPlan.org  AI-DevStatus.org\n(via /bx-archive-update, /bx-status-update)',
+         {**reference, 'shape': 'note'}),
+    ], outsides=[
+        ('loopViaTrim', '', loopPoint),
+        ('refShared', '<activity>/AI-Activity.org\n+ its imports (shared)', {**reference, **sharedRef, 'shape': 'note'}),
+    ])
+    layer('lyr_usage', [
+        ('usage', 'Usage sessions\n(see aiUsageWorkflow)', {'shape': 'rectangle', 'style': 'rounded,dashed', 'color': 'gray40'}),
+    ], outsides=[
+        ('loopViaUse', '', loopPoint),
+    ])
+    layer('lyr_maintain', [
+        ('maintain', '-i refresh\n-i deClaudify', perhaps(write)),
+    ], subjects=[
+        ('refInstalled', 'Installed files\n(symlinks + safe-copies)', {**reference, 'shape': 'note'}),
+    ])
+
+    # Left-to-right order within ranks (dot ignores subgraph source order).
+    for leftToRight in [['lyr_install', 'tplMother', 'install', 'subjLinks'],
+                        ['lyr_install2', 'tplActivity', 'install2', 'subjCopies'],
+                        ['lyr_trim', 'loopViaTrim', 'refShared', 'trim', 'refLocal'],
+                        ['lyr_usage', 'loopViaUse', 'usage'],
+                        ['lyr_maintain', 'maintain', 'refInstalled']]:
+        for left, right in zip(leftToRight, leftToRight[1:]):
+            d.edge(left, right, style='invis')
+    # Columns.
+    d.edge('tplMother', 'tplActivity', style='invis')
+    d.edge('subjLinks', 'subjCopies', style='invis')
+
+    # Main path.
+    d.edge('discover', 'install')
+    d.edge('install', 'install2', arrowhead='none')
+    d.edge('install2', 'inspect')
+    d.edge('inspect', 'trim')
+    d.edge('trim', 'usage')
+    d.edge('usage', 'maintain')
+
+    # Templates as source.
+    d.edge('tplMother', 'install', constraint='false', **source)
+    d.edge('tplActivity', 'install', constraint='false', **source)
+
+    # aiActivity.cs writes.
+    d.edge('install', 'subjLinks', constraint='false', **engineLink)
+    d.edge('install', 'subjCopies', constraint='false', **engineCopy)
+    d.edge('maintain', 'refInstalled', constraint='false',
+           label=' refresh (CLAUDE.md, missing links, \n .claude/commands) / remove ',
+           fontsize='9', fontcolor='darkseagreen4', **engineCopy)
+
+    # Claude writes (/bx-context-trim, after confirmation). The shared edit
+    # is declared ref --> trim with dir='back' so it can sit on the left.
+    d.edge('refShared', 'trim', constraint='false', dir='back',
+           label=' shared edit \n (confirmed separately) ', fontsize='9', **claudeWrite)
+    d.edge('trim', 'refLocal', constraint='false', label=' local trims ', fontsize='9', **claudeWrite)
+
+    # Loop: as sessions add to the chain, inspect and trim again. Declared
+    # top-down through left waypoints; single arrowhead lands on inspect.
+    loop = {'color': 'darkgreen', 'penwidth': '1.6'}
+    d.edge('inspect', 'loopViaTrim', dir='back', **loop)
+    d.edge('loopViaTrim', 'loopViaUse', dir='none', label='  chain grew  ',
+           fontsize='10', fontcolor='darkgreen', **loop)
+    d.edge('loopViaUse', 'usage', dir='none', **loop)
+
+    d.node('legend',
+           '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">'
+           '<TR><TD BGCOLOR="lightskyblue">read</TD>'
+           '<TD BGCOLOR="lightpink">write</TD>'
+           '<TD BGCOLOR="plum">read-write</TD>'
+           '<TD>solid border = always</TD>'
+           '<TD STYLE="dashed">dashed border = perhaps</TD></TR>'
+           '<TR><TD COLSPAN="2"><FONT COLOR="darkseagreen4">green = aiActivity.cs writes</FONT></TD>'
+           '<TD COLSPAN="2">dashed = symlink, solid = copy</TD>'
+           '<TD><FONT COLOR="crimson">red = Claude writes</FONT></TD></TR>'
+           '<TR><TD COLSPAN="5">left (grey) = templates tree, shared across projects;  right = this repo<BR/>'
+           'grey hollow arrow = template source;  thin-bordered file = refers to a subject above</TD></TR>'
+           '</TABLE>>',
+           shape='plaintext', fontsize='10')
+    d.edge('maintain', 'legend', style='invis')
+
+    return d
+
+""" #+begin_org
+#+begin_src sh :results output :session shared
+aiStartupWorkflow-graphviz.pcs --format=evince  -i ngProcess aiStartupWorkflow
+#+end_src
+#+end_org """

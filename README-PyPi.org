@@ -1,0 +1,105 @@
+#+title: bisos.aiActivity: Install AI Collaborative Development Templates
+#+DATE: <2026-07-12 Sat>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+
+#+BEGIN: b:org:pypi:readme/topControls :pkgName "aiActivity" :comment "basic"
+
+|----------------------+--------------------------------------------------------------------------------|
+| ~Blee Panel Controls~: | [[elisp:(show-all)][Show-All]] : [[elisp:(org-shifttab)][Overview]] : [[elisp:(progn (org-shifttab) (org-content))][Content]] : [[elisp:(delete-other-windows)][(1)]] : [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]] : [[elisp:(save-buffer)][Save]]  : [[elisp:(kill-buffer)][Quit]]  : [[elisp:(bury-buffer)][Bury]] |
+| ~Panel Links~:         | [[file:./py3/panels/bisos.startAiActivity/_nodeBase_/fullUsagePanel-en.org][Repo Blee Panel]] --  [[file:/bisos/git/bxRepos/bisos-pip/startAiActivity/py3/panels/bisos.startAiActivity/_nodeBase_/fullUsagePanel-en.org][Blee Panel]]                         |
+| ~See Also~:            | [[https://pypi.org/project/bisos.startAiActivity][At PYPI]] : [[https://github.com/bisos-pip/pycs][bisos.PyCS]]                                                         |
+|----------------------+--------------------------------------------------------------------------------|
+
+#+END:
+
+* The Concept and Model of an AI Activity
+
+An *AI Activity* is a durable, collaborative effort between a human and
+an AI assistant (Claude Code) toward a specific purpose --- writing a
+document, building new software, enhancing existing software, and so on.
+Unlike a one-shot chat, an activity is expected to span many sessions,
+possibly across machines and over long stretches of time. Its state,
+conventions, and progress live in files under version control rather
+than in any one session's memory.
+
+Two org-mode files encode the activity, playing distinct roles:
+
+- =AI-Activity.org= describes the human's *usual way of doing that kind
+  of work* --- their conventions, preferred libraries, patterns, and
+  gotchas. It is *reusable*: symlinked from a shared activity template
+  so the same conventions apply to every project of that kind. Examples
+  of concrete activities: =bisos-pip= (Python package authorship),
+  =xu-single= (single-XU PyCS scripts), =blee-panels= (Blee panel
+  authorship), =lcnt= (LaTeX content).
+- =AI-WorkPlan.org= describes *this specific effort* --- what will be
+  built or written, broken into stages with TODOs. It is per-effort:
+  edited freely, org-archived as work completes, and paired with
+  =AI-DevStatus.org= which records where the effort stands right now.
+
+Activities are classes of work; WorkPlans are instances. The templates
+=/bisos.aiActivity/= installs are what encode this distinction on
+disk --- shared invariants and activity conventions are symlinked from a
+templates repo (so improvements propagate); WorkPlan and DevStatus start
+as safe-copies (so each effort owns its own state).
+
+* Collaboration Across People and Across Sessions
+
+An AI Activity is collaborative in two symmetric senses. It is
+*human-to-human* --- one person starts the activity, a colleague continues
+it later, possibly on a different machine. And it is *human-to-AI* ---
+one Claude Code session begins the work, another resumes it hours or
+weeks later with no memory of the earlier one. Both are the same
+problem: *continuity across a discontinuity*. The state, conventions,
+and open TODOs must live in files that a fresh reader --- human or AI ---
+can pick up cold.
+
+
+* Overview
+
+/bisos.aiActivity/ installs the ByStar AI collaborative development
+template set --- =CLAUDE.md=, =AI-WORKFLOW.org=,
+=AI-Activity.org=, =AI-DevStatus.org=, =AI-WorkPlan.org=, plus a =.claude/=
+directory with =settings.json=, =commands/=, and optionally =skills/= ---
+into a project directory, git repo root, or subproject.
+
+This package is *just the execution engine* --- the template content lives
+in a separately-cloned repo
+([[https://github.com/bxexamples/aiActivityTemplates]], or your own fork).
+See [[#two-part-architecture-execution-engine--templates][Two-Part Architecture]] below for details.
+
+The installed layout is *hierarchical and Claude-consumable*. Files fall
+into two classes:
+
+- *Invariants*, symlinked from =mother/= (=CLAUDE.md=,
+  =AI-WORKFLOW.org=, =.claude/settings.json=, =.claude/commands/=).
+  Because they are symlinks to a shared source, an edit to =mother/=
+  propagates automatically to every project that has been =initiate=-d
+  against that templates base.
+- *Activity-specific* files, from =<activity>/= (=AI-Activity.org=
+  symlinked; =AI-DevStatus.org= and =AI-WorkPlan.org= safe-copied and
+  editable; optionally =.claude/skills/= symlinked from
+  =<activity>/_skills/= for on-demand task-specific instructions).
+
+Claude Code consumes this hierarchy automatically. On startup it walks
+upward from the current working directory collecting every =CLAUDE.md=,
+which in turn imports (imports =AI-WORKFLOW.org= +
+=AI-Activity.org= + =AI-DevStatus.org= + =AI-WorkPlan.org= via =@=
+directives). Nested subprojects installed with =initiateSub= use a slim
+=CLAUDE.md= that imports only the local trio; the invariants are
+inherited from an ancestor via the same walk-up, avoiding duplication.
+
+bisos.aiActivity is a python package that uses the [[https://github.com/bisos-pip/pycs][PyCS-Framework]].
+It provides the =aiActivity.cs= command with the following operations:
+=userConfig_set/get= (persistent config), =initiate= (base install), =initiateSub=
+(slim subproject overlay), =refresh=,
+=deClaudify= (permanent removal), and =examples= (all invocations with the current
+templates base).
+
+* Details at github
+
+See https://github.com/bisos-pip/aiActivity
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

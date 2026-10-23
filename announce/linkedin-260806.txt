@@ -1,0 +1,33 @@
+Beyond Chatbots -- AI-Activity: A Convivial, Collaborative and Cumulative Framework
+
+Dear FOSS Developer Colleagues,
+
+By Convivial, I mean: the user and not the tool maker is in charge.
+
+By Collaborative, I mean: you in many AI sessions and many colleagues working together towards well defined goals.
+
+By Cumulative, I mean: your colleagues can profit from the details of your AI interactions and you can profit from the details of your colleagues AI interactions.
+
+By Framework, I mean: a set of foundational facilities that allow customization and expansion.
+
+The default mode of AI-assisted development today is individualistic. That is not good. Like most of you, over the past year or so I have been trying to understand the "right" models for team oriented AI interactions.
+
+I am now ready to share what I have come up with: "AI-Activity". I have formalized it. I use it all day long. It is not abstract or academic.
+
+The Model: https://github.com/bisos-pip/aiActivity
+The Tool: pipx install bisos.aiActivity
+Example Templates: https://github.com/bxexamples/aiActivityTemplates
+
+An AI-Activity is a durable, collaborative effort between a human and an AI assistant toward a specific purpose - writing a document, building or enhancing software, and so on. Unlike a one-shot chat, it spans many sessions, possibly across machines and over long stretches of time, and is handed off to other team members.
+
+It is a set of tools (PyPI) and a set of templates we create and maintain. The tool itself is very simple. The power comes from the richness of the templates.
+
+I am not the only one thinking we should move beyond the chatbot model. "What if AI systems weren't chatbots?" is a peer-reviewed argument that the chatbot paradigm erodes user agency, deskills its users, and homogenizes knowledge - harms that task-specific, workflow-integrated AI systems largely avoid. The AI-Activity is my move toward convivial tools - shaped by their user rather than the reverse - and away from the industrial default.
+
+The FOSS community already knows well how to collaborate. Linux, Git, and org-mode are not accidents — they are decades of deliberate choices about what makes software development cumulative and convivial. The risk with AI is not the tools themselves but the default mode of individualistic use: each developer in a separate chatbot session, nothing persisting, nothing shared. AI-Activity is a different answer: bring AI inside the collaborative substrate you already trust, shaped by the structures already there. Symlinks into a shared templates tree mean a convention refined by one team member propagates to every project that references it. Git tracks the work. Org-mode carries the context. The AI works within that — not instead of it.
+
+It would be great if you could take a look at what I have in place and let me know what you think.
+
+Or better yet, try it out for your own projects.
+
+#ClaudeCode #AI #DeveloperTools #OrgMode #Emacs #OpenSource #FOSS #Linux #Git #Python

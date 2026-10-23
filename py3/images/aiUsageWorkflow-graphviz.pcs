@@ -1,0 +1,257 @@
+#!/usr/bin/env python
+
+####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
+""" #+begin_org
+* *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
+** This File: /bisos/git/bxRepos/bisos/defaults/ai-templates/_nonTemplate_/images/aiUsageWorkflow-graphviz.pcs
+** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
+#+end_org """
+####+END:
+
+""" #+begin_org
+* Overview and Relevant Pointers
+The AI-Activity session workflow as a sequence of =/bx-*= slash commands.
+Lives in bisos.aiActivity's =py3/images/= since 2026-10-20 (before: the templates tree's
+=_nonTemplate_/images/=). The commands it depicts are in the =aiTemplates-workFlow= repository
+(=mother/_claude/commands/=), described in its =mother/AI-WORKFLOW.org=; re-render here when they change.
+#+end_org """
+
+from bisos import b
+from bisos.b import cs
+
+import graphviz
+
+from bisos.graphviz import graphvizSeed
+ng = graphvizSeed.namedGraph
+
+
+####+BEGIN: b:py3:cs:orgItem/basic :type "=Seed Setup= " :title "*Common Facilities*" :comment "General"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  =Seed Setup=  [[elisp:(outline-show-subtree+toggle)][||]] *Common Facilities* General  [[elisp:(org-cycle)][| ]]
+#+end_org """
+####+END:
+
+namedGraphsList = [
+    # Forward reference: aiUsageWorkflow is defined below this block.
+    ng("aiUsageWorkflow",
+       func=lambda: aiUsageWorkflow(),
+       title="AI-Activity Session Workflow",
+       caption="Usage of an existing AI-Activity setup: the /bx-* slash "
+               "commands in the order a typical session uses them --- "
+               "confirm context at session start, a per-TODO work loop, "
+               "and housekeeping at session end. Fill shows what a command "
+               "does to files: blue reads into the session, pink writes "
+               "session knowledge to files, purple does both. Red arrows "
+               "show which subject each command writes: repo content, "
+               "repo git, AI-WorkPlan.org, AI-DevStatus.org, or the "
+               "cross-project AI-Outputs.org. Solid borders are always "
+               "done; dashed borders are 'perhaps'."),
+]
+
+graphvizSeed.setup(
+    seedType="common",
+    namedGraphsList=namedGraphsList,
+)
+
+####+BEGIN: b:py3:cs:func/typing :funcName "aiUsageWorkflow" :funcType "Typed" :deco "track"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-Typed  [[elisp:(outline-show-subtree+toggle)][||]] /aiUsageWorkflow/  deco=track  [[elisp:(org-cycle)][| ]]
+#+end_org """
+@cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+def aiUsageWorkflow(
+####+END:
+) -> graphviz.Digraph:
+    """ #+begin_org
+** [[elisp:(org-cycle)][| *DocStr | ]  Layered session workflow over an existing setup:
+    session start --> per-TODO work loop --> session end, with the subject
+    each command writes on its right. Setup-shaping commands (/bx-initiate,
+    /bx-context-trim) are out of scope; they belong to the templates/setup figure.
+    #+end_org """
+
+    d = graphviz.Digraph()
+    d.attr(rankdir='TB', nodesep='0.35', ranksep='0.45')
+    d.attr('node', fontsize='12')
+
+    # Fill = effect on files (blue + pink = purple is the mnemonic):
+    #   lightskyblue = read       --- loads into the session, changes no files
+    #   lightpink    = write      --- records session knowledge into files
+    #   plum         = read-write --- both
+    # Border: solid = always, dashed = perhaps.
+    read = {'style': 'filled', 'fillcolor': 'lightskyblue'}
+    write = {'style': 'filled', 'fillcolor': 'lightpink'}
+    readWrite = {'style': 'filled', 'fillcolor': 'plum'}
+
+    def perhaps(kind: dict) -> dict:
+        return {**kind, 'style': 'filled,dashed'}
+
+    cmndShape = {'shape': 'rectangle'}
+
+    # Subjects the commands write, each on the rank of its main writer so
+    # write edges stay short. Position carries locality:
+    #   right of the spine = this repo (white)
+    #   left of the spine  = outside this repo, shared across projects
+    #                        (gainsboro, as in the structure figure)
+    subject = {'style': 'filled,bold', 'fillcolor': 'white', 'fontsize': '11', 'group': 'subjects'}
+    outside = {'style': 'filled,bold', 'fillcolor': 'gainsboro', 'fontsize': '11'}
+    writes = {'color': 'crimson', 'penwidth': '1.6', 'arrowhead': 'normal'}
+    # Writes done by you, not by Claude.
+    youWrite = {'color': 'black', 'style': 'dashed', 'penwidth': '1.6', 'arrowhead': 'normal'}
+
+    # Left column: one plaintext label per layer, chained invisibly to
+    # hold the layers in order.
+    layerLabels = [
+        ('lyr_start',   'Session start'),
+        ('lyr_loop1',   'Work loop\n(per TODO)'),
+        ('lyr_loop2',   ''),
+        ('lyr_loop3',   ''),
+        ('lyr_loop4',   ''),
+        ('lyr_loop5',   ''),
+        ('lyr_end',     'Session end'),
+        ('lyr_close',   ''),
+    ]
+    for name, label in layerLabels:
+        d.node(name, label, shape='plaintext', fontsize='11', fontcolor='gray30')
+    for (upper, _), (lower, _) in zip(layerLabels, layerLabels[1:]):
+        d.edge(upper, lower, style='invis')
+
+    spine = {'confirm0', 'importArchive', 'work', 'commitMsg', 'aiOutputs', 'done', 'updateStatus', 'sessionVerify'}
+
+    # Invisible waypoints, one per rank, far left: the next-TODO loop runs
+    # through them as a straight line clear of every other edge.
+    loopPoint = {'shape': 'point', 'width': '0.03', 'color': 'darkgreen', 'group': 'loop'}
+
+    def layer(labelNode: str, nodes: list, subjects: list = [], outsides: list = []) -> None:
+        # Within a rank, source order is left-to-right: label, outside, spine, subjects.
+        with d.subgraph() as s:
+            s.attr(rank='same')
+            s.node(labelNode)
+            for name, label, attrs in outsides:
+                s.node(name, label, **attrs)
+            for name, label, attrs in nodes:
+                group = {'group': 'spine'} if name in spine else {}
+                s.node(name, label, **cmndShape, **attrs, **group)
+            for name, label, attrs in subjects:
+                s.node(name, label, **attrs)
+
+    layer('lyr_start', [
+        ('confirm0',    '/bx-confirm0',    read),
+        ('confirmHere', '/bx-confirm-here', perhaps(read)),
+    ])
+    layer('lyr_loop1', [
+        ('importArchive', '/bx-archive-read', perhaps(read)),
+        ('statusRead',    '/bx-status-read',    perhaps(read)),
+    ])
+    layer('lyr_loop2', [
+        ('work', 'Work on the selected TODO\nin AI-WorkPlan.org', {**readWrite, 'style': 'filled,rounded,bold'}),
+    ], [
+        ('subjContent', 'Repo content\n(working tree)', {**subject, 'shape': 'folder'}),
+    ], outsides=[
+        ('loopVia2', '', loopPoint),
+    ])
+    layer('lyr_loop3', [
+        ('commitMsg', '/bx-git-commit-msg', perhaps(readWrite)),
+    ], [
+        ('subjGit', 'Repo git\n(.git)', {**subject, 'shape': 'cylinder'}),
+    ], outsides=[
+        ('loopVia3', '', loopPoint),
+    ])
+    layer('lyr_loop4', [
+        ('aiOutputs', '/bx-ai-outputs', perhaps(readWrite)),
+    ], outsides=[
+        ('loopVia4', '', loopPoint),
+        ('subjOutputs', 'AI-Outputs.org\n(cross-project)', {**outside, 'shape': 'note'}),
+    ])
+    layer('lyr_loop5', [
+        ('done', '/bx-done <anchor>', write),
+    ], [
+        ('subjWorkPlan', 'AI-WorkPlan.org\n(+ _archive)', {**subject, 'shape': 'note'}),
+    ])
+    layer('lyr_end', [
+        ('updateStatus', '/bx-status-update', write),
+        ('archive',      '/bx-archive-update',       perhaps(readWrite)),
+    ], [
+        ('subjDevStatus', 'AI-DevStatus.org', {**subject, 'shape': 'note'}),
+    ])
+    layer('lyr_close', [
+        ('sessionVerify', '/bx-session-verify', read),
+    ])
+
+    # Chain so the this-repo subjects (one group) line up as a straight
+    # column. content --> git is a real edge (your git add / commit); the
+    # rest are invisible.
+    d.edge('subjContent', 'subjGit', label=' you: git add, \n git commit -t ', fontsize='9', **youWrite)
+    subjectColumn = ['subjGit', 'subjWorkPlan', 'subjDevStatus']
+    for upper, lower in zip(subjectColumn, subjectColumn[1:]):
+        d.edge(upper, lower, style='invis')
+
+    # Writes (only). Reads are carried by the fill colour.
+    d.edge('work',         'subjContent', **writes)
+    d.edge('commitMsg',    'subjGit', label=' .git/CLAUDE_COMMIT_MSG ',
+           fontsize='9', fontcolor='crimson', **writes)
+    # Left-of-spine placement: invisible flat edges (label --> outside -->
+    # spine) pin the left-to-right order within the rank; dot does not
+    # guarantee subgraph source order on its own.
+    for leftToRight in [['lyr_loop2', 'loopVia2', 'work'],
+                        ['lyr_loop3', 'loopVia3', 'commitMsg'],
+                        ['lyr_loop4', 'loopVia4', 'subjOutputs', 'aiOutputs'],
+                        ['subjDevStatus', 'archive']]:
+        for left, right in zip(leftToRight, leftToRight[1:]):
+            d.edge(left, right, style='invis')
+    d.edge('aiOutputs', 'subjOutputs', label=' capture ', fontsize='9', fontcolor='crimson',
+           constraint='false', **writes)
+    d.edge('done',         'subjWorkPlan', **writes)
+    d.edge('archive',      'subjWorkPlan', constraint='false', **writes)
+    d.edge('updateStatus', 'subjDevStatus', **writes)
+
+    # Main path.
+    d.edge('confirm0', 'importArchive')
+    d.edge('importArchive', 'work')
+    d.edge('work', 'commitMsg')
+    d.edge('commitMsg', 'aiOutputs')
+    d.edge('aiOutputs', 'done')
+    d.edge('done', 'updateStatus', label='  end of session  ', fontsize='10')
+    d.edge('updateStatus', 'sessionVerify', label='  before closing  ', fontsize='10')
+
+    # Loop back for the next TODO, through the left waypoints. Segments are
+    # declared top-down (the ranking direction) and drawn with dir='back' /
+    # 'none', so the single arrowhead lands on /bx-archive-read.
+    # (A direct done --> importArchive edge, with or without west ports,
+    # was routed round the right and crossed the subject edges.)
+    loop = {'color': 'darkgreen', 'penwidth': '1.6'}
+    d.edge('importArchive', 'loopVia2', dir='back', **loop)
+    d.edge('loopVia2', 'loopVia3', dir='none', **loop)
+    d.edge('loopVia3', 'loopVia4', dir='none', label='  next TODO  ', fontsize='10',
+           fontcolor='darkgreen', **loop)
+    d.edge('loopVia4', 'done', dir='none', **loop)
+
+    # Alternatives at session start (same rank, not sequential).
+    d.edge('confirm0', 'confirmHere', style='dotted', arrowhead='none', label=' or ', fontsize='10')
+    # Alternatives within the work loop: orient on archived work and/or re-read state.
+    d.edge('importArchive', 'statusRead', style='dotted', arrowhead='none', label=' and/or ', fontsize='10')
+
+
+    # Legend, as a borderless table below everything.
+    d.node('legend',
+           '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">'
+           '<TR><TD BGCOLOR="lightskyblue">read</TD>'
+           '<TD BGCOLOR="lightpink">write</TD>'
+           '<TD BGCOLOR="plum">read-write</TD>'
+           '<TD>solid border = always</TD>'
+           '<TD STYLE="dashed">dashed border = perhaps</TD>'
+           '<TD><FONT COLOR="crimson">red arrow = Claude writes</FONT></TD>'
+           '<TD>dashed black arrow = you write</TD></TR>'
+           '<TR><TD COLSPAN="7">right of the main path = this repo;  '
+           'left (grey) = outside this repo, shared across projects</TD></TR>'
+           '</TABLE>>',
+           shape='plaintext', fontsize='10')
+    # Anchored under the main path, not the label column, so the legend sits
+    # inside the width the content already uses instead of widening the image.
+    d.edge('sessionVerify', 'legend', style='invis')
+
+    return d
+
+""" #+begin_org
+#+begin_src sh :results output :session shared
+aiUsageWorkflow-graphviz.pcs --format=evince  -i ngProcess aiUsageWorkflow
+#+end_src
+#+end_org """

@@ -1,0 +1,82 @@
+bisos.startAiActivity: Towards Increasing Aggregate Conviviality of Team Oriented Collaborative AI Interactions
+
+Engine (source): https://github.com/bisos-pip/startAiActivity
+Engine (PyPI): https://pypi.org/project/bisos.startAiActivity
+Templates: https://github.com/bxexamples/aiActivityTemplates
+
+My use of <Conviviality> is in the context of Ivan Illiche's "Tools for Conviviality" --- http.
+It is a must read.
+Briefly, in Illich's words:
+\begin{quote}
+  To the degree that an individual masters his tools, he can invest
+  the world with his meaning; to the degree that he is mastered by his
+  tools, the shape of the tool determines his own
+  self-image. Convivial tools are those which give each person who
+  uses them the greatest opportunity to enrich the environment with
+  the fruits of his or her vision. Industrial tools deny this
+  possibility to those who use them and they allow their designers to
+  determine the meaning and expectations of others.
+\end{quote}
+
+
+With the recent emergence of AI, we are now faced with how to orient our AI interactions towards
+conviviality.
+
+The American Digital Ecosystem is inherently proprietary, exploitation oriented
+and hence expected trends are towards industrial models for individualistic AI usage.
+
+We want to redirect those expected trends by integrating AI usage into a
+cumulative convivial collaborative environment.
+
+The Unix model is very convivial, Microsoft Windows is inherently industrial.
+The Git model is inherently collaborative. Micosoft's VS Code limited model of
+Mark Down is inferior to Emacs's broad model of org-mode.
+
+We are saying that it makes good sense to first create a base  aggregate convivial
+colaborative environment consisting of Linux plus Git plus org-mode first and
+then shape our AI usage in it. By choice, we did not require Emacs in that base
+environment. Of course our own usage is Emacs based but what we have created
+works very well with VS Code as well.
+
+% Claude Code is powerful. But when you close the session, everything Claude learned about your project is gone.
+
+% I built something to fix that.
+
+Nature of software development is inherently collaborative, yet existing AI
+interaction models are individualistic. Real software or writing work spans many
+sessions, sometimes across machines, often across teammates. Every new Claude
+Code session means re-explaining context, re-establishing conventions,
+re-orienting. When a colleague picks up your work, they get even less — they can
+read the code, but not how you've been collaborating with Claude on it.
+
+Our solution revolves around the team oriented concept of AI Activity — a
+durable, collaborative effort between a human and Claude toward a specific
+purpose (writing a document, building software, enhancing existing software).
+Unlike a one-shot chat, an activity spans many sessions. Its state lives in
+git-controlled files, not in any one session's memory. Through org-mode and Git,
+this model of interaction is fundamentally team oriented.
+
+Two org-mode files encode it:
+• AI-Activity.org — the human's usual way of doing that kind of work. Reusable across every project of that kind.
+• AI-WorkPlan.org — this specific effort's stages and TODOs. Paired with AI-DevStatus.org, which tracks where things stand right now.
+
+Both human-to-human handoff (you start it, a colleague continues it) and
+human-to-AI resumption (one session begins the work, another resumes weeks
+later) are the same problem: continuity across a discontinuity. Org-mode is the
+substrate that makes both work — real TODO state machines, anchors, archive,
+scheduled dates. Markdown can only approximate these through convention.
+
+I've published it as bisos.startAiActivity on PyPI. Zero-config setup:
+
+  pipx install bisos.startAiActivity
+  git clone https://github.com/bxexamples/aiActivityTemplates ~/aiActivityTemplates
+  cd yourProject
+  startAiActivity.cs -i initiate --activity=bisos-pip
+
+That's it. Claude Code walks up from your project, reads the CLAUDE.md hierarchy, and knows how you work and where the current effort stands. Fork the templates repo to customize for your team's conventions. Nest subprojects. Suspend and resume activities.
+
+%Part of BISOS — the ByStar Internet Services OS, a Libre-Halaal digital ecosystem prioritizing autonomy and privacy. Standalone package, works outside BISOS too.
+
+If you're using Claude Code for real collaborative work, try it. I'd love to hear how it lands.
+
+#ClaudeCode #AI #DeveloperTools #OrgMode #Emacs #OpenSource #BISOS #ByStar

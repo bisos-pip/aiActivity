@@ -1,0 +1,59 @@
+digraph {
+	nodesep=0.12 rankdir=LR ranksep=0.5
+	node [fontsize=11]
+	root [label="BISOS-AI-Workflow
+(drives an AI-Activity;
+adopt as-is)" fillcolor=thistle fontsize=13 shape=ellipse style="filled,bold"]
+	commands [label="Commands
+(you invoke)" fontsize=12 shape=box style=bold]
+	skills [label="Skills
+(Claude loads)" fontsize=12 shape=box style=bold]
+	root -> commands [arrowhead=none color=gray40]
+	root -> skills [arrowhead=none color=gray40]
+	cmdStart [label="session start" color=gray40 fontsize=11 shape=box style=dashed]
+	commands -> cmdStart [arrowhead=none color=gray40]
+	"/bx-confirm0" [label="/bx-confirm0" fillcolor=khaki1 shape=box style=filled]
+	cmdStart -> "/bx-confirm0" [arrowhead=none color=gray40]
+	"/bx-confirm-here" [label="/bx-confirm-here" fillcolor=khaki1 shape=box style=filled]
+	cmdStart -> "/bx-confirm-here" [arrowhead=none color=gray40]
+	cmdLoop [label="work loop" color=gray40 fontsize=11 shape=box style=dashed]
+	commands -> cmdLoop [arrowhead=none color=gray40]
+	"/bx-archive-read" [label="/bx-archive-read" fillcolor=khaki1 shape=box style=filled]
+	cmdLoop -> "/bx-archive-read" [arrowhead=none color=gray40]
+	"/bx-status-read" [label="/bx-status-read" fillcolor=khaki1 shape=box style=filled]
+	cmdLoop -> "/bx-status-read" [arrowhead=none color=gray40]
+	"/bx-git-commit-msg" [label="/bx-git-commit-msg" fillcolor=khaki1 shape=box style=filled]
+	cmdLoop -> "/bx-git-commit-msg" [arrowhead=none color=gray40]
+	"/bx-ai-outputs" [label="/bx-ai-outputs" fillcolor=khaki1 shape=box style=filled]
+	cmdLoop -> "/bx-ai-outputs" [arrowhead=none color=gray40]
+	"/bx-done" [label="/bx-done" fillcolor=khaki1 shape=box style=filled]
+	cmdLoop -> "/bx-done" [arrowhead=none color=gray40]
+	cmdEnd [label="session end" color=gray40 fontsize=11 shape=box style=dashed]
+	commands -> cmdEnd [arrowhead=none color=gray40]
+	"/bx-git-uncommitted-list" [label="/bx-git-uncommitted-list" fillcolor=khaki1 shape=box style=filled]
+	cmdEnd -> "/bx-git-uncommitted-list" [arrowhead=none color=gray40]
+	"/bx-status-update" [label="/bx-status-update" fillcolor=khaki1 shape=box style=filled]
+	cmdEnd -> "/bx-status-update" [arrowhead=none color=gray40]
+	"/bx-archive-update" [label="/bx-archive-update" fillcolor=khaki1 shape=box style=filled]
+	cmdEnd -> "/bx-archive-update" [arrowhead=none color=gray40]
+	"/bx-session-verify" [label="/bx-session-verify" fillcolor=khaki1 shape=box style=filled]
+	cmdEnd -> "/bx-session-verify" [arrowhead=none color=gray40]
+	cmdSetup [label=setup color=gray40 fontsize=11 shape=box style=dashed]
+	commands -> cmdSetup [arrowhead=none color=gray40]
+	"/bx-initiate" [label="/bx-initiate" fillcolor=khaki1 shape=box style=filled]
+	cmdSetup -> "/bx-initiate" [arrowhead=none color=gray40]
+	"/bx-context-trim" [label="/bx-context-trim" fillcolor=khaki1 shape=box style=filled]
+	cmdSetup -> "/bx-context-trim" [arrowhead=none color=gray40]
+	skAiActivity [label="AI-Activity model" color=gray40 fontsize=11 shape=box style=dashed]
+	skills -> skAiActivity [arrowhead=none color=gray40]
+	"authoring-skills" [label="authoring-skills" fillcolor=lightcyan shape=box style="filled,rounded"]
+	skAiActivity -> "authoring-skills" [arrowhead=none color=gray40]
+	"bx-ai-commands-authorship" [label="bx-ai-commands-authorship" fillcolor=lightcyan shape=box style="filled,rounded"]
+	skAiActivity -> "bx-ai-commands-authorship" [arrowhead=none color=gray40]
+	{
+		rank=same
+		root
+		legend [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="3"><TR><TD><B>lives in</B></TD><TD><B>seen by</B></TD></TR><TR><TD BGCOLOR="khaki1">mother/_claude/commands/</TD><TD>every project: one set, not per activity<BR/>(from aiTemplates-workFlow)</TD></TR><TR><TD BGCOLOR="lightcyan">mother/_skills/</TD><TD>every project: one shared set,<BR/>all activities</TD></TR><TR><TD>box = command (you invoke)</TD><TD STYLE="rounded">rounded = skill (Claude loads)</TD></TR><TR><TD COLSPAN="2">every templates base includes aiTemplates-workFlow,<BR/>assembled by aiActivityAssemble.cs</TD></TR></TABLE>> fontsize=10 shape=plaintext]
+	}
+	root -> legend [style=invis]
+}

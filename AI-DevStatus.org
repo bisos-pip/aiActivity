@@ -1,0 +1,743 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me ai aiAndMe
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/aiActivity
+  File: /bisos/git/auth/bxRepos/bisos-pip/aiActivity/AI-DevStatus.org
+  Activity: bisos-pip
+  Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org, README.org
+
+####+END:
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is maintained by Claude. Updates are typically triggered by the
+=/bx-status-update= slash command, after major interactions, or before a release.
+
+* Current State
+
+As of 2026-10-19: Stages 1--12 and 16 are complete and archived. Stage 14
+is partly done (14.1, 14.2, 14.2.1, 14.3, 14.4, 14.5, 14.13, 14.14, 14.15
+DONE); open: 14.9 (yasnippets, a Blee job), 14.10 (isolate the Claude
+binding constants), 14.12 (=startupClaudeTokens --graph=), plus the
+Stage 15 sync loop (15.1). *Stage 17* (one set of Claude workflow commands,
+synced across templates trees) is implemented: 17.1 DONE, 17.2--17.10 have
+results and await review. *Stage 18* (templates bases assembled from two input
+trees) is implemented 2026-10-20: 18.1--18.8 have results and await review;
+18.9 (making the input trees repos) is Mohsen's. Template-maintenance TODOs live
+in the templates repo's own WorkPlan (its Stage 2, =<<2.1>>=--=<<2.4>>=).
+
+*Done on 2026-10-20* (Stage 18; details in its Results):
+
+- *Every templates base is now assembled* from two inputs with fixed names, =aiTemplates-workFlow=
+  (BISOS-AI-Workflow) and =aiTemplates-DE= (an ecosystem's skills and activities), by the new CSXU
+  =aiActivityAssemble.cs= (logic =py3/bisos/aiActivity/assemble.py=): a deep merge of relative links,
+  no layering, the base's own files untouched, a manifest =.aiActivityAssembled=.
+- The two input trees live at =/bisos/git/bxRepos/bxexamples/aiTemplates-{workFlow,DE}= (not yet
+  repos; untracked in =bxexamples/base=). Assembled from them: the BISOS base
+  (=bisos/defaults/ai-templates=; all 192 host project links resolved to the same content before and
+  after) and the public base (=bxexamples/aiActivityTemplates=; now identical to BISOS). A fork
+  is assembled from the workflow tree and its own real =aiTemplates-DE/= (its 18 project links
+  resolve; 5 changed as intended).
+- =aiActivity.cs=: the input names are not activities; the BISOS-first commands rule is dropped (a
+  project uses its base's own commands).
+- *Retired*: =aiActivityCmnds.cs=, =cmndsSync.py=, their =verify.sh= section and figure
+  (=aiActivityCmndsFlow=, replaced by =aiActivityAssembleFlow=), the forks' =.syncedFrom=. Copies of
+  the deleted, never-committed files are in the 2026-10-20 session's scratchpad only.
+- Documents: README ("Assemble a Templates Base", "The Commands Are the Workflow", "Forking the
+  Templates: Two Layers", Key Files, command table), the workflow tree's =AI-WORKFLOW.org= (generic,
+  assembled model), the =bx-ai-commands-authorship= skill (edit in the workflow tree, re-assemble), the
+  templates figures, the bases' READMEs, =PriorAndSimilarArt.org= axis 7.
+
+*Done on 2026-10-19* (from a session in a fork's project; details in Stage 17's Results):
+
+- *The =/bx-*= commands are one set, not per activity.* They are the workflow, the same for every
+  activity. The BISOS tree's =mother/_claude/commands/= is primary; a fork holds *real copies* (so it
+  works where BISOS is absent).
+- /Retired 2026-10-20 (Stage 18):/ *New CSXU =aiActivityCmnds.cs=* (template maintainers), logic in
+  =py3/bisos/aiActivity/cmndsSync.py=:
+  =cmndsDiff=, =cmndsCheck=, =cmndsSync=, =cmndsSyncPrune=; =--fromTemplates= (default BISOS),
+  =--toTemplates= (mandatory); a =.syncedFrom= sidecar records each sync. First real sync, BISOS to a
+  fork, run by Mohsen: =IN SYNC=, 13 commands; the five old names pruned.
+- *=aiActivity.cs=*: =initiate= points =.claude/commands= at the BISOS tree's commands when that tree
+  exists, else the templates tree's own; the activity-level override for commands is dropped (none
+  existed). =refresh= re-evaluates the link in base mode (missing, wrong, dangling: fixed; a real
+  directory: left alone).
+- *Documentation*: README sections "The Commands Are the Workflow: One Set", "Forking the Templates:
+  Two Layers" (BISOS-AI-Workflow vs BISOS-Digital-Ecosystem-Skills), "Keep Claude Commands in Step",
+  "Prior and Similar Art" (pointing to =PriorAndSimilarArt.org=, a dated survey). The structure
+  figure split in two: =aiActivityFlow= (as before, plus where =commands/= and =skills/= point) and the
+  new =aiActivityCmndsFlow=. The templates figures were fixed and retitled and re-copied.
+- *Templates trees*: new BISOS skill =bx-ai-commands-authorship=; a fork's and bxexamples'
+  =AI-WORKFLOW.org=, seeds and commands brought current; bxexamples gained =mother/_skills/= (workflow
+  skills) with =aiActivity/_skills= linked to it.
+- Not yet (as of 2026-10-20): package reinstall (=aiActivityAssemble.cs= is not on PATH until
+  =pypiProc.sh -i pkgReInstall=); =verify.sh='s new sections not run; nothing committed.
+
+*Done on 2026-10-11* (from a bisos-pip/kafka session; no engine code changed):
+
+- *Slash commands renamed in the templates tree* to subject-then-verb groups:
+  =bx-git-commit-msg=, =bx-status-read=, =bx-status-update=, =bx-archive-read=,
+  =bx-archive-update=; new =bx-git-uncommitted-list= and =bx-session-verify=. Recorded in
+  the templates repo (=ai-templates/AI-DevStatus.org=, and its naming-convention TODO).
+  README.org's session-workflow table and Archive bullet follow the new names.
+- *=py3/images/fromTemplates/refreshFromTemplates.sh=* (new) copies the rendered figures in
+  (only those that changed), names the source commit, warns when the source is uncommitted,
+  and reminds that both repos need commit+push. Normally run from the source side by the
+  templates' =aiActivityFiguresPush.sh=. All three workflow figures re-copied.
+- =py3/images/AI-DevStatus.org= (a sample): its boilerplate now names =/bx-status-update= (2026-10-19).
+
+*Done on 2026-10-08/09* (details under each TODO's Results in
+=AI-WorkPlan.org= and =AI-WorkPlan.org_archive=):
+
+- *Templates base follows the repo.* =initiateSub=, =refresh= and the
+  =examples= menu resolve templates as CLI → cwdConfig → nearest initiated
+  ancestor → userConfig → auto-detect. Homogeneous is the default;
+  heterogeneous (a sub on another tree) is explicit and honoured with a
+  =HETEROGENEOUS= note. Base vs sub is decided by a directory's own
+  =AI-WORKFLOW.org= symlink. Fixes [[14.1]] and [[14.4]]; see the design
+  decision below.
+- *=AI-Outputs.org= in every directory.* =initiateSub= now creates the
+  symlink and =refresh= backfills it in subs ([[14.5]]); before, subs never
+  had it and =/bx-ai-outputs= stopped there.
+- *=aiSuspend= / =aiResume= retired* (never used). =deClaudify= warns
+  before deleting =AI-DevStatus.org= / =AI-WorkPlan.org= that git doesn't
+  have. Templates text, figure, README and the engine figure updated;
+  the Blee panel is not (see Known Gaps).
+- *=parSuggestions= in =bisos.b=* feeds the =userConfig_set= /
+  =cwdConfig_set= example menus; =aiActivity.cs= suggests the ancestor's
+  base, =~/aiActivityTemplates= and =/bisos/apps/defaults/ai-templates=
+  when they exist.
+- *=verify.sh=* gained homogeneous and heterogeneous sub cases and ran to
+  exit 0 against the source engine. =py3/tests/= is meant to start and end
+  clean, so it now has a =.gitignore= for everything an install creates.
+- *Templates repo (=bisos/defaults=)* is itself an AI-Activity: root
+  =initiate=-d with =basic=, =ai-templates/= =initiateSub=-d with
+  =aiActivity=; its DevStatus/WorkPlan content was merged back after an
+  overwrite. Its text for the retired commands is updated in the working
+  tree, uncommitted until Mohsen commits ([[15.1]]).
+- *WorkPlan housekeeping:* 8 DONE TODOs archived; =aiStartupWorkflow=
+  re-rendered and its PNG re-copied into =py3/images/fromTemplates/=.
+
+*Done on 2026-10-07* (one line each): =startupClaudeTokens= (chars/4
+estimate of the Claude Code startup load; ~77K tokens here, ~59K from the
+12 panel imports of =bisos-pip/AI-Activity.org=), =/bx-context-trim=,
+Claude specificity made explicit, =nonActivityDirs=, four new templates
+figures plus the updated =aiActivityFlow=, README Templates section and
+session-workflow sections.
+
+*Earlier milestones, one line each* (full detail in git history and
+=AI-WorkPlan.org_archive=):
+- Stage 12 --- =AI-Outputs.org= symlink support (=initiate=, =refresh=
+  backfill); =cwdConfig_csu=; =parPermanence= as a list; =--root=
+  removed (operate on cwd); activity auto-persist; =fps/= config paths;
+  README framing (chatbot vs AI-Activity; templates as cumulative
+  knowledge; topology).
+- Rename =startAiActivity= → =aiActivity=; new =listClaudesPath=.
+- Stage 11 --- =CLAUDE.md= safe-copied (not symlinked) + =refresh=.
+- Stage 10 --- provenance block in safe-copies; =--noLink=; =custom= activity.
+- Stage 8 --- =AI-AGENTS.org= retired (still cleaned up as legacy).
+- Stage 7 --- templates auto-detect, user-first (=~/aiActivityTemplates=, then BISOS).
+- Stage 6 --- =initiateSub= overlays. (Its suspend/resume was retired 2026-10-08.)
+- Stage 5 --- skills via =.claude/skills= → =<activity>/_skills/=.
+- Stages 2--4 --- engine, docs, =deClaudify=.
+
+*Pointers to records outside the import chain* (newest first):
+- *The two input trees*, =/bisos/git/bxRepos/bxexamples/aiTemplates-workFlow/= and =aiTemplates-DE/=
+  (Stage 18): the source of every templates base on this host. *Not under version control yet*
+  (untracked in =bxexamples/base= until 18.9 makes them repos), so they have no revert path; they hold
+  the only copy of the 2026-10-19/20 template work (the new skill, the figures, =AI-WORKFLOW.org=).
+  Edit there, then =aiActivityAssemble.cs -i assemblyUpdate --base=<base>= where files were added or
+  removed.
+- =PriorAndSimilarArt.org= (this repo, not imported): the survey of similar tools, dated 2026-10-19;
+  re-survey before quoting. Linked from README "Prior and Similar Art".
+- The =bx-ai-commands-authorship= skill: in the workflow input,
+  =aiTemplates-workFlow/mother/_skills/bx-ai-commands-authorship/= (see above). The procedure for
+  editing commands and re-assembling the bases.
+- The =store_true= WORKAROUND (why pruning is a verb, not a flag): BISOS =AI-Outputs.org=,
+  =blee-binders/evolution/aiActivity-outputs/= --- in its own git repo, =blee-binders/evolution=
+  (=github.com/blee-binders/evolution=), not in =blee-binders=; commit it there. Actionable when
+  =bisos.b='s =argsparseBasedOnCsParams= builds kwargs by action.
+- Templates-side work lives in the two input repos since 2026-10-20 (=bxexamples/aiTemplates-workFlow=,
+  =aiTemplates-DE=); the workflow figures moved from the workflow tree's =_nonTemplate_/images/= into
+  this repo's =py3/images/= (18.12). Both input repos are aiActivity projects themselves (2026-10-20):
+  the old BISOS base's plan (=ai-templates.k1=) is =aiTemplates-workFlow='s WorkPlan Stages 2--5.
+- Claude Code loading rules used by =startupClaudeTokens= were verified
+  against code.claude.com/docs/en/memory.md and skills.md on 2026-10-07.
+  Re-verify if Claude Code changes its loading behaviour.
+
+* What Works
+
+- =aiActivity.cs= / =-i examples= --- the self-documenting menu: activities
+  under the resolved templates base (excluding =nonActivityDirs=), current
+  userConfig / cwdConfig values, and a bare =initiate= when cwdConfig has
+  an activity.
+- Config: =userConfig_get/set= (=~/.config/bisos/aiActivity.cs/fps/=),
+  =cwdConfig_get/set= (=./.aiActivity.cs/fps/=), =cwdConfig_record=.
+  Templates base precedence: CLI → cwdConfig → userConfig → auto-detect
+  (=~/aiActivityTemplates=, then =/bisos/apps/defaults/ai-templates=); for
+  a sub, the nearest initiated ancestor's base sits before userConfig.
+  The base is read from a project's links one hop only (=_linkTargetOneHop=), so an assembled base's
+  own links into its inputs are not followed (18.13; verified with =verify.sh= 2026-10-20).
+  The =*Config_set= examples show suggested values (=parSuggestions=).
+- =initiate= / =initiateSub= operate on cwd; =activity= comes from the CLI
+  or cwdConfig and is auto-persisted on success. =CLAUDE.md= is
+  safe-copied; =AI-WORKFLOW.org=, =AI-Activity.org=, =AI-Outputs.org= (if
+  the templates ship it) and =.claude/{settings.json,commands,skills}= are
+  symlinked; DevStatus/WorkPlan are safe-copied with provenance and the
+  particulars dblock expanded. =--noLink=<file>= safe-copies a would-be
+  symlink. =initiateSub= requires an initiated ancestor and installs only
+  the slim overlay plus an =AI-Outputs.org= symlink (every directory gets
+  one, as it is read from cwd and never found by walk-up; =refresh=
+  backfills it in subs too, fixed 2026-10-08).
+- =--activity= refuses =mother=, =test=, =_nonTemplate_= in =initiate=,
+  =initiateSub= (verified in a scratch dir; no files created).
+- =refresh= (re-copy =CLAUDE.md=, upgrade legacy symlinked ones, backfill
+  =AI-Outputs.org=); =deClaudify= (also cleans legacy =AI-AGENTS.org= and
+  =.dormant= files; warns first if =AI-DevStatus.org= / =AI-WorkPlan.org=
+  are untracked or modified in git).
+- Inspection: =listClaudesPath=; =startupClaudeTokens= (verified from the
+  repo root ~77K, from =py3/tests/= ~78K, and from an empty dir 0; parser
+  checks for emails, code spans, fenced blocks, escaped spaces).
+- =py3/tests/verify.sh= exercises the full lifecycle surface, including
+  homogeneous and heterogeneous subs, and exited 0 on 2026-10-09 (see
+  Known Gaps for the venv caveat).
+- =aiActivityAssemble.cs= (2026-10-20): against the real input trees a scratch base reproduced the
+  BISOS tree byte for byte (104 links; =__pycache__= skipped); 16 edge cases on synthetic trees; then
+  three real bases assembled =IN SYNC= (above). A project initiated from an assembled base gets all its
+  links resolving (13 commands, 22 skills through =bisos-pip/_skills=); this Claude session discovered
+  skills through a fork's assembled base.
+- /Retired 2026-10-20:/ =aiActivityCmnds.cs= (2026-10-19, scratch trees and one real sync): diff,
+  check, sync (extras kept),
+  prune, idempotent re-run, five refusals writing nothing, =settings.json= untouched, the examples menu
+  lines runnable as printed; =cmndsDiff= against a real fork matched the predicted delta; the
+  real sync and prune left it =IN SYNC=.
+- =initiate= / =refresh= commands link (2026-10-19): with a fork as templates source the link
+  went to BISOS while =settings.json= and =skills= followed the fork; =refresh= handled right, wrong,
+  dangling, missing and real-directory links; a sub was left alone; the no-BISOS fallback was checked
+  by monkeypatching the BISOS path.
+
+* What Is Untested
+
+- PyPI upload and =pipx install bisos.aiActivity= end to end. (The PyPI
+  README will be a different document; =README.org= image paths are not
+  meant for PyPI.)
+- =/bx-context-trim= on a real trimming pass: it is written and live, but
+  has not been run through propose → confirm → apply → re-measure.
+- =startupClaudeTokens= calibration: the chars/4 estimate has not been
+  compared with the built-in =/context= "Memory files" figure on a fresh
+  session.
+- The auto-default hook on a machine with neither templates location.
+- Activities other than =bisos-pip= under =initiate= (the
+  logic is generic but only =bisos-pip= was exercised interactively).
+- Lifecycle commands where =.claude/= holds non-symlink files such as
+  =settings.local.json= (meant to be left intact).
+- =/bx-ai-outputs= (index and capture) live in a sub-project after a
+  =refresh=.
+- Heterogeneous subs against a real second templates tree (only a minimal
+  scratch tree was used), and =refresh= over the existing subs.
+- =parSuggestions=: no =bisos.b= tests were run; the =(current)= marker
+  and a package other than aiActivity using it are unexercised.
+- =deClaudify='s git warning where =git= is missing.
+- The =verify.sh= sections for the commands link and for =aiActivityAssemble.cs=: written, =bash -n=
+  clean, not run (need the package reinstalled and a =tests/= directory).
+- A fresh Claude session in a BISOS project on the assembled base (this session showed skill discovery
+  through a fork's assembled base; a new session's startup listing is not yet seen).
+- A colleague's machine: a clone of the workflow tree, one link, =assemblyCheck= (the fork's README
+  describes it; not exercised).
+- No project is initiated from the bxexamples base.
+
+* Known Gaps (not bugs --- areas for future work)
+
+- *Skill provisioning ≠ purpose* (exposed by =aiEcosystemTree=). 15 of the
+  16 ecosystem skills live in =bisos-pip/_skills/=, including
+  =cbm-authorship=, =sysd-pcs-authorship= and =walkable-tree-planting=,
+  which are not about pip packages. Projects initiated with
+  =--activity=pycs=, =sbom+cap= or =bisos-core= don't see them, and a
+  =bisos-pip= project doesn't see =sbom-authoring=. Any re-homing must move
+  prerequisite chains together (=seeded= ← =spread-seeded= ← =walkable= /
+  =cbm=; =writing-cs-commands= ← =icm-to-pycs=). Not yet a WorkPlan TODO.
+  *Resolved 2026-10-17, without an engine change*: all skills moved to one
+  shared set, =mother/_skills/=; =bisos-pip=, =aiActivity= and =sbom+cap=
+  now have =_skills -> ../mother/_skills=. Left: =refresh= does not add a
+  missing =.claude/skills= link (AI-Outputs.org), and the =aiCommandsSkillsTrees=
+  figures show the old homes.
+- *Startup context is heavy in this repo.* ~77K tokens, ~59K of it from
+  =bisos-pip/AI-Activity.org='s 12 panel imports. A candidate for a
+  =/bx-context-trim= pass (a shared edit: it affects every =bisos-pip=
+  project).
+- *Stale =bisos.graphviz= in the bisos3 venv (WORKAROUND).* The installed
+  copy is 0.29, non-editable, and its =namedGraph()= lacks the =title= /
+  =caption= kwargs every figure here uses. Render with
+  =PYTHONPATH=/bisos/git/bxRepos/bisos-pip/graphviz-cs/py3= prepended.
+  Fix: =pip install -e= graphviz-cs into bisos3 (not done; shared venv).
+  A candidate =AI-Outputs.org= WORKAROUND entry (not captured yet).
+- *=listClaudesPath= stops at the git root*, while Claude Code walks up to
+  =/=. Folded into [[14.10]].
+- *=csuListProc= dblock body in =aiActivity.cs= was hand-edited* to add
+  =startupClaudeTokens_csu=, because =py-dblock.cs= has no handler for it.
+  Commit 05cbb2b ("blee dblocked over ai hand dblocks") re-ran Blee dblocks
+  on =aiActivity.cs= but changed no =csuListProc= lines. Either the hand
+  edit already matched the generator, or that block wasn't regenerated.
+  Confirm by running that one dblock in Blee.
+- *=verify.sh= venv issue.* =#!/bin/bash -i= activates =tmoBisos= on BISOS
+  machines, which lacks =bisos.pyDblock=. It passed on 2026-10-09 in a shell
+  where =devbin= led the PATH (=hash -r= was needed). Fix: install it in
+  tmoBisos, or pin verify.sh to the BISOS venv. It deletes
+  =py3/tests/CLAUDE.md= (tracked until =git rm=; now gitignored).
+- *Templates content is uneven.* =bisos-pip= has 16 skills and a rich
+  orientation file; most other activities are skeletal.
+- *The Blee panel is behind.* =py3/panels/bisos.aiActivity/.../fullUsagePanel-en.org=
+  still has "aiSuspend and aiResume" sections (retired) and none for
+  =listClaudesPath=, =refresh=, =startupClaudeTokens=, =cwdConfig_*=, or
+  the figures. It needs dblock-based sections (the
+  blee-panel-authorship skill); hand-writing them is not appropriate.
+- *Incomplete templates tree → raw traceback.* =initiateSub= on a tree
+  missing =mother/AI-DevStatus.org= dies with =FileNotFoundError= rather
+  than a usage error.
+- *=aiActivityFlow.odg= is hand-made and stale* (not generated with the
+  other formats), more so after the suspend/resume removal.
+- *=startupClaudeTokens= treats =.claude/commands/*.md= descriptions like
+  skills; the docs don't confirm they load at startup.* The Claude Code
+  rules otherwise verified 2026-10-07 include: walk-up to the filesystem
+  root, skills discovered only up to the repo root, auto-memory capped at
+  200 lines / 25KB.
+- *Design negative results (=startupClaudeTokens=).* A cache-status
+  section was dropped: prompt caching is server-side and prefix-keyed, so
+  file mtimes say nothing. Names rejected: =aiStatus= (too close to
+  =/bx-status=), =startupTokens= (overclaims; the rules are Claude's),
+  =aiInTokens= was the runner-up.
+- *No contribution/governance story* for how template improvements flow
+  back between forks.
+- *A boolean flag is impossible in a CS command* (WORKAROUND, =AI-Outputs.org=): =bisos.b='s
+  argparse builder passes =nargs= / =metavar= to =store_true= (Python 3.13 rejects them). (The retired
+  =aiActivityCmnds.cs= worked round it with a verb.)
+- *The PyCS main exits 0* for a refused Cmnd and whatever =assemblyCheck= says: documented, not worked
+  around.
+- *Dblocks of the new files were copied by hand* (=aiActivityAssemble.cs=, =assemble.py=, the
+  =aiActivityAssembleFlow= function): regenerate them in Blee. The Blee panel has nothing on
+  =aiActivityAssemble.cs=.
+- *Files in a base are links.* Editing through a base writes into the input (fine); a tool that replaces
+  the file (=sed -i=, backup-and-rename editors) leaves a real file, reported as a conflict by
+  =assemblyCheck=. Edit in the input trees.
+- *Safe-copies never receive template improvements* (only =CLAUDE.md= is refreshed). A Copier-style
+  three-way update is one of the ideas in =PriorAndSimilarArt.org=.
+- *Two-part install friction*: the pip package plus a separately cloned
+  templates repo.
+
+* Architecture
+
+#+begin_example
+py3/
+  bin/
+    aiActivity.cs              --- main csxu: initiate, initiateSub, refresh,
+                                   deClaudify, cwdConfig_record,
+                                   listClaudesPath, examples; helpers
+                                   _findInitiatedAncestor,
+                                   _resolveTemplatesBaseSub, _suggestTemplates;
+                                   nonActivityDirs; csuList = userConfig_csu,
+                                   cwdConfig_csu, startupClaudeTokens_csu
+    aiActivityAssemble.cs      --- second csxu (template maintainers): assemblyDiff,
+                                   assemblyCheck, assemblyUpdate
+  bisos/aiActivity/
+    startupClaudeTokens_csu.py --- startupClaudeTokens (Claude binding)
+    assemble.py                --- aiActivityAssemble.cs's logic, pure pathlib
+                                   functions (plan, apply, manifest)
+  images/                      --- initiateSub overlay (graphviz-pcs activity)
+    aiActivity-graphviz.pcs    --- aiActivityFlow (structure figure) and
+                                   aiActivityAssembleFlow (aiActivityAssemble.cs) + outputs
+    aiCommandsSkillsTrees-graphviz.pcs, aiStartupWorkflow-graphviz.pcs,
+    aiUsageWorkflow-graphviz.pcs (+ aiUsageWorkflow.org)
+                               --- the workflow figures (moved here 2026-10-20 from the
+                                   workflow tree's _nonTemplate_/images/) + outputs
+  tests/
+    verify.sh                  --- end-to-end harness (bash -i, lpDo); starts
+                                   and ends clean, installs are gitignored
+  panels/bisos.aiActivity/_nodeBase_/fullUsagePanel-en.org --- Blee panel
+README.org                     --- the only authored README
+#+end_example
+
+Key external dependencies (not bundled):
+
+- =bisos.b= --- PyCS-Core (=cs=, =b_io=, =fp=, =b.op=), plus
+  =userConfig_csu= and =cwdConfig_csu= and =parSuggestions= on =parDictAdd=.
+- =bisos.pyDblock= --- the dblock engine (=updateDblock=,
+  =dblock_particulars=), used at install time.
+- =bisos.graphviz= --- for rendering figures (see the venv WORKAROUND
+  above).
+- The AI templates repo, not bundled. Layout:
+  #+begin_example
+  ai-templates/
+    mother/                  --- baseline: CLAUDE.md, AI-WORKFLOW.org,
+                                 AI-Outputs.org (-> blee-binders), _claude/
+                                 {settings.json, commands/}, initiateSub/CLAUDE.md
+    <activity>/              --- AI-Activity.org, AI-DevStatus.org, AI-WorkPlan.org,
+                                 optional _claude/, optional _skills/<skill>/SKILL.md
+    _nonTemplate_/           --- the one escape from the templates concept
+      images/                --- aiStartupWorkflow, aiUsageWorkflow (+ .org table),
+                                 aiCommandsSkillsTrees (aiGeneralTree, aiEcosystemTree)
+  #+end_example
+  =initiate= falls back to =mother/= for a missing =_claude/<entry>= or
+  =_skills/=. Skills today (2026-10-19): one shared set of 22 in =mother/_skills/=
+  (=bisos-pip=, =aiActivity= and =sbom+cap= link =_skills -> ../mother/_skills=); two of them are
+  workflow skills (=authoring-skills=, =bx-ai-commands-authorship=), the rest
+  BISOS-Digital-Ecosystem-Skills. Commands: 13 =/bx-*= in =mother/_claude/commands/=, one set
+  for every activity (no activity-level override since 2026-10-19).
+
+Entry points (=setup.py= console_scripts): =aiActivity.cs= →
+=py3/bin/aiActivity.cs=.
+
+** Templates Trees
+
+Three templates trees are live:
+
+- *BISOS canonical* --- =/bisos/apps/defaults/ai-templates/=. Master
+  source. All new activities and changes originate here.
+- *bxexamples public reference* ---
+  =/bisos/git/bxRepos/bxexamples/aiActivityTemplates/= (a git repo
+  published at https://github.com/bxexamples/aiActivityTemplates).
+  Kept as a full structural mirror of BISOS. Only differences: its
+  own top-level =README.org= (fork-identity) and =LICENSE=. Per-project
+  files at the BISOS templates root (=AI-Activity.org=,
+  =AI-DevStatus.org=, =AI-WorkPlan.org=, symlinked =AI-WORKFLOW.org=,
+  =CLAUDE.md=, and =.claude/=) are intentionally NOT propagated ---
+  BISOS eats its own dogfood by installing =aiActivity= against
+  itself, but bxexamples remains a bare templates repo.
+- *An organization's fork* --- a templates tree in that organization's own
+  repository (tracked there, as of 2026-10-19; the earlier "untracked by
+  design" no longer holds). Since 2026-10-20 an *assembled base*: the
+  workflow tree linked in (per host), its own content in a real
+  =aiTemplates-DE/= (its own activities, its =mother/AI-Activity.org= and
+  ledger link, extra =basic/= and =custom/= seeds). Before that it contained an adjusted
+  =mother/= and activities of its own. Selectively receives updates from BISOS: as of
+  2026-07-21, has =aiActivity/= (the shared model orientation) but
+  intentionally NOT =sbom+cap/= or the BISOS-specific
+  =bisos-pip=/=xu-single=/=bisos-core=/=lcnt= activities.
+  (The note that its =basic/AI-Activity.org= deliberately diverged was
+  stale: the difference was a trailing newline; it now uses the workflow's.)
+
+Since 2026-10-20 there is no sync: the three bases are assembled from the same
+workflow tree (=bxexamples/aiTemplates-workFlow=), BISOS and bxexamples from the
+same ecosystem tree too (so they are identical), a fork from its own.
+See Stage 18; Stage 17's copy-sync is retired, and [[15.1]]'s sync loop is
+reduced to the input trees' commits.
+
+* Key Design Decisions
+
+- *The commands are one set, the workflow's, not an activity's* (2026-10-19, Mohsen). No layering:
+  no activity-level =_claude/commands= override. The BISOS tree's set is primary; a fork holds real
+  copies, because BISOS is optional (a colleague's machine may have only the fork). =initiate= /
+  =refresh= point =.claude/commands= at the templates tree's own =mother/_claude/commands=. *Revised
+  2026-10-20 (18.4)*: the BISOS-first rule (prefer the BISOS tree's set when it exists, an exception
+  to the user-first templates detection) is dropped, because with Stage 18 every base contains the
+  real workflow. Skills keep following their templates tree as a whole. =settings.json= is out of
+  scope.
+- *Stage 18 (2026-10-20): a templates base is assembled from two inputs*, =aiTemplates-workFlow= and
+  =aiTemplates-DE= (fixed names; real directories or symlinks to clones anywhere), by
+  =aiActivityAssemble.cs=: a deep merge of relative links, no layering (a path in both is refused),
+  the base's own files untouched, a manifest of what it made. No separate =./all= tree: the base is
+  the aggregate. =git subtree= was considered and rejected. Supersedes the copy-sync once migrated.
+- /Superseded 2026-10-20 by the assembly (Stage 18):/ *Keeping a fork current is a separate
+  maintainer CSXU, =aiActivityCmnds.cs=*, generic over
+  templates trees (=--fromTemplates= / =--toTemplates=), not part of =aiActivity.cs='s user commands.
+  bxexamples is a valid source and never a target (hand-maintained). Copies are byte-identical; the
+  record is a =.syncedFrom= sidecar, because a frontmatter-less command file takes its first line as its
+  slash-menu description (a "do not edit" header would replace every description). Verbs
+  (=cmndsSyncPrune=) rather than a flag, forced by the =store_true= limitation and clearer for a
+  delete. The target has no default. The reminder to sync is a skill only, no git hook.
+- *Two layers of a templates tree* (2026-10-19): BISOS-AI-Workflow (commands, workflow skills, the
+  =mother/= workflow files: adopt as-is, near-zero cost) and BISOS-Digital-Ecosystem-Skills (replace
+  with your own). The README's "Forking the Templates: Two Layers" and the two figure titles say so.
+- *One figure per topic*: =aiActivityAssemble.cs= has its own figure (=aiActivityAssembleFlow=;
+  before it, =aiActivityCmndsFlow= for the retired tool) instead of sharing the structure figure, which
+  stays about a project's install and Claude's reads.
+- *No internal names in public pieces*: README, figures, the =.cs= examples and skills use
+  =<forkTemplates>= / "an organization's own tree"; so do the AI-*.org files, since 2026-10-20
+  (Mohsen: no organization or project names anywhere in this public repo; earlier mentions cleaned).
+
+- *=userConfig_csu= in =bisos.b=, not this package* — the persistent user-config
+  CSU is general-purpose and belongs in the PyCS-Core library. Any bisos-pip
+  package that needs persistent config can reuse it without copying.
+
+- *=parDictAdd= hook for auto-defaults* — rather than a separate =initUserConfig=
+  command, the default is written to the store inside =parDictAdd= itself when
+  =parPermanence="userConfig"= and the store is empty. This fires at runtime via
+  =g_extraParams=, not at import time. The hook is in =bisos.b/cs/param.py= so
+  it is available to all PyCS packages.
+
+- *Precedence-based parDefault probe* — =parDefault= for =templates= is
+  set by =_detectTemplatesDefault()=, which probes two well-known paths
+  in order: =~/aiActivityTemplates= (canonical per-user clone from the
+  templates repo README) first, then =/bisos/apps/defaults/ai-templates=
+  (BISOS-provisioned) second. First existing path wins; if neither
+  exists, =parDefault= is =None= and the user must =userConfig_set=
+  explicitly. User-first ordering means a personal fork cloned to the
+  canonical name transparently takes over from the BISOS system copy
+  --- no explicit =userConfig_set= needed. This avoids silently storing
+  a non-existent path and honors user intent when both are present.
+
+- *Per-directory config is a separate CSU, not a =--cwd= flag on
+  =userConfig_csu=.* =bisos.b.cwdConfig_csu= is the sibling of
+  =bisos.b.userConfig_csu= --- same shape, but its =_configRoot()=
+  returns =<cwd>/.<csxu-name>/fps/= instead of
+  =~/.config/bisos/<csxu-name>/fps/=. Chose composition-of-CSUs over
+  parameter-overload because (a) it matches the existing "one CSU per
+  capability, opt in via csuList" pattern, (b) users who don't want
+  per-directory config don't pay for an extra CLI param in every
+  command signature, (c) each store has a symmetric read/write pair
+  (=cwdConfig_get/set= and =userConfig_get/set=) with no fall-through
+  magic --- precedence policy lives in the caller
+  (=_resolveTemplatesBase=), the stores stay dumb. The dotdir prefix
+  (=.<csxu-name>/=) hides the per-project config from =ls= and clearly
+  attributes it to the tool that manages it.
+
+- *=csuListProc= pattern: elisp block is mandatory* — the
+  =b:py3:cs:framework/csuListProc= dblock reads =b:py:cs:csuList= from the
+  elisp =#+BEGIN_SRC emacs-lisp= block immediately above it. The generated
+  =g_extraParams= calls only =cs.csuList_commonParamsSpecify= — not the csxu's
+  own =commonParamsSpecify=, which is wired separately by the framework.
+
+- *=README.org= is the only authored source; =py3/README.rst= is generated*
+  by =py3/pypiProc.sh -i fullPrep= (invoked directly or via
+  =fullPrepBuild forPypi=). Never hand-edit =README.rst= — edits are
+  overwritten at release time. Between releases, =README.rst= may be stale
+  relative to =README.org=; that's expected and harmless.
+
+- *=mother/= not =bystar/=* — the baseline templates directory is named =mother/=
+  in the current templates repo layout. The =excludedDirs= set in =examples=
+  uses =mother= accordingly.
+
+- *=aiSuspend= / =aiResume= retired* (2026-10-08). Never used in practice:
+  idle AI files cost nothing until Claude is started in that directory. Their
+  only unique property, preserving edited =AI-DevStatus.org= /
+  =AI-WorkPlan.org=, is covered by git. Removed with them: the =.dormant=
+  suffix scheme, activity inference from the =Activity:= header, and the
+  =CLAUDE.md.dormant= symlink-target mode signature. Rather than keep a
+  second mechanism, =deClaudify= now warns before deleting those two files
+  when git does not have them in their current form (untracked, modified,
+  or not in a repo); it still proceeds. =deClaudify= keeps removing legacy
+  =.dormant= files. =deClaudify= and =refresh= operate on the current
+  directory only --- no =--root= param.
+
+- *Skills at activity root, not under =_claude/=* — skills live in
+  =<activity>/_skills/=, not =<activity>/_claude/skills/=. Rationale: skills are
+  semantically distinct from =.claude/= machinery — they're knowledge, not
+  harness config. Placing them at the activity root keeps them independently
+  visible to humans and other tools; the installed location under
+  =.claude/skills/= is just where Claude Code looks. =initiate= symlinks
+  =<activity>/_skills/= to =.claude/skills/= to bridge the two.
+
+- *Subproject overlays use Claude Code walk-up, not local hooks* — an
+  =initiateSub= directory has a slim =CLAUDE.md= that imports only its
+  local trio. The invariants come from an ancestor's =CLAUDE.md= via
+  Claude Code's built-in upward walk. This avoids relying on manual
+  prompting or session hooks — discovery is fully automatic once files
+  are on disk.
+
+- *A repo follows its initiated ancestor's templates base* (2026-10-08).
+  =initiateSub= and =refresh= resolve templates as CLI → cwdConfig → nearest
+  initiated ancestor (an =AI-WORKFLOW.org= symlink into some =<base>/mother/=)
+  → userConfig → auto-detect. Before, userConfig outranked the ancestor, so a
+  userConfig naming a fork made =initiateSub= fail ("No initiated parent
+  found") inside a repo initiated from the BISOS tree. An explicit
+  =--templates= or cwdConfig that disagrees with the ancestor makes the
+  sub Heterogeneous: honoured, with a =HETEROGENEOUS= note (a first version
+  refused it as a "Templates mismatch", contradicting the README's topology
+  section; corrected the same day). Homogeneous is the default,
+  heterogeneous always explicit. Base vs sub is decided by the directory's
+  own =AI-WORKFLOW.org= symlink (base has one, sub inherits an ancestor's),
+  so no mode is stored anywhere and a base nested in another initiated
+  project is classified correctly (this is [[14.1]]).
+
+- *=parSuggestions= for the =*Config_set= examples menus* (2026-10-09, in
+  =bisos.b=, shared). A new optional =parDictAdd= / =CmndParam= argument: a
+  list, or a callable evaluated only when a menu is built. It feeds the
+  =userConfig_set= / =cwdConfig_set= example lines (one per suggestion; the
+  =<name-value>= placeholder remains when there are none). Not =parChoices=
+  (argparse would restrict values) and not =parDefault= (persisted by
+  =parDictAdd= in the string-permanence case). Never validated or persisted.
+  =aiActivity.cs= supplies =_suggestTemplates=: nearest initiated ancestor's
+  base (shown in its =/bisos/apps/...= spelling when it is the same tree),
+  then =~/aiActivityTemplates= and =/bisos/apps/defaults/ai-templates= if
+  they exist. Verified in scratch dirs only; =bisos.b= has no tests run for it.
+
+- *=--activity= required on =initiateSub=* — no inheritance-from-parent
+  default. Rationale: a subproject can legitimately be a different
+  activity than its parent (e.g., a =blee-panels= subproject inside a
+  =bisos-pip= repo), and inference would silently pick the wrong one
+  in that case. Explicit is better.
+
+- *Nested =initiateSub= allowed* — both base and sub CLAUDE.md symlinks
+  land under =templatesBase=, so the precondition check treats them
+  equivalently. Grandchild's walk-up hits child's =CLAUDE.md=, which
+  points at =mother/initiateSub/CLAUDE.md= — still under =templatesBase=,
+  precondition satisfied.
+
+- *Splitting =AI-Activity.org= into orientation + skills* — the pre-Stage-5
+  =bisos-pip/AI-Activity.org= was 456 lines of always-loaded context, of which
+  ~60% was procedural knowledge only needed for specific tasks (writing CS
+  commands, authoring READMEs, releasing to PyPI). Splitting cut the baseline
+  to 154 lines and moved ~916 lines of procedural content into 5 skills that
+  load on demand. Original preserved as =AI-Activity.org.pre-skills-backup=.
+  Trade-off: skills are a Claude Code-only feature; a human reading
+  =AI-Activity.org= outside Claude Code will see references but not content.
+  Mitigation: the "Available Skills" table in =AI-Activity.org= names each
+  skill's file path, so a human can open it directly.
+
+- *This repo functions as a working example of the full AI Activity
+  workflow.* The presence of =AI-WorkPlan.org_archive= alongside
+  =AI-WorkPlan.org= demonstrates the org-archive pattern in action ---
+  completed stages are moved to the archive file (via org-mode's
+  =org-archive-subtree=) to keep the active WorkPlan focused on current
+  work. Other artifacts in this repo (=verify.sh=, the skills folder,
+  =AI-DevStatus.org='s update discipline) are similarly load-bearing
+  as reference implementations of what the templates enable.
+
+- *=CLAUDE.md= imports the four subordinate files directly; no
+  =AI-AGENTS.org= indirection.* The historical layer added no
+  functional value --- =AI-AGENTS.org= was aspirationally
+  vendor-neutral but 100% Claude-specific in content, and every user
+  hop through it just made the graph deeper. Merging =CLAUDE.md= to
+  import =AI-WORKFLOW.org= / =AI-Activity.org= / =AI-DevStatus.org= /
+  =AI-WorkPlan.org= directly eliminates one file, one symlink, one
+  install step, and one layer of indirection without loss. Legacy
+  projects with an =AI-AGENTS.org= symlink still get correctly cleaned
+  up by =deClaudify= (it retains the entry in its cleanup list with an
+  explanatory comment).
+
+- *=--noLink= is a CLI flag, not a per-activity config file.* When
+  the need for per-project safe-copy of =AI-Activity.org= (and
+  possibly other files) emerged with the =custom= activity, two
+  designs were considered: (a) a per-activity =_activity-config.org=
+  in the templates tree declaring which files should be safe-copied,
+  or (b) a =--noLink=<file>= CLI flag on the invocation. Chose (b)
+  because it preserves the design principle that *templates should
+  stay passive* --- a template tree is a filesystem of examples, not
+  a configuration layer requiring engine-side interpretation. (a)
+  would have put behavior specification in two places (config file
+  plus optional CLI override) with precedence rules to reason about.
+  (b) is more general (works on any file, not only pre-declared
+  ones), simpler (one mechanism), and honest (the choice is made at
+  invocation time by the human who knows what they want). The
+  trade-off: the user has to remember the flag. Mitigated by
+  advertising =--noLink=AI-Activity.org= in the =examples= menu
+  right after each =--activity=custom= line, and by keeping the
+  =custom= activity itself rare (used only when no standard activity
+  fits).
+
+- *=CLAUDE.md= is safe-copied, not symlinked.* Claude Code resolves
+  symlinks before reading a file, so =@./AI-Activity.org= inside a
+  symlinked =CLAUDE.md= resolves relative to the templates directory
+  (where the symlink target lives), not the project. That silently pulls
+  in the wrong =AI-Activity.org= --- discovered in a fresh Claude session
+  in a fork's project. Fix: =initiate= and =initiateSub=
+  =shutil.copy2= =CLAUDE.md= from templates instead of =symlink_to=; no
+  provenance line is written (CLAUDE.md must remain equivalent to a
+  symlink in content). The new =refresh= command is the escape hatch:
+  re-copies =CLAUDE.md= from templates on demand, upgrading any legacy
+  symlinked install in place. Alternatives considered: (a) drop =@./=
+  imports from CLAUDE.md and rely on prose --- rejected as fragile;
+  (b) absolute =@/full/path= imports --- doesn't work for per-project
+  files (=AI-Activity.org=, etc.); (c) two-level wrapper --- doesn't
+  solve the underlying resolution. Trade-off: templates changes to
+  CLAUDE.md don't propagate automatically to installed projects ---
+  mitigated by =refresh=. Mode detection in =refresh= and =initiateSub=
+  switched from CLAUDE.md-symlink-target to parent =AI-WORKFLOW.org=
+  walk-up under templatesBase; =AI-WORKFLOW.org= is still symlinked
+  (it has no back-imports, so symlink resolution is harmless).
+
+- *Agent-neutral in content, Claude-bound in loader; the binding is
+  isolated, not abstracted* (decided 2026-10-07). The value --- the
+  AI-*.org files, the templates tree, the lifecycle logic --- is
+  agent-neutral. Everything that touches the agent is Claude Code:
+  - the entry file =CLAUDE.md=, and the =@= import syntax that pulls in
+    the org files
+  - =.claude/=: =settings.json= permissions format, slash commands, skills
+  - behaviors the design relies on: symlinks resolved before reading
+    (hence the safe-copied =CLAUDE.md=), ancestor walk-up loading (which
+    =initiateSub= depends on), lazy loading of subdirectory overlays
+  The real lock-in is the =@= imports + walk-up, not the filenames: an
+  agent without imports would need a generated, concatenated entry file,
+  which breaks the "edit the shared template, every project sees it"
+  property of symlinks. Policy:
+  1. Claude-specific commands say so in their name (=startupClaudeTokens=,
+     =listClaudesPath=, =deClaudify=).
+  2. Binding constants are to be gathered in one place (Stage 14 TODO
+     14.10).
+  3. No =--agent= param or multi-agent support until a second agent is
+     actually in use --- designing a second binding with zero users would
+     be designing in the dark.
+
+- *Provenance is inert text, not a dblock.* The provenance line
+  written by =initiate= / =initiateSub= into =AI-DevStatus.org= and
+  =AI-WorkPlan.org= (date, user, templates base, =sys.argv=) is a
+  plain multi-line org-comment block, not a dblock of any signature.
+  Dblocks have two implementations (Python via =bisos.pyDblock=, and
+  elisp via =org-dblock-update= inside Emacs). Elisp dblock
+  regeneration cannot recover invocation context --- it runs long
+  after =initiate= exited, in a shell it never observed. Any dblock-
+  based approach would either only work under the Python expander,
+  or would need parallel elisp code reaching into a persistence
+  store. Provenance is *birth-certificate* data, correct only at
+  install time; inert text written once matches the semantics
+  exactly. Placement is after the last =#+= header directive at the
+  top of the file, robust to header reordering.
+
+- *One explicit escape from the templates concept: =_nonTemplate_/=*
+  (2026-10-07). Everything in a templates repo is a template or relates to
+  one. Material /about/ the tree (images, docs, ...) goes under this single
+  top-level directory, as subdirectories. The engine knows it through one
+  explicit set, =nonActivityDirs = {'mother', 'test', '_nonTemplate_'}=,
+  which is used both for listing activities and for refusing them as
+  =--activity=. Considered and rejected:
+  - =mother/_images/=: it blurs =mother/='s single job, being the install
+    source.
+  - A general "=_=-prefix = not an activity" pattern: one escape is enough
+    by construction, and a pattern would silently hide any =_foo/=
+    someone creates.
+
+- /Superseded 2026-10-20 (18.12): the workflow figures now live in this repo's =py3/images/=, next
+  to the README that shows them; the copy step (=fromTemplates/=, =refreshFromTemplates.sh=,
+  =aiActivityFiguresPush.sh=) is retired. Once the templates were split, the workflow repo holds only
+  templates, and figures versioned with the engine give the version-matched snapshot directly. The
+  cost: a new command or skill in an input repo means updating =aiCommandsSkillsTrees= here (the
+  =bx-ai-commands-authorship= and =authoring-skills= skills say so)./
+  *Workflow figures live with what they depict; the engine README carries
+  PNG copies* (2026-10-07). The figures of the =/bx-*= workflow and the
+  skills sit in the templates repo next to the commands and skills.
+  =py3/images/fromTemplates/= holds rendered PNG copies only. Reasons:
+  - A README of a released engine version should show a snapshot matching
+    that version, not a live link that can run ahead of it.
+  - The =.pcs= sources stay single-sourced.
+  Provenance and the refresh command are in that directory's =README.org=,
+  and refreshing is a Stage 15 sync item. The ecosystem-skills tree is
+  framed in the README as /a pattern to mimic/ for the reader's own
+  ecosystem. Placing it after the engine figure keeps the order "engine
+  first, then example".
+
+- *Figure conventions shared by the workflow figures* (=aiUsageWorkflow=,
+  =aiStartupWorkflow=, so they read as a pair):
+  - Fill = effect on files: blue read, pink write, purple read-write.
+  - Border = always (solid) vs perhaps (dashed).
+  - Writes only as edges: red = Claude, green = =aiActivity.cs=, dashed
+    black = you. Reads are carried by the fill.
+  - Position = locality: right of the main path is this repo; left (grey)
+    is shared or outside it.
+  Graphviz lessons (added to the graphviz-authoring skill's "Debugging
+  layout surprises" on 2026-10-08):
+  - =dot= ignores source order within a =rank=same= subgraph. Pin it with
+    invisible flat edges.
+  - Long back-edges can't be steered with ports. Route them through
+    invisible point waypoints, one per rank, declared top-down with
+    =dir='back'=.
+  - Edges back to subjects drawn far above tangle. Use thin-bordered
+    reference nodes on the writer's own rank instead.
+  - In LR trees, put the legend on the root's rank to use the empty
+    column.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

@@ -1,0 +1,329 @@
+#+title: bisos.startAiActivity --- Design and Implementation Specification
+#+DATE: <2026-07-09 Wed>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+
+* HISTORICAL NOTE
+
+On August 3, 2026; I decided to rename bisos.startAiActivity to bisos.aiActivity.
+Other than this history file, there should no longer be any references to startAiActivity.
+
+This document was the design spec for =bisos.startAiActivity= at the time it
+was being derived from an earlier =startAiAt.cs= reference implementation.
+That reference implementation lived at
+=/bisos/apps/defaults/ai-templates/startAiAt.cs/= and has since been
+*retired and deleted* (2026-07-15) — all of its functionality is now in
+=startAiActivity.cs=, plus new commands (=initiateSub=, =deClaudify=,
+=aiSuspend=, =aiResume=, =userConfig_get/set=).
+
+References below to =startAiAt.cs= describe the original spec and are
+preserved as part of the development record; do not attempt to look up
+that file. For current authoritative behavior see =py3/bin/startAiActivity.cs=
+and the =bisos-pip/_skills/= documentation.
+
+* Overview
+
+=bisos.startAiActivity= is a new, standalone =bisos-pip= package that generalizes
+the functionality of =startAiAt.cs= (found at
+=/bisos/git/auth/bxRepos/bisos/defaults/ai-templates/startAiAt.cs/startAiAt.cs=)
+into a reusable tool decoupled from any specific BISOS installation.
+
+The existing =startAiAt.cs= is *not modified*. It remains the BISOS-internal
+reference implementation. =bisos.startAiActivity= is built fresh as a separate
+=bisos-pip= package, using =startAiAt.cs= as its specification and design guide.
+
+* What It Does
+
+=bisos.startAiActivity= installs AI collaborative development templates into a
+target directory (or git repo root). The templates establish the file structure
+that Claude Code (and other AI assistants) use for sustained, multi-session,
+multi-machine collaboration via org-mode.
+
+The installed files are:
+
+| File               | Type      | Source                        | Who edits |
+|--------------------+-----------+-------------------------------+-----------|
+| =CLAUDE.md=        | symlink   | =<templatesBase>/mother/=     | never     |
+|    | symlink   | =<templatesBase>/mother/=     | never     |
+| =AI-WORKFLOW.org=  | symlink   | =<templatesBase>/mother/=     | never     |
+| =AI-Activity.org=  | symlink   | =<templatesBase>/<activity>/= | never     |
+| =AI-DevStatus.org= | safe-copy | =<activity>/= or =mother/=    | Claude    |
+| =AI-WorkPlan.org=  | safe-copy | =<activity>/= or =mother/=    | user+AI   |
+| =.claude/=         | safe-copy | =<activity>/_claude/= or =mother/_claude/= | never |
+
+Naming convention: all-caps filenames are constant (always symlinked, never
+edited in the project). Mixed-case filenames are local and editable.
+
+After safe-copying =AI-DevStatus.org= and =AI-WorkPlan.org=, the tool expands
+the =b:ai:file/particulars= dblock in each file *in pure Python* (no =bx-dblock=
+subprocess). The dblock emits:
+- Working Directory (target dir)
+- File (canonical path)
+- Activity (resolved from =AI-Activity.org= symlink target)
+- Companion Docs (dynamically, based on files present)
+
+All install operations are idempotent (skip if destination already exists).
+
+* Key Design Decisions
+
+** No bundled templates
+
+Templates are *not* included in the package. They live in a separately
+=git clone=-d templates repository. The package is pure engine.
+
+The templates repo can be:
+- The BISOS defaults repo: =https://github.com/bisos/defaults=
+  (under =ai-templates/=, with =bystar/= renamed to =mother/=)
+- Any organization's own fork or custom repo
+
+** =mother/= as the baseline directory
+
+What =startAiAt.cs= calls =bystar/= is renamed =mother/= in the generalized
+model. =mother/= contains:
+- =CLAUDE.md=, =AI-WORKFLOW.org= — constant symlink targets
+- =AI-DevStatus.org=, =AI-WorkPlan.org= — fallback templates when activity
+  directory does not provide its own
+- =_claude/= — fallback slash commands and settings
+
+Activity directories sit alongside =mother/= and override only what they need.
+
+** Pure Python dblock expansion (no =bx-dblock= dependency)
+
+=startAiAt.cs= calls =bx-dblock -i dblockUpdateFiles= as a subprocess to expand
+the =b:ai:file/particulars= dblock. This is a BISOS/Blee/Emacs tool that does
+not exist outside BISOS.
+
+=bisos.startAiActivity= reimplements this expansion in pure Python. The dblock
+pattern is:
+
+#+begin_example
+####+BEGIN: b:ai:file/particulars
+... generated content ...
+####+END:
+#+end_example
+
+The Python expander:
+1. Reads the copied file
+2. Locates the =####+BEGIN: b:ai:file/particulars= / =####+END:= block
+3. Replaces the content between markers with freshly computed values
+   (working dir, file path, activity name, companion docs list)
+4. Writes the file back
+
+This is straightforward string processing with =pathlib= and =re=.
+
+** File Parameters for =templatesBase= persistence
+
+The path to the templates repo is persisted as a BISOS File Parameter:
+
+: ~/.config/bisos/startAiActivity/templatesBase/value
+
+Setting it:
+: echo /path/to/templates > ~/.config/bisos/startAiActivity/templatesBase/value
+
+Reading it in Python using =bisos.b=:
+#+begin_src python
+import os
+from bisos.b import fp
+
+templatesBase = fp.FileParamValueReadFrom(
+    parRoot=os.path.expanduser('~/.config/bisos/startAiActivity'),
+    parName='templatesBase',
+)
+#+end_src
+
+The =--templates== CLI parameter overrides the file parameter for one-off use.
+
+Precedence: =--templates== flag > file parameter > error (no hardcoded default).
+
+** =bisos.b= fully used
+
+The package uses =bisos.b= fully: =cs=, =b_io=, =csParam=, =fp=, =b.op=.
+It follows the same =cs.Cmnd= subclass pattern as =startAiAt.cs= and all other
+=bisos-pip= CS packages. Use =gitist= as a structural reference:
+=/bisos/git/bxRepos/bisos-pip/gitist/=
+
+* Commands
+
+** =initiate=
+
+The primary command. Installs templates into the target directory.
+
+Parameters:
+- =activity= (mandatory): name of a subdirectory under =<templatesBase>/=
+  (excluding =mother/= itself)
+- =root= (optional, default =curDir=): =curDir= = cwd, =repo= = git repo root
+- =templates= (optional): override =templatesBase= file parameter for this run
+
+Behavior mirrors =startAiAt.cs initiate= exactly, with these differences:
+- =bystar/= is now =mother/=
+- =templatesBase= comes from file parameter or =--templates== flag, not hardcoded
+- dblock expansion is done in pure Python, not via =bx-dblock= subprocess
+- fallback for =AI-DevStatus.org= / =AI-WorkPlan.org=: if not in =<activity>/=,
+  use =mother/= (this fallback was the bug fixed in =startAiAt.cs= on 2026-07-09)
+
+** =examples=
+
+Dynamically discovers activity directories under =<templatesBase>/=, excluding
+=mother/= and =startAiAt.cs= and =test=. Generates two =menuChapter= sections
+(=root=curDir= and =root=repo=), one entry per activity. Mirrors the dynamic
+discovery logic in =startAiAt.cs examples=.
+
+** =setup= (new, not in startAiAt.cs)
+
+Interactive helper to set the =templatesBase= file parameter:
+
+: startAiActivity -i setup --templates=/path/to/templates
+
+Writes =/path/to/templates= to =~/.config/bisos/startAiActivity/templatesBase/value=,
+creating parent directories as needed.
+
+* Reference: startAiAt.cs
+
+The canonical reference implementation is at:
+=/bisos/git/auth/bxRepos/bisos/defaults/ai-templates/startAiAt.cs/startAiAt.cs=
+
+Read it in full before implementing. Key sections to study:
+- =commonParamsSpecify= — parameter declaration pattern
+- =initiate.cmnd= — the full install logic (lines 229–316)
+- =examples.cmnd= — dynamic activity discovery (lines 175–203)
+
+The fallback fix for =AI-DevStatus.org= / =AI-WorkPlan.org= (added 2026-07-09)
+is at lines 276–284 of =startAiAt.cs=:
+
+#+begin_src python
+activitySrc = activityDir / fname
+bystarSrc = bystarDir / fname
+src = activitySrc if activitySrc.exists() else bystarSrc
+#+end_src
+
+In =bisos.startAiActivity=, =bystarDir= becomes =motherDir=.
+
+* Repo Structure
+
+The bisos-pip repo staructure for here (bisos-pip/startAiActivity) has already been setup.
+
+The =/bisos/git/auth/bxRepos/bisos/defaults/ai-templates/startAiAt.cs/startAiAt.cs= has
+already been copied to ./py3/bin/startAiActivity.cs.
+
+The bisos.startAiActivity has already been locally installed.
+
+ls -l $(which -a startAiActivity.cs)
+
+produces:
+lrwxrwxrwx 1 bystar bisos    76 Jul 11 21:31 /bisos/venv/py3/devbin/startAiActivity.cs -> /bisos/git/auth/bxRepos/bisos-pip/startAiActivity/py3/bin/startAiActivity.cs
+-rwxrwxr-x 1 bystar bisos 16989 Jul 11 21:31 /bisos/venv/py3/dev-bisos3/bin/startAiActivity.cs
+
+So, you can just run startAiActivity.cs
+
+* Implementation Notes for the Next Claude
+
+1. *Read =startAiAt.cs= first* — it is the spec. Every behavior of =initiate=
+   should match it unless a design decision above says otherwise.
+
+2. *dblock expansion in Python* — implement a helper function, e.g.
+   =dblockParticularsExpand(filePath, workingDir, activity, companionDocs)=,
+   that uses =re.sub= to replace the content between =####+BEGIN: b:ai:file/particulars=
+   and =####+END:= markers. The companion docs list is built by scanning the
+   target directory for files matching =AI-*.org=.
+
+3. *=mother/=* — when you see =bystar/= in =startAiAt.cs=, use =mother/= here.
+   The templates repo must have a =mother/= directory at its root for the tool
+   to work.
+
+4. *File Parameter read* — use =b.fp.FileParamValueReadFrom= with
+   =parRoot=os.path.expanduser('~/.config/bisos/startAiActivity')= and
+   =parName='templatesBase'=. Returns =None= if unset — treat as error unless
+   =--templates== is provided.
+
+5. *No templates in the package* — do not bundle any =.org= files or =_claude/=
+   content. The package is engine only.
+
+6. *Idempotent* — all copy/symlink operations must skip if destination exists,
+   matching =startAiAt.cs= behavior exactly.
+
+7. *Type hints* — use type hints throughout (new file, new module — see
+   =AI-GENERAL.org= convention: type hints for new code).
+
+8. *Use =pathlib= everywhere* — no =os.path= for path manipulation.
+
+* Testing And Validation
+
+After setting up the repo and reading this file plus the reference files listed
+above, the first TODO is:
+
+
+Verify by running:
+: startAiActivity.cs -i initiate --activity=xu-single
+
+At /bisos/apps/defaults/ai-templates the base is setfor testing.
+
+Run
+echo //bisos/apps/defaults/ai-templates  > ~/.config/bisos/startAiActivity/templatesBase/value
+
+to make that existing dir base available for testing.
+
+* Modularization
+
+ - All the AI related acitivity should be kept in ./py3/bin/startAiActivity.cs
+
+- General purpose code (functions/classes) for interacting with persistent user configuration
+  would go in ./py3/bisos/startAiActivity/userConfigFileParam_csu.py
+
+  That is the code that reads ~/.config/bisos/startAiActivity
+
+ - General purpose code for updating dblocks should go in ./py3/bisos/startAiActivity/updateDblock.py
+ - Code specific to ####+BEGIN: b:ai:file/particulars
+   should go in ./py3/bisos/startAiActivity/dblock_particulars.py
+   Which would be the equivalent of
+
+   ------------------
+   (advice-add 'org-dblock-write:b:ai:file/particulars :around #'bx:dblock:control|wrapper)
+(defun org-dblock-write:b:ai:file/particulars (<params)
+;;;#+END:
+   " #+begin_org
+** [[elisp:(org-cycle)][| DocStr |]] Process dblock args
+Based on outCommentPreContent, bodyContent and outCommentPostContent.
+#+end_org "
+  (let* (
+         (<governor (letGet$governor)) (<extGov (letGet$extGov))
+         (<outLevel (letGet$outLevel 1)) (<model (letGet$model))
+         (<style (letGet$style "openBlank" "closeBlank"))
+         ($f-canonical (f-canonical buffer-file-name))
+         ($buffer-dir-name (f-dirname  buffer-file-name))
+         )
+    (bxPanel:params$effective)
+
+    (defun helpLine () ":authors (\"pathToAuthorFile\")" )
+    (defun outCommentPreContent ())
+    (defun bodyContentPlus ())
+    (defun bodyContent ()
+      (let* (
+             ($ai-general-path (expand-file-name "AI-Activity.org" $buffer-dir-name))
+             ($activity (when (file-symlink-p $ai-general-path)
+                          (f-filename (f-dirname (file-truename $ai-general-path)))))
+             ($companion-files '("" "AI-WORKFLOW.org" "AI-Activity.org"
+                                 "AI-DevStatus.org" "README.org"))
+             ($present-companions
+              (seq-filter (lambda (f)
+                            (file-exists-p (expand-file-name f $buffer-dir-name)))
+                          $companion-files))
+             )
+        (insert (s-lex-format "* AI Working Context\n"))
+        (insert (s-lex-format "  Working Directory: ${$buffer-dir-name}\n"))
+        (insert (s-lex-format "  File: ${$f-canonical}\n"))
+        (when $activity
+          (insert (s-lex-format "  Activity: ${$activity}\n")))
+        (when $present-companions
+          (insert (format "  Companion Docs: %s\n" (mapconcat 'identity $present-companions ", ")))
+          )))
+    (defun outCommentPostContent ())
+
+    (progn  ;; Actual Invocations
+      (outCommentPreContent)
+      (bx:invoke:withStdArgs$bx:dblock:governor:process)
+      (outCommentPostContent)
+      )))
+      --------------
+      Which was taken from /bisos/blee/env3/dblocks/dblock-comeega-prog.el
+
+ Based on these, later, perhaps we can implement py-dblock -- similar to bx-dblock.

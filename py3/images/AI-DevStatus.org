@@ -1,0 +1,67 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me ai aiAndMe
+
+# Provenance (installed once by startAiActivity.cs --- not regenerated):
+#   Date:      2026-07-28T12:48:38-07:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/venv/py3/devbin/startAiActivity.cs -i initiateSub --activity=graphviz-pcs
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/startAiActivity/py3/images
+  File: /bisos/git/auth/bxRepos/bisos-pip/startAiActivity/py3/images/AI-DevStatus.org
+  Activity: graphviz-pcs
+  Companion Docs: AI-Activity.org, AI-DevStatus.org
+####+END:
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is maintained by Claude. Updates are typically triggered by the
+=/bx-status-update= slash command, after major interactions, or before a release.
+
+* Current State
+
+As of 2026-10-07: =aiActivityFlow= (the engine's structure figure) is
+current. It shows the lifecycle/inspection split, the Claude binding and
+=AI-Outputs.org=. =fromTemplates/= holds PNG copies of the four templates
+workflow figures used by the top-level =README.org=. Stages 1--5 are done
+(see =AI-WorkPlan.org=).
+
+Note: the particulars dblocks in this file and in =AI-WorkPlan.org= still
+show =startAiActivity= paths, left over from before the rename. They are
+dblock-generated; regenerate them rather than hand-edit.
+
+* Architecture
+
+- =aiActivity-graphviz.pcs= --- one named graph, =aiActivityFlow=. The
+  outputs (png, pdf, svg, jpg, gv, title, caption) sit alongside it and
+  are committed.
+- =fromTemplates/= --- copies only. The sources are in
+  =bisos/defaults/ai-templates/_nonTemplate_/images/=, and its
+  =README.org= gives provenance and the refresh command.
+- =aiActivityFlow.odg= --- a hand-made earlier drawing; stale.
+
+* What Works
+
+- =PYTHONPATH=/bisos/git/bxRepos/bisos-pip/graphviz-cs/py3 ./aiActivity-graphviz.pcs --format=all -i ngProcess aiActivityFlow=
+  regenerates everything.
+
+* What Is Untested
+
+- Rendering without the =PYTHONPATH= prefix, once bisos3 has a current
+  =bisos.graphviz=.
+
+* Key Design Decisions
+
+- The structure figure lives here, with the engine. The workflow and
+  skills figures live with the templates and are only copied here; see the
+  parent =AI-DevStatus.org=.
+- Colour and edge conventions are documented in the top-level README's
+  /Structure at a Glance/ legend.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

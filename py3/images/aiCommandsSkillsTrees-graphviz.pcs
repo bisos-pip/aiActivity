@@ -1,0 +1,254 @@
+#!/usr/bin/env python
+
+####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
+""" #+begin_org
+* *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
+** This File: /bisos/git/bxRepos/bisos/defaults/ai-templates/_nonTemplate_/images/aiCommandsSkillsTrees-graphviz.pcs
+** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
+#+end_org """
+####+END:
+
+""" #+begin_org
+* Overview and Relevant Pointers
+The /bx-* commands and the skills of the templates tree, as two trees:
+- =aiGeneralTree=   --- general: guiding the workflow (commands + general skills)
+- =aiEcosystemTree= --- digital-ecosystem specific (BISOS / Blee / ByStar) skills,
+                       with their "load this skill first" prerequisites
+Leaf colour = where it lives in the templates tree, i.e. which projects see it.
+Since 2026-10-17 every skill is in the one shared set, =mother/_skills/=; since 2026-10-19 the
+commands are one set too, in the =aiTemplates-workFlow= tree that every templates base includes
+(assembled by =aiActivityAssemble.cs=, 2026-10-20).
+Inventory and prerequisites taken from the SKILL.md files on 2026-10-19.
+#+end_org """
+
+from bisos import b
+from bisos.b import cs
+
+import graphviz
+
+from bisos.graphviz import graphvizSeed
+ng = graphvizSeed.namedGraph
+
+
+####+BEGIN: b:py3:cs:orgItem/basic :type "=Seed Setup= " :title "*Common Facilities*" :comment "General"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  =Seed Setup=  [[elisp:(outline-show-subtree+toggle)][||]] *Common Facilities* General  [[elisp:(org-cycle)][| ]]
+#+end_org """
+####+END:
+
+namedGraphsList = [
+    # Forward references: both functions are defined below this block.
+    ng("aiGeneralTree",
+       func=lambda: aiGeneralTree(),
+       title="BISOS-AI-Workflow: Commands and Workflow Skills",
+       caption="BISOS-AI-Workflow, the workflow-guiding part of AI-Activity: the /bx-* "
+               "commands you invoke, grouped by when a session uses them, and "
+               "the general skills Claude loads. The commands are the workflow, "
+               "not an activity's: one set in mother/_claude/commands/ of the "
+               "aiTemplates-workFlow tree, which every templates base includes "
+               "(assembled with an ecosystem's own tree). Leaf colour shows where each lives in the "
+               "templates tree."),
+    ng("aiEcosystemTree",
+       func=lambda: aiEcosystemTree(),
+       title="BISOS-Digital-Ecosystem-Skills",
+       caption="BISOS-Digital-Ecosystem-Skills, the BISOS / Blee / ByStar skills, "
+               "grouped by area. All of them live in the one shared set, "
+               "mother/_skills/, so every activity's projects see them. Dotted "
+               "arrows mean 'load the target skill first'."),
+]
+
+graphvizSeed.setup(
+    seedType="common",
+    namedGraphsList=namedGraphsList,
+)
+
+
+# Where a leaf lives in the templates tree = which projects see it.
+# mother/ is khaki as in the structure figure's template folders. Both homes are in mother/ now:
+# the per-activity skill homes (aiActivity/, bisos-pip/, sbom+cap/ _skills) were retired 2026-10-17.
+lives = {
+    'mother': {'fillcolor': 'khaki1', 'where': 'mother/_claude/commands/',
+               'who': 'every project: one set, not per activity<BR/>(from aiTemplates-workFlow)'},
+    'skills': {'fillcolor': 'lightcyan', 'where': 'mother/_skills/',
+               'who': 'every project: one shared set,<BR/>all activities'},
+}
+
+branch = {'shape': 'box', 'style': 'bold', 'fontsize': '12'}
+group = {'shape': 'box', 'style': 'dashed', 'fontsize': '11', 'color': 'gray40'}
+treeEdge = {'arrowhead': 'none', 'color': 'gray40'}
+
+
+def _treeNew(rootLabel: str) -> graphviz.Digraph:
+    d = graphviz.Digraph()
+    d.attr(rankdir='LR', nodesep='0.12', ranksep='0.5')
+    d.attr('node', fontsize='11')
+    d.node('root', rootLabel, shape='ellipse', style='filled,bold', fillcolor='thistle', fontsize='13')
+    return d
+
+
+def _subtree(d: graphviz.Digraph, parent: str, groupName: str, label: str, leaves: list) -> None:
+    """Group node under parent, then its leaves. Box = command (you invoke);
+    rounded = skill (Claude loads); fill = where it lives."""
+    d.node(groupName, label, **group)
+    d.edge(parent, groupName, **treeEdge)
+    for leafName, where, kind in leaves:
+        style = 'filled' if kind == 'cmnd' else 'filled,rounded'
+        d.node(leafName, leafName, shape='box', style=style, fillcolor=lives[where]['fillcolor'])
+        d.edge(groupName, leafName, **treeEdge)
+
+
+def _legend(d: graphviz.Digraph, wheres: list, extraRows: str) -> None:
+    rows = ''.join(
+        f'<TR><TD BGCOLOR="{lives[w]["fillcolor"]}">{lives[w]["where"]}</TD><TD>{lives[w]["who"]}</TD></TR>'
+        for w in wheres)
+    # In the root's column (same rank, LR layout = same x), below the root:
+    # that column is otherwise empty above and below the root, so the legend
+    # uses existing space instead of adding a row under the leaves.
+    # A flat edge in LR is drawn top to bottom, so root --> legend puts it below.
+    with d.subgraph() as s:
+        s.attr(rank='same')
+        s.node('root')
+        s.node('legend',
+               '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="3">'
+               '<TR><TD><B>lives in</B></TD><TD><B>seen by</B></TD></TR>'
+               + rows + extraRows +
+               '</TABLE>>',
+               shape='plaintext', fontsize='10')
+    d.edge('root', 'legend', style='invis')
+
+
+####+BEGIN: b:py3:cs:func/typing :funcName "aiGeneralTree" :funcType "Typed" :deco "track"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-Typed  [[elisp:(outline-show-subtree+toggle)][||]] /aiGeneralTree/  deco=track  [[elisp:(org-cycle)][| ]]
+#+end_org """
+@cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+def aiGeneralTree(
+####+END:
+) -> graphviz.Digraph:
+    """ #+begin_org
+** [[elisp:(org-cycle)][| *DocStr | ]  General (workflow-guiding) commands and skills, left to right.
+    #+end_org """
+
+    d = _treeNew('BISOS-AI-Workflow\n(drives an AI-Activity;\nadopt as-is)')
+
+    d.node('commands', 'Commands\n(you invoke)', **branch)
+    d.node('skills', 'Skills\n(Claude loads)', **branch)
+    d.edge('root', 'commands', **treeEdge)
+    d.edge('root', 'skills', **treeEdge)
+
+    _subtree(d, 'commands', 'cmdStart', 'session start', [
+        ('/bx-confirm0', 'mother', 'cmnd'),
+        ('/bx-confirm-here', 'mother', 'cmnd'),
+    ])
+    _subtree(d, 'commands', 'cmdLoop', 'work loop', [
+        ('/bx-archive-read', 'mother', 'cmnd'),
+        ('/bx-status-read', 'mother', 'cmnd'),
+        ('/bx-git-commit-msg', 'mother', 'cmnd'),
+        ('/bx-ai-outputs', 'mother', 'cmnd'),
+        ('/bx-done', 'mother', 'cmnd'),
+    ])
+    _subtree(d, 'commands', 'cmdEnd', 'session end', [
+        ('/bx-git-uncommitted-list', 'mother', 'cmnd'),
+        ('/bx-status-update', 'mother', 'cmnd'),
+        ('/bx-archive-update', 'mother', 'cmnd'),
+        ('/bx-session-verify', 'mother', 'cmnd'),
+    ])
+    _subtree(d, 'commands', 'cmdSetup', 'setup', [
+        ('/bx-initiate', 'mother', 'cmnd'),
+        ('/bx-context-trim', 'mother', 'cmnd'),
+    ])
+    _subtree(d, 'skills', 'skAiActivity', 'AI-Activity model', [
+        ('authoring-skills', 'skills', 'skill'),
+        ('bx-ai-commands-authorship', 'skills', 'skill'),
+    ])
+
+    _legend(d, ['mother', 'skills'],
+            '<TR><TD>box = command (you invoke)</TD><TD STYLE="rounded">rounded = skill (Claude loads)</TD></TR>'
+            '<TR><TD COLSPAN="2">every templates base includes aiTemplates-workFlow,<BR/>'
+            'assembled by aiActivityAssemble.cs</TD></TR>')
+    return d
+
+
+####+BEGIN: b:py3:cs:func/typing :funcName "aiEcosystemTree" :funcType "Typed" :deco "track"
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  F-T-Typed  [[elisp:(outline-show-subtree+toggle)][||]] /aiEcosystemTree/  deco=track  [[elisp:(org-cycle)][| ]]
+#+end_org """
+@cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+def aiEcosystemTree(
+####+END:
+) -> graphviz.Digraph:
+    """ #+begin_org
+** [[elisp:(org-cycle)][| *DocStr | ]  Digital-ecosystem specific skills, left to right, plus
+    prerequisite edges. All leaves are skills, so there is no commands/skills level.
+    #+end_org """
+
+    d = _treeNew('BISOS-Digital-Ecosystem-Skills\n(BISOS / Blee / ByStar; Claude loads)\n(build your own equivalent)')
+
+    _subtree(d, 'root', 'ecoAuthorship', 'authorship model', [
+        ('comeega-authorship', 'skills', 'skill'),
+        ('dblock-authoring', 'skills', 'skill'),
+    ])
+    _subtree(d, 'root', 'ecoPycs', 'PyCS commands', [
+        ('writing-cs-commands', 'skills', 'skill'),
+        ('icm-to-pycs-conversion', 'skills', 'skill'),
+    ])
+    _subtree(d, 'root', 'ecoSeeded', 'seeded CS', [
+        ('seeded-cs-commands', 'skills', 'skill'),
+        ('spread-seeded-cs-commands', 'skills', 'skill'),
+        ('walkable-tree-planting', 'skills', 'skill'),
+        ('cbm-authorship', 'skills', 'skill'),
+        ('sysd-pcs-authorship', 'skills', 'skill'),
+        ('configfile-pattern', 'skills', 'skill'),
+        ('sbom-authoring', 'skills', 'skill'),
+    ])
+    _subtree(d, 'root', 'ecoCapability', 'capability packages', [
+        ('cbm-package-authorship', 'skills', 'skill'),
+    ])
+    # Beside capability packages: cbm-package-authorship's prerequisite edge to banna-lookup stays short.
+    _subtree(d, 'root', 'ecoLookups', 'lookups', [
+        ('banna-lookup', 'skills', 'skill'),
+    ])
+    _subtree(d, 'root', 'ecoSites', 'web sites', [
+        ('astro-site-authorship', 'skills', 'skill'),
+        ('bx-pals-web-site', 'skills', 'skill'),
+        ('bs-pals-web-edit', 'skills', 'skill'),
+    ])
+    _subtree(d, 'root', 'ecoPackaging', 'packaging and docs', [
+        ('bisos-pip-setup-py', 'skills', 'skill'),
+        ('bisos-pip-release', 'skills', 'skill'),
+        ('readme-authorship', 'skills', 'skill'),
+        ('blee-panel-authorship', 'skills', 'skill'),
+        ('graphviz-authoring', 'skills', 'skill'),
+    ])
+
+    # Prerequisites: "load <head> first" (explicit in the SKILL.md files).
+    # constraint=false: an overlay on the tree, not part of its layout.
+    prereq = {'style': 'dotted', 'color': 'purple', 'penwidth': '1.4', 'constraint': 'false'}
+    for dependent, prerequisite in [
+            ('spread-seeded-cs-commands', 'seeded-cs-commands'),
+            ('walkable-tree-planting', 'seeded-cs-commands'),
+            ('walkable-tree-planting', 'spread-seeded-cs-commands'),
+            ('cbm-authorship', 'spread-seeded-cs-commands'),
+            ('icm-to-pycs-conversion', 'writing-cs-commands'),
+            ('cbm-package-authorship', 'cbm-authorship'),
+            ('cbm-package-authorship', 'sysd-pcs-authorship'),
+            ('cbm-package-authorship', 'banna-lookup'),
+    ]:
+        d.edge(dependent, prerequisite, **prereq)
+    # Conditional: only if the CBM leaves will be walked from a branch.
+    d.edge('cbm-authorship', 'walkable-tree-planting', label=' if walked ', fontsize='9',
+           fontcolor='purple', **{**prereq, 'color': 'plum3'})
+    # Conditional: a PALS site takes its naming, serving and planting from bx-pals-web-site.
+    d.edge('astro-site-authorship', 'bx-pals-web-site', label=' if PALS ', fontsize='9',
+           fontcolor='purple', **{**prereq, 'color': 'plum3'})
+
+    _legend(d, ['skills'],
+            '<TR><TD COLSPAN="2"><FONT COLOR="purple">dotted arrow = load the target skill first</FONT></TD></TR>')
+    return d
+
+""" #+begin_org
+#+begin_src sh :results output :session shared
+aiCommandsSkillsTrees-graphviz.pcs --format=evince  -i ngProcess aiGeneralTree
+aiCommandsSkillsTrees-graphviz.pcs --format=evince  -i ngProcess aiEcosystemTree
+#+end_src
+#+end_org """

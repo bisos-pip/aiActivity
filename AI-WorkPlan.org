@@ -1,0 +1,442 @@
+#+title: Work Plan
+#+DATE: <2026-06-10 Wed 13:54>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+#+TAGS: me ai aiAndMe
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: ../..
+  File: /bisos/git/auth/bxRepos/bisos-pip/aiActivity/AI-WorkPlan.org
+  Activity: bisos-pip
+  Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org, README.org
+###+END:
+
+This Work Plan file drives the AI collaborative development.
+Interactions are broken down into "Stages". Each Stage has a set
+of TODOs that I work with Claude to accomplish.
+
+Note to a fresh Claude: read this file together with AI-WORKFLOW.org,
+AI-Activity.org and AI-DevStatus.org to orient yourself. The =<<Context Confirmation>>=
+TODO below is the standard first step, or use =/bx-confirm0= as the automated equivalent.
+TODOs tagged =:ai:= are assigned to Claude. After completing a TODO, summarize results
+under =----- AI Results: ------= and mark it DONE.
+
+* Stage 0: Confirm AI's Understanding of This Repo's Context
+
+Goal: Confirm AI's understanding of the context and capture that in [[Context Confirmation]] TODO.
+
+
+* Stage 0: TODOs
+** +
+** LOOP <<0.1>> In chatbot confirmation that /bx-confirm0 was done
+SCHEDULED: <2026-10-01 Thu>
+Scheduled date can be updated but [[0.1]] remains as LOOP.
+ ----- Results: ------
+** -
+
+
+* Stage 1: Misc Place Holder 
+
+Goal: A placeholder for misc
+
+
+* Stage 1 TODOs (Misc)
+** +
+** TODO Re-Create bisos.aiActivity
+** TODO Different  bisos.aiActivity examples when base already exists
+** TODO Add Emacs intgration to aiActivity -- include yasnipets
+** -
+
+* Stage 2: Fully Implement aiActivity.cs
+
+Goal: A functioning implementation with starting point files for py-dblock and userConfigFileParams
+
+
+* Stage 2 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+* Stage 3: Documentation and pypi upload
+
+Goal: Update README for pypi, Update Blee-Panels documentation, upload to pypi and test as pipx
+
+
+* Stage 3 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 4: Lifecycle Commands
+
+Goal: Add commands for reversible and permanent removal of AI collaboration files.
+
+
+* Stage 4 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 5: Skills Integration
+
+Goal: Distribute Claude Code skills alongside AI collaboration templates.
+
+Skills are self-contained, filesystem-based packages of task-specific
+instructions (each a folder with a =SKILL.md=) that Claude loads on-demand
+when the current task calls for them. The skill's description sits in
+context by default; the full file is read only when relevant.
+
+Two variants:
+- *Anthropic pre-built skills* (e.g. =xlsx=, =docx=, =pptx=, =pdf=) — no
+  distribution needed; reference by name.
+- *Custom skills* — user/org-defined; these are what we distribute through
+  the templates tree.
+
+The natural fit with aiActivity's existing =mother/= + activity-specific
+override pattern:
+- =mother/_skills/= — skills available to every activity (baseline).
+- =<activity>/_skills/= — activity-specific skills (e.g. a =bisos-pip-release=
+  skill under =bisos-pip/_skills/= for version bumps and PyPI publishing).
+
+=initiate= would symlink =.claude/skills/= the same way it currently
+symlinks =.claude/settings.json= and =.claude/commands=. =deClaudify=,
+=aiSuspend=, and =aiResume= all need to handle the new =.claude/skills=
+symlink the same way they handle the other =.claude/= entries.
+
+
+* Stage 5 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 6: Subproject Overlays via initiateSub
+
+Goal: A separate command that installs only the subproject-specific state
+(=CLAUDE.md=, =AI-Activity.org=, =AI-DevStatus.org=, =AI-WorkPlan.org=) in
+a subdirectory, requiring an already-=initiate=-d ancestor. The invariants
+(=AI-WORKFLOW.org=, =.claude/=) are inherited from the
+ancestor via Claude Code's walk-up.
+
+Motivation: nested projects should not re-install the invariants at every
+level. Doing so wastes context (Claude reads the same twice)
+and creates ambiguity about which activity applies. A slim overlay keeps
+subproject state local without duplicating the base.
+
+
+* Stage 6 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 7: Precedence-based templates auto-detect
+
+Goal: Zero-config setup for a non-BISOS user who does the canonical
+=git clone https://github.com/bxexamples/aiActivityTemplates ~/aiActivityTemplates=.
+Currently =parDefault= for the =templates= param probes only
+=/bisos/apps/defaults/ai-templates=; extend to also probe
+=~/aiActivityTemplates=, with user-first precedence.
+
+
+* Stage 7 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 8: Retire AI-AGENTS.org — merge into CLAUDE.md
+
+Goal: Eliminate the =AI-AGENTS.org= indirection layer. Historically
+=CLAUDE.md= was a 3-line pointer that =@imports= =AI-AGENTS.org=, which
+in turn =@imports= =AI-WORKFLOW.org= / =AI-Activity.org= / =AI-DevStatus.org=
+/ =AI-WorkPlan.org=. The =AI-AGENTS.org= layer added no functional value:
+it was aspirationally vendor-neutral but content-wise 100% Claude-specific,
+and =CLAUDE.md= directly importing the four subordinate files is simpler
+and equally functional. Merge and delete.
+
+
+* Stage 8 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 9: pipx outside of bisos testing
+
+Goal: Make sure that aiActivity works fine outside of bisos
+
+
+* Stage 9 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 10: Post-launch refinements --- provenance, --noLink, custom activity
+
+Goal: Address rough edges that emerged when using =bisos.aiActivity=
+on a real hierarchical project (=<forkProject>=) --- three related
+changes bundled together because they came out of the same field-usage
+session:
+
+1. Provenance recording in safe-copied files (the =templates=<X>= mistake
+   would have been caught faster with visible birth-certificate data)
+2. =--noLink= CLI override for symlinked files (needed by =custom= activity
+   where =AI-Activity.org= must be per-project, not shared)
+3. New =custom/= activity in all three templates trees (BISOS, bxexamples),
+   for projects whose conventions don't fit any standard
+   activity
+
+
+* Stage 10 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+
+* Stage 11: CLAUDE.md safe-copy + refresh command
+
+Goal: Fix a resolution bug discovered in a fresh Claude session against
+=<forkProject>=. =CLAUDE.md= was symlinked into the templates
+directory. Claude Code resolves symlinks before reading, so
+=@./AI-Activity.org= inside the symlinked =CLAUDE.md= resolved against
+=<templatesBase>/mother/=, pulling in the wrong =AI-Activity.org=
+instead of the project's per-activity one. Silent misinformation ---
+critical to fix.
+
+Two related changes:
+
+1. Make =CLAUDE.md= a safe-copy (like =AI-DevStatus.org= /
+   =AI-WorkPlan.org=) so its =@./= imports resolve at the project.
+   No provenance line --- =CLAUDE.md= must remain equivalent to a
+   symlink in content.
+2. Add a =refresh= command so template changes to =CLAUDE.md= can be
+   pulled in on demand (safe-copy loses the automatic-propagation
+   property of symlinks; =refresh= gives it back explicitly).
+
+
+* Stage 11 TODOs
+** +
+** Accomplished and archived. <2026-09-22 Tue 22:15>
+** -
+
+* Stage 12: Capture the Concept of AI-Outputs.org 
+
+Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
+
+* Stage 12 TODOs
+** +
+** Archived. No longer relevant.
+** -
+
+
+* Stage 14: Maintenance and New Feature Ideas
+
+Goal: Based on usage consider new features, and non-urgent bugs.
+
+* Stage 14 TODOs
+** +
+** TODO [#A] <<14.9>>  Add a AI-Activity set of templates for YaSnippets
+SCHEDULED: <2026-10-01 Thu 10:23>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+
+It should show up under bx-ai-activity in the moded drop down.
+It should have a bx-ai-activity -> WorkPlan -> "aiAndMe"
+----- Results: ------
+
+** TODO [#B] <<14.10>> Isolate the Claude binding constants in aiActivity.cs :ai:
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Claude
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+
+=CLAUDE.md= is hardcoded ~53 times in =aiActivity.cs=, plus =.claude= /
+=_claude= / =mother/initiateSub/CLAUDE.md=. Gather
+these into one place (entry filename, harness dir name, templates-side dir
+name) so the binding is visible and a second one could be added later.
+*Isolate, don't abstract* --- no =--agent= param, no multi-agent support
+until a second agent is actually in use. Pure refactor; =verify.sh= must
+pass unchanged. Related: =listClaudesPath= stops at the git root while
+Claude Code walks up to =/= ([[16.1]]); fix while in there.
+----- Results: ------
+
+** TODO [#C] <<14.12>> Token-weighted startup-context figure: startupClaudeTokens --graph
+SCHEDULED: <2026-10-07 Wed>
+:PROPERTIES:
+:ORIGIN: Claude
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-07 Wed>
+:END:
+Have =startupClaudeTokens= optionally emit a =.gv= of the import tree, with
+node width or edge penwidth proportional to tokens, so the cost
+distribution of /your/ project is visible at a glance. For example, this
+repo's 59K of =AI-Activity.org= panel imports. A generated per-project
+figure is better than a static picture of one repo.
+----- Results: ------
+
+
+** -
+
+
+* Stage 15: Sync ai-templates accross  bisos/examples/other
+
+Goal: Make sure relevant common activities, commands and skills are consistent across:
+
+- /bisos/apps/defaults/ai-templates/
+- /bxRepos/bxexamples/aiActivityTemplates/
+- Others  /de/active/aiTemplates
+
+
+* Stage 15 TODOs
+** +
+** LOOP [#A] <<15.1>>
+SCHEDULED: <2026-09-23 Wed>
+Some TODOs like Stage 0 [[0.1]]
+----- AI Results: ------
+
+*Pending sync items as of 2026-10-07* (BISOS canonical → forks; none done yet):
+- =mother/_claude/commands/bx-context-trim.md= (new, [[16.4]]) → bxexamples, fork.
+- =mother/AI-WORKFLOW.org=: the =/bx-context-trim= row, and pointers to the
+  four figures → bxexamples. The fork's =mother/= is adjusted, so merge by hand.
+- =_nonTemplate_/= (new: the four figures + =aiUsageWorkflow.org=) →
+  bxexamples. Forks need an =aiActivity.cs= that has =nonActivityDirs=, or
+  =_nonTemplate_= shows up in their =examples= menu.
+- *aiSuspend / aiResume retired in the engine (2026-10-08).* The text in
+  =bisos/defaults= was updated on 2026-10-09 in its working tree, to be
+  committed by Mohsen: =aiActivity/AI-Activity.org= (lifecycle, Homogeneous
+  default, AI-Outputs in subs, precedence), =bisos-pip/_skills/writing-cs-commands/SKILL.md=,
+  and =_nonTemplate_/images/aiStartupWorkflow= (re-rendered; its PNG was
+  re-copied into =py3/images/fromTemplates/=). The Blee panel
+  =py3/panels/.../fullUsagePanel-en.org= still has the "aiSuspend and
+  aiResume" sections (lines ~102, 123--129, 144, 157); it is dblock-based,
+  so regenerate it in Blee rather than hand-editing.
+- Engine-side copies: refresh =py3/images/fromTemplates/*.png= from
+  =_nonTemplate_/images/= whenever the figures change (one-line command in
+  =py3/images/fromTemplates/README.org=).
+
+** -
+
+
+* Stage 16: Addition of -i aiStatus (or -i aiInTokensEval)
+
+<<Stage 16>>
+
+Goal: Before starting a new session with the AI-Model, the User can know what tokens AI-Model is being read by the Model.
+
+A starting point outline is in place at ./py3/bisos/aiActivity/aiStatusOutine.py
+
+It can become a _csu.py to be imported by ./py3/bin/aiActivity.cs
+
+
+* Stage 16 TODOs
+** +
+** Archived. No longer relevant.
+** -
+
+
+
+
+* Stage 17: One Set of Claude Workflow Commands, Synced Across Templates Trees
+
+<<Stage 17>>
+
+Goal: the =/bx-*= slash commands are the workflow of aiActivity, not of an activity, so they are not
+layered and there is *one set*. Today there are two that have drifted: BISOS =mother/_claude/commands/=
+has the 2026-10-11 subject-verb names (=bx-status-read=, =bx-status-update=, =bx-archive-read=,
+=bx-archive-update=, =bx-git-commit-msg=) and =bx-ai-outputs=, =bx-context-trim=, =bx-session-verify=,
+=bx-git-uncommitted-list=; the fork still has =bx-status=, =bx-update-status=, =bx-archive=,
+=bx-import-archive=, =bx-commit-msg=. (The two had the same =bx-confirm0=, =bx-confirm-here=, =bx-done=,
+=bx-initiate= until 2026-10-19.)
+
+Decided with Mohsen, 2026-10-19 (from a session in a fork's project and its PALS sub,
+where the
+BISOS skills but not the BISOS commands reached a heterogeneous sub, because commands are inherited from
+the base's =.claude/commands=):
+- BISOS is optional: a colleague's environment has the fork (or bxexamples) and no BISOS.
+- Where BISOS exists, its commands are the ones used; where it does not, the tree's own copy is. This is
+  chosen by =aiActivity.cs= (=initiate= / =refresh=) as the target of the repo-level =.claude/commands=
+  symlink. A sub inherits it through the walk-up, so no sub needs its own.
+- The copy in a fork is made of *real files* (a symlink into =/bisos/...= would dangle without BISOS),
+  produced one-way, BISOS to fork, by a new CSXU in this package, not edited in the fork.
+- A BISOS skill reminds Mohsen to run the sync when =mother/_claude/commands/= changes.
+
+Pushback recorded, to settle in [[17.1]]: (1) the names must be unified first, or the first sync renames
+Mohsen's commands in every fork repo's docs; (2) "BISOS wins" reverses the user-first templates
+auto-detect (=~/aiActivityTemplates= before =/bisos/apps/defaults/ai-templates=), so it is a deliberate
+exception for commands; (3) the symlink is chosen once, so installing BISOS later needs a =refresh=;
+(4) a Claude slash command is Claude-specific, which the naming policy in AI-DevStatus.org says the name
+should show; (5) the user-facing =aiActivity.cs= must not grow a command that refuses to run in the
+environments without BISOS.
+
+Relation to existing work: this takes over the commands part of [[15.1]] (the pending sync items) and of
+the templates repo's own WorkPlan [[file:/bisos/apps/defaults/ai-templates/AI-WorkPlan.org::2.4][2.4]]
+(command naming convention). Do not start until [[17.1]] is answered.
+
+* DONE Stage 17 TODOs
+CLOSED: [2026-10-20 Tue 17:23]
+** -
+
+
+* Stage 18: Two Template Trees, Assembled into One Base
+
+<<Stage 18>>
+
+Goal (decided with Mohsen 2026-10-19/20): fully separate the two layers of a templates tree, so that
+each is maintained on its own and a fork takes the workflow layer whole, by git, instead of receiving
+copies. Supersedes Stage 17's copy-sync (=aiActivityCmnds.cs=) once migrated.
+
+*The design.*
+- A templates base, =./ai-templates/= (the directory the engine already uses), contains two inputs with
+  *fixed names*: =aiTemplates-workFlow/= and =aiTemplates-DE/=. Each is a real directory or a symlink
+  to a clone anywhere; only the names are fixed. All three have the *same structure* (=mother/=,
+  =<activity>/=, =_nonTemplate_/=).
+- *=aiActivityAssemble.cs=* generates the aggregate in =./ai-templates=: everything an input provides
+  appears in the base at the same relative path. No =./all= tree: the base is the aggregate.
+- *Deep merge*: directories are real directories in the base; files are relative links into the inputs;
+  a symlink found in an input is reproduced as the same symlink in the base (so a relative link such as
+  =bisos-pip/_skills -> ../mother/_skills= resolves against the base, i.e. the merged =mother/_skills/=).
+  This keeps every path existing projects link to (=mother/...=, =<activity>/...=, =<activity>/_skills=)
+  valid after the switch.
+- *No layering*: a path provided by both inputs is an error, not an override. Base-level files that are
+  not generated (a tree's own =README.org=, =LICENSE=, self-hosted =AI-*.org=, =.aiActivity.cs/=) are
+  never touched; the assembler manages only the links it made (recorded in a manifest) and refuses to
+  overwrite a real file.
+- *Boundary*: =aiTemplates-workFlow= = BISOS-AI-Workflow: =mother/{CLAUDE.md, AI-WORKFLOW.org,
+  AI-DevStatus.org, AI-WorkPlan.org, initiateSub/, _claude/}=, the workflow skills
+  (=mother/_skills/{authoring-skills, bx-ai-commands-authorship}=), the generic activities (=aiActivity=,
+  =custom=, =basic=), =_nonTemplate_/=. =aiTemplates-DE= = BISOS-Digital-Ecosystem-Skills:
+  =mother/{AI-Activity.org, AI-Outputs.org}=, the other =mother/_skills/=, the ecosystem activities
+  (=astro-site=, =bisos-core=, =bisos-pip=, =blee-panels=, =graphviz-pcs=, =lcnt=, =pycs=, =sbom+cap=,
+  =xu-single=).
+- *Where they live* (Mohsen, 2026-10-20): =/bxRepos/bxexamples/aiTemplates-workFlow= and
+  =/bxRepos/bxexamples/aiTemplates-DE=, to become repos later. Both the BISOS base
+  (=bisos/defaults/ai-templates=) and the public base (=bxexamples/aiActivityTemplates=) link their two
+  inputs to these, so the two bases are permanently in sync. The fork links =aiTemplates-workFlow=
+  to a clone and keeps its own content as a real =aiTemplates-DE/=.
+
+* Stage 18 TODOs
+** +
+** Archived
+** -
+
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# eval: (setq-local org-log-done 'time)
+# End:

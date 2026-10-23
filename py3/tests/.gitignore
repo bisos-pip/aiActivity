@@ -1,0 +1,6 @@
+# verify.sh starts from, and returns to, a clean state: nothing it installs is versioned.
+.aiActivity.cs/
+.claude/
+AI-*.org
+AI-*.org_archive
+CLAUDE.md

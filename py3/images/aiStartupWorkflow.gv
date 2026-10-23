@@ -1,0 +1,121 @@
+digraph {
+	nodesep=0.35 rankdir=TB ranksep=0.5
+	node [fontsize=12]
+	lyr_discover [label=Discover fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_install [label="Install
+(once per directory)" fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_install2 [label="" fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_inspect [label=Inspect fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_trim [label=Trim fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_usage [label=Use fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_maintain [label="Maintain
+(over the project's life)" fontcolor=gray30 fontsize=11 group=labels shape=plaintext]
+	lyr_discover -> lyr_install [style=invis]
+	lyr_install -> lyr_install2 [style=invis]
+	lyr_install2 -> lyr_inspect [style=invis]
+	lyr_inspect -> lyr_trim [style=invis]
+	lyr_trim -> lyr_usage [style=invis]
+	lyr_usage -> lyr_maintain [style=invis]
+	{
+		rank=same
+		lyr_discover
+		discover [label="aiActivity.cs
+(examples menu: activities,
+current config)" fillcolor=lightskyblue group=spine shape=rectangle style="filled,dashed"]
+	}
+	{
+		rank=same
+		lyr_install
+		tplMother [label="mother/
+CLAUDE.md  AI-WORKFLOW.org
+AI-Outputs.org  _claude/  _skills/
+(an assembled base: links into
+aiTemplates-workFlow, -DE)" fillcolor=gainsboro fontsize=11 group=templates shape=folder style="filled,bold"]
+		install [label="-i initiate --activity=<activity>
+or -i initiateSub (overlay)
+[--noLink=<file>]
+(or /bx-initiate inside Claude)" fillcolor=plum group=spine shape=rectangle style="filled,bold"]
+		subjLinks [label="Symlinks (→ templates)
+AI-WORKFLOW.org  AI-Activity.org
+AI-Outputs.org  .claude/" fillcolor=white fontsize=11 group=subjects shape=note style="filled,bold"]
+	}
+	{
+		rank=same
+		lyr_install2
+		tplActivity [label="<activity>/
+AI-Activity.org  (_skills → mother)
+AI-DevStatus.org  AI-WorkPlan.org
+(seeds)" fillcolor=gainsboro fontsize=11 group=templates shape=folder style="filled,bold"]
+		install2 [label="" color=gray70 group=spine shape=point width=0.01]
+		subjCopies [label="Safe-copies (yours)
+CLAUDE.md  AI-DevStatus.org
+AI-WorkPlan.org" fillcolor=white fontsize=11 group=subjects shape=note style="filled,bold"]
+	}
+	{
+		rank=same
+		lyr_inspect
+		inspect [label="-i listClaudesPath
+-i startupClaudeTokens" fillcolor=lightskyblue group=spine shape=rectangle style="filled,dashed"]
+	}
+	{
+		rank=same
+		lyr_trim
+		loopViaTrim [label="" color=darkgreen group=loop shape=point width=0.03]
+		refShared [label="<activity>/AI-Activity.org
++ its imports (shared)" fillcolor=gainsboro fontsize=10 shape=note style=filled]
+		trim [label="/bx-context-trim" fillcolor=plum group=spine shape=rectangle style="filled,dashed"]
+		refLocal [label="AI-WorkPlan.org  AI-DevStatus.org
+(via /bx-archive-update, /bx-status-update)" fillcolor=white fontsize=10 shape=note style=filled]
+	}
+	{
+		rank=same
+		lyr_usage
+		loopViaUse [label="" color=darkgreen group=loop shape=point width=0.03]
+		usage [label="Usage sessions
+(see aiUsageWorkflow)" color=gray40 group=spine shape=rectangle style="rounded,dashed"]
+	}
+	{
+		rank=same
+		lyr_maintain
+		maintain [label="-i refresh
+-i deClaudify" fillcolor=lightpink group=spine shape=rectangle style="filled,dashed"]
+		refInstalled [label="Installed files
+(symlinks + safe-copies)" fillcolor=white fontsize=10 shape=note style=filled]
+	}
+	lyr_install -> tplMother [style=invis]
+	tplMother -> install [style=invis]
+	install -> subjLinks [style=invis]
+	lyr_install2 -> tplActivity [style=invis]
+	tplActivity -> install2 [style=invis]
+	install2 -> subjCopies [style=invis]
+	lyr_trim -> loopViaTrim [style=invis]
+	loopViaTrim -> refShared [style=invis]
+	refShared -> trim [style=invis]
+	trim -> refLocal [style=invis]
+	lyr_usage -> loopViaUse [style=invis]
+	loopViaUse -> usage [style=invis]
+	lyr_maintain -> maintain [style=invis]
+	maintain -> refInstalled [style=invis]
+	tplMother -> tplActivity [style=invis]
+	subjLinks -> subjCopies [style=invis]
+	discover -> install
+	install -> install2 [arrowhead=none]
+	install2 -> inspect
+	inspect -> trim
+	trim -> usage
+	usage -> maintain
+	tplMother -> install [arrowhead=empty color=gray50 constraint=false]
+	tplActivity -> install [arrowhead=empty color=gray50 constraint=false]
+	install -> subjLinks [color=darkseagreen4 constraint=false penwidth=1.8 style=dashed]
+	install -> subjCopies [color=darkseagreen4 constraint=false penwidth=1.8]
+	maintain -> refInstalled [label=" refresh (CLAUDE.md, missing links, 
+ .claude/commands) / remove " color=darkseagreen4 constraint=false fontcolor=darkseagreen4 fontsize=9 penwidth=1.8]
+	refShared -> trim [label=" shared edit 
+ (confirmed separately) " color=crimson constraint=false dir=back fontcolor=crimson fontsize=9 penwidth=1.6]
+	trim -> refLocal [label=" local trims " color=crimson constraint=false fontcolor=crimson fontsize=9 penwidth=1.6]
+	inspect -> loopViaTrim [color=darkgreen dir=back penwidth=1.6]
+	loopViaTrim -> loopViaUse [label="  chain grew  " color=darkgreen dir=none fontcolor=darkgreen fontsize=10 penwidth=1.6]
+	loopViaUse -> usage [color=darkgreen dir=none penwidth=1.6]
+	legend [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR="lightskyblue">read</TD><TD BGCOLOR="lightpink">write</TD><TD BGCOLOR="plum">read-write</TD><TD>solid border = always</TD><TD STYLE="dashed">dashed border = perhaps</TD></TR><TR><TD COLSPAN="2"><FONT COLOR="darkseagreen4">green = aiActivity.cs writes</FONT></TD><TD COLSPAN="2">dashed = symlink, solid = copy</TD><TD><FONT COLOR="crimson">red = Claude writes</FONT></TD></TR><TR><TD COLSPAN="5">left (grey) = templates tree, shared across projects;  right = this repo<BR/>grey hollow arrow = template source;  thin-bordered file = refers to a subject above</TD></TR></TABLE>> fontsize=10 shape=plaintext]
+	maintain -> legend [style=invis]
+}

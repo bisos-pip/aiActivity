@@ -1,0 +1,247 @@
+#+title: Prior and Similar Art for bisos.aiActivity
+#+DATE: <2026-10-19 Mon>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:3
+
+*Anchored in time: surveyed on 2026-10-19.* This is a snapshot of what was publicly described then,
+gathered by web search of READMEs, documentation and blog posts during a Claude Code session. It is
+not exhaustive, and the other tools' features are as their own pages and third-party write-ups describe
+them: none was installed or run for this comparison. The field moves fast, so read every statement
+below as "as of 2026-10-19", and re-survey before quoting it.
+
+The README of this package ([[file:README.org][README.org]]) already places aiActivity against the
+chatbot paradigm (Gemini Notebook, Claude's Plan mode) in /Why AI-Activity, Not Chatbot?/. This file
+looks sideways instead: at tools that address some of the same capabilities.
+
+* Table of Contents     :TOC:
+- [[#what-aiactivity-combines][What aiActivity Combines]]
+- [[#team-orientation-designed-not-to-be-individualized][Team Orientation: Designed Not to Be Individualized]]
+- [[#similar-art-by-kind][Similar Art, by Kind]]
+  - [[#claude-codes-own-distribution-mechanisms][Claude Code's Own Distribution Mechanisms]]
+  - [[#one-rules-source-for-many-agents-and-projects][One Rules Source for Many Agents and Projects]]
+  - [[#memory-banks][Memory Banks]]
+  - [[#spec-driven-frameworks][Spec-Driven Frameworks]]
+  - [[#starter-kits-and-component-catalogs][Starter Kits and Component Catalogs]]
+  - [[#template-engines-that-update-existing-projects][Template Engines That Update Existing Projects]]
+  - [[#org-mode-backlogs-for-agents][Org-Mode Backlogs for Agents]]
+- [[#summary-table][Summary Table]]
+- [[#what-appears-distinctive-in-aiactivity][What Appears Distinctive in aiActivity]]
+- [[#ideas-worth-considering][Ideas Worth Considering]]
+- [[#method-and-limits][Method and Limits]]
+
+* What aiActivity Combines
+
+The axes of the comparison. Each kind of similar art below covers some of them; none found covers all.
+
+1. *Activities as reusable classes of work.* A templates tree holds one directory per kind of work
+   (=AI-Activity.org=, seeds for the per-project files), installed into a project by *live symlink*
+   (improvements propagate) plus *safe-copies* (per-project state).
+2. *Per-project state built for handoff.* =AI-WorkPlan.org= (Stages, TODOs with owner tags),
+   =AI-DevStatus.org= (current state for a reader on another machine), and an archive round-trip
+   that keeps the startup context small without losing what was tried and rejected.
+3. *Hierarchy.* Sub-projects overlay a parent (=initiateSub=), inheriting its invariants, and may
+   come from another templates tree (heterogeneous subs).
+4. *One workflow command set, plus shared skills.* The =/bx-*= commands are the workflow itself, the
+   same for every activity; skills are on-demand knowledge, one shared set per templates tree.
+5. *A cross-project findings ledger.* =AI-Outputs.org=: defects and lessons found in one project
+   whose fix belongs in another.
+6. *Inspection.* =listClaudesPath= (what is in effect from here) and =startupClaudeTokens= (what the
+   next session will load, before it starts).
+7. *Forks kept in step.* A templates base is assembled (=aiActivityAssemble.cs=) from the workflow
+   tree, the same for everyone and taken whole by git, and an organization's own ecosystem tree, so a
+   fork works where the primary is absent and cannot drift from the workflow. (At the survey date the
+   commands were still copied into forks; the assembly replaced that on 2026-10-20.)
+8. *Org-mode as the substrate*, with dynamic blocks for generated regions (see the README for why
+   org-mode and not Markdown).
+9. *Team orientation* (next section).
+
+* Team Orientation: Designed Not to Be Individualized
+
+aiActivity is built for a team and for the long life of a project, not for one person's setup.
+
+- *The knowledge is shared, not personal.* Conventions live in a canonical templates tree that every
+  project links to. When anyone refines an =AI-Activity.org=, every project inherits it at its next
+  session. The default relationship is inheritance from one tree, not a private copy per user.
+- *The state is in the repository, not in a session or a home directory.* =AI-WorkPlan.org= and
+  =AI-DevStatus.org= are committed with the code, so a colleague on another machine, or a fresh
+  Claude session weeks later, picks the work up cold. =AI-DevStatus.org= is written explicitly for a
+  reader who has the repo but not the author's =~=.
+- *Work is assigned, not just listed.* TODOs carry owner tags (=:me:=, =:ai:=, =:aiAndMe:=) and
+  anchors that other files cross-reference; =/bx-done= and =/bx-archive-update= move them through a
+  shared lifecycle.
+- *Findings travel between projects.* The =AI-Outputs.org= ledger is shared across projects, so a
+  lesson learned in one is visible to the people working in another.
+- *Organizations get their own tree.* A fork encodes an organization's conventions once, for all of
+  its projects; colleagues without the primary tree still get the same commands.
+
+Much of the similar art below is, by design or by default, *individual*: configuration in the user's
+home directory (=~/.claude=), memory files kept out of git (one write-up on memory banks notes that
+committing them causes merge conflicts, while excluding them keeps the memory on one machine),
+component catalogs copied into one project at a time. Some of it is team-capable when its output is
+committed (rules-sync outputs, spec files, Kiro steering, Copier projects, Claude Code plugins at
+project scope). What is rare is a design whose /point/ is that knowledge accumulates across people and
+projects in one shared place.
+
+* Similar Art, by Kind
+
+** Claude Code's Own Distribution Mechanisms
+
+- *What*: user-level =~/.claude/= (commands, skills, settings for one user across projects);
+  =.claude/rules/= (modular, optionally path-scoped rule files); and *plugins*, bundles of skills,
+  commands, agents, hooks and MCP servers, distributed through git-based *marketplaces*
+  (a repository with =.claude-plugin/marketplace.json=), installable at user, project or local scope.
+- *Overlap*: 4, 7. Plugins are the nearest official answer to "one command set across many
+  projects", and marketplaces to "a primary source and its forks".
+- *Differs*: no notion of an activity or of per-project state; a plugin is a bundle of behaviour, not
+  a seed for a project's plan and handoff files. User-level configuration is individual by
+  construction.
+- Sources: [[https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more][Steering Claude Code]] (Anthropic, June 2026);
+  [[https://www.morphllm.com/claude-code-marketplace][Claude Code Plugins and Marketplaces]];
+  [[https://claudefa.st/blog/tools/mcp-extensions/plugins-distribution][Plugins distribution]].
+
+** One Rules Source for Many Agents and Projects
+
+- *What*: tools that keep one source of AI rules and generate or copy each assistant's own files from
+  it: Ruler, rulesync (several projects share the name), sync-rules (a central repository to many
+  projects, selected by glob), agentsync (AGENTS.md as the source, with an optional pre-commit hook),
+  Rulix (validation and token budgets; early-stage).
+- *Overlap*: 1 (central rules, distributed), 7 (one source, many targets). =sync-rules= is the closest
+  to aiActivity's templates distribution; agentsync's hook is close to a sync check.
+- *Differs*: agent-neutral by design (Cursor, Copilot, Claude, AGENTS.md); aiActivity is deliberately
+  Claude-bound until a second agent is in use. They copy or generate rather than link live, and they
+  carry rules only: no plan, no handoff state, no workflow commands.
+- Sources: [[https://gh.nn.ci/intellectronica/ruler][Ruler]];
+  [[https://github.com/kierr/rulesync][rulesync]];
+  [[https://cdn.jsdelivr.net/npm/sync-rules@5.11.5/README.md][sync-rules]];
+  [[https://github.com/PanisHandsome/ai-rules-sync][agentsync]];
+  [[https://forum.cursor.com/t/rulix-ai-rules-manager-with-validation-token-budgets-cursor-claude-code-agents-md/151254][Rulix]];
+  [[https://developertoolkit.ai/en/ecosystem/frameworks/rules-sync/][One Rules Source for Every Agent]].
+
+** Memory Banks
+
+- *What*: markdown files an assistant reads at the start of each task and updates as it works. Cline:
+  =projectbrief.md= feeding =productContext.md=, =systemPatterns.md=, =techContext.md=, then
+  =activeContext.md= and =progress.md=. Roo Code: a leaner set with =decisionLog.md=.
+- *Overlap*: 2. The same idea as =AI-DevStatus.org= and =AI-WorkPlan.org=: the session's state outside
+  the session.
+- *Differs*: no templates or activities, no Stages with owners, no archive discipline; often kept out
+  of git, which makes the memory individual.
+- Sources: [[https://docs.cline.bot/best-practices/memory-bank][Cline Memory Bank]];
+  [[https://cline.bot/blog/memory-bank-how-to-make-cline-an-ai-agent-that-never-forgets][Cline blog]];
+  [[https://spin.atomicobject.com/roo-code-ai-assisted-development/][Roo Code in practice]];
+  [[https://www.fast.io/resources/cline-claude-code-memory-comparison.md][Cline vs Claude Code memory]].
+
+** Spec-Driven Frameworks
+
+- *What*: write a specification, derive a plan and tasks, let the agent implement. GitHub Spec Kit (a
+  CLI installing templates and slash commands for many assistants, with a gated specify / plan /
+  tasks / implement flow); Kiro (an agentic IDE whose /steering files/ hold product, structure and
+  tech context); BMAD Method (a multi-agent, agile-team-shaped framework for larger projects); Agent OS
+  (described variously as captured standards and workflows, or multi-agent coordination).
+- *Overlap*: 1, 2, 4. Spec Kit is structurally the closest to aiActivity (an installer, templates and
+  slash commands); Kiro's steering files resemble =AI-Activity.org=; their task lists resemble a
+  WorkPlan Stage.
+- *Differs*: oriented to delivering one feature through phases, not to a long-lived activity whose
+  conventions accumulate; initialized once rather than linked live to a shared tree.
+- Sources: [[https://www.martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html][Understanding Spec-Driven Development]] (martinfowler.com);
+  [[https://medium.com/@tim_wang/spec-kit-bmad-and-agent-os-e8536f6bf8a4][Spec Kit, BMAD and Agent OS]];
+  [[https://medium.com/@visrow/comprehensive-guide-to-spec-driven-development-kiro-github-spec-kit-and-bmad-method-5d28ff61b9b1][Kiro, Spec Kit and BMAD]];
+  [[https://infoworld.com/article/4171332/four-cutting-edge-tools-for-spec-driven-development.html][Four tools for spec-driven development]] (InfoWorld).
+
+** Starter Kits and Component Catalogs
+
+- *What*: collections of agents, commands, hooks, settings and skills copied into a project or into
+  =~/.claude=: claude-code-templates (=npx claude-code-templates=, a catalog of hundreds of components),
+  Claude Code Mastery, claude-kit's bootstrap.
+- *Overlap*: 4.
+- *Differs*: copy-in with no update path and no project state; several install at user level.
+- Sources: [[https://docs.aitmpl.com/cli/overview][claude-code-templates docs]];
+  [[https://gh.nn.ci/davila7/claude-code-templates][repository]];
+  [[https://sharedcontext.ai/plugins/external/TheDecipherist/claude-code-mastery][Claude Code Mastery]];
+  [[https://openskillindex.com/skills/luiseiman-claude-kit-bootstrap-project][claude-kit bootstrap-project]];
+  [[https://www.shyft.ai/blog/claude-code-frameworks-guide][What Claude Code frameworks are]].
+
+** Template Engines That Update Existing Projects
+
+- *What*: Copier generates a project from a template *and updates it later* when the template changes,
+  replaying the saved answers and leaving git-style conflict markers where local edits collide; cruft
+  adds the same to cookiecutter, which on its own generates once.
+- *Overlap*: 1. A general-purpose answer to "template improvements should reach existing projects".
+- *Differs*: not about AI collaboration at all. But its three-way update is stronger than aiActivity's
+  for safe-copied files: =refresh= re-copies =CLAUDE.md= only, and template improvements to the seeds of
+  =AI-WorkPlan.org= / =AI-DevStatus.org= never reach projects already initiated.
+- Sources: [[https://x-cmd.com/install/copier/][Copier]];
+  [[https://guidebook.devops.uis.cam.ac.uk/howtos/development/copier/migrate/][Migrating to Copier]];
+  [[https://pypi.org/project/cruft/1.4.0/][cruft]].
+
+** Org-Mode Backlogs for Agents
+
+- *What*: dev-agent-backlog keeps a =backlog.org= as the human-readable hub (Active, Blocked, Up Next),
+  with agents writing progress notes and =:HANDOFF:= entries, shared TODO states in an
+  =org-setup.org=, and design documents as the source of truth. Claude Code's own Tasks are file-based
+  (=~/.claude/tasks=) and can be shared between sessions by an environment variable.
+- *Overlap*: 2, 8. The closest to aiActivity's org-mode WorkPlan practice.
+- *Differs*: per project; no templates tree, activities or hierarchy. Claude Code's Tasks live in the
+  user's home directory, not in the repository.
+- Sources: [[https://tomevault.io/tome/farra/dev-agent-backlog][dev-agent-backlog]];
+  [[https://medium.com/@joe.njenga/claude-code-tasks-are-here-new-update-turns-claude-code-todos-to-tasks-a0be00e70847][Claude Code Tasks]].
+
+* Summary Table
+
+Axes as numbered in [[#what-aiactivity-combines][What aiActivity Combines]]. "Team" says whether the
+kind is shared across people by design, can be when its output is committed, or is individual.
+
+| Kind                         | Examples                         | Axes    | Team              |
+|------------------------------+----------------------------------+---------+-------------------|
+| Claude Code distribution     | =~/.claude=, rules, plugins      | 4, 7    | user or project   |
+| Rules sync across agents     | Ruler, rulesync, sync-rules      | 1, 7    | if committed      |
+| Memory banks                 | Cline, Roo Code                  | 2       | often individual  |
+| Spec-driven frameworks       | Spec Kit, Kiro, BMAD, Agent OS   | 1, 2, 4 | if committed      |
+| Starter kits and catalogs    | claude-code-templates and others | 4       | mostly individual |
+| Template engines that update | Copier, cruft                    | 1       | if committed      |
+| Org-mode agent backlogs      | dev-agent-backlog, Claude Tasks  | 2, 8    | per project       |
+| aiActivity                   | =aiActivity.cs=, templates tree  | 1--9    | by design         |
+
+* What Appears Distinctive in aiActivity
+
+As far as this survey found:
+
+- *Live links for shared knowledge, copies for per-project state*, in one install.
+- *The activity as the unit of reuse*: a class of work, not a set of rules for one project.
+- *Accumulation across people and projects as the goal*: the templates tree is the product, the
+  engine only delivers it.
+- *Hierarchical and heterogeneous* project trees.
+- *The archive round-trip* with an explicit rule to keep negative results ("we tried X and it broke").
+- *A cross-project findings ledger.*
+- *Estimating the next session's startup context* before it starts.
+- *Org-mode with dynamic blocks* as the authorship model.
+
+* Ideas Worth Considering
+
+- *Copier-style updates for safe-copies*: a three-way merge so that improvements to the seeds of
+  =AI-WorkPlan.org= / =AI-DevStatus.org= can reach projects already initiated (today only =CLAUDE.md=
+  is refreshed).
+- *A Claude Code plugin, or marketplace, for outside users*: for someone starting from the public
+  bxexamples tree, a plugin is the expected way to get the =/bx-*= commands and general skills. It
+  would sit beside the templates tree and the fork model, not replace them.
+- *AGENTS.md interoperability*: only once a second agent is actually in use (the policy recorded in
+  this repo's =AI-DevStatus.org=, 2026-10-07).
+- *Inclusion modes for activity guidance*, as Kiro's steering files and Claude Code's path-scoped rules
+  have (always, when matching files are touched, on demand): a complement to =/bx-context-trim=.
+- *Vocabulary*: much of this field now calls itself "context engineering" or "spec-driven
+  development". Using those terms where they fit would help people looking for aiActivity find it.
+
+* Method and Limits
+
+- Date: 2026-10-19. Method: a handful of web searches (Claude Code distribution and starter kits,
+  rules-sync tools, memory banks, spec-driven frameworks, plugins, Copier, org-mode agent backlogs).
+- Sources are mostly the projects' own pages and third-party guides, not independent reviews; star
+  counts and feature lists conflicted between sources and are not repeated here.
+- Not covered: closed or enterprise tools without public descriptions, IDE-specific memory features
+  beyond those named, and anything published after the survey date.
+- To update: re-run the survey, change the date at the top, and keep superseded findings in git
+  history rather than in this file.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 3)
+# End:
