@@ -3361,3 +3361,13 @@ Fixed 2026-10-20. Not marked DONE: awaiting review. Nothing staged or committed.
 - Not done: these cases are not in =verify.sh= (the suite lives in the session scratchpad).
 
 
+
+* DONE Re-Create bisos.aiActivity
+CLOSED: [2026-10-23 Fri 11:18] SCHEDULED: <2026-10-23 Fri>
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-10-23 Fri 11:18
+:ARCHIVE_FILE: /bxRepos/bisos-pip/aiActivity/AI-WorkPlan.org
+:ARCHIVE_OLPATH: Stage 1 TODOs (Misc)
+:ARCHIVE_CATEGORY: AI-WorkPlan
+:ARCHIVE_TODO: DONE
+:END:

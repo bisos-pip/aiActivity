@@ -22,12 +22,13 @@ TODO below is the standard first step, or use =/bx-confirm0= as the automated eq
 TODOs tagged =:ai:= are assigned to Claude. After completing a TODO, summarize results
 under =----- AI Results: ------= and mark it DONE.
 
+
 * Stage 0: Confirm AI's Understanding of This Repo's Context
 
 Goal: Confirm AI's understanding of the context and capture that in [[Context Confirmation]] TODO.
 
 
-* Stage 0: TODOs
+* Stage 0: TODOs -- Loop
 ** +
 ** LOOP <<0.1>> In chatbot confirmation that /bx-confirm0 was done
 SCHEDULED: <2026-10-01 Thu>
@@ -38,32 +39,39 @@ Scheduled date can be updated but [[0.1]] remains as LOOP.
 
 * Stage 1: Misc Place Holder 
 
-Goal: A placeholder for misc
+Goal: A placeholder for misc ideas and TODOs
 
 
 * Stage 1 TODOs (Misc)
 ** +
-** TODO Re-Create bisos.aiActivity
-** TODO Different  bisos.aiActivity examples when base already exists
+** TODO Different  bisos.aiActivity.cs examples when base already exists
 ** TODO Add Emacs intgration to aiActivity -- include yasnipets
+** TODO Add figure for Homogenous and Heterogenous
+** TODO Create repo for video
+** TODO Revisit bx-git-commit-msg with new style
+- Front tag -- aiActivity: Then 50/72
+- At the end, example;  WorkPlan: 3.2, 4.3   <AI Tag Opus 5.5>
+- The body (72) Less than 4 lines.
 ** -
+
 
 * Stage 2: Fully Implement aiActivity.cs
 
 Goal: A functioning implementation with starting point files for py-dblock and userConfigFileParams
 
 
-* Stage 2 TODOs
+* Stage 2 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
+
 
 * Stage 3: Documentation and pypi upload
 
 Goal: Update README for pypi, Update Blee-Panels documentation, upload to pypi and test as pipx
 
 
-* Stage 3 TODOs
+* Stage 3 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -74,7 +82,7 @@ Goal: Update README for pypi, Update Blee-Panels documentation, upload to pypi a
 Goal: Add commands for reversible and permanent removal of AI collaboration files.
 
 
-* Stage 4 TODOs
+* Stage 4 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -107,7 +115,7 @@ symlinks =.claude/settings.json= and =.claude/commands=. =deClaudify=,
 symlink the same way they handle the other =.claude/= entries.
 
 
-* Stage 5 TODOs
+* Stage 5 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -127,7 +135,7 @@ and creates ambiguity about which activity applies. A slim overlay keeps
 subproject state local without duplicating the base.
 
 
-* Stage 6 TODOs
+* Stage 6 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -142,7 +150,7 @@ Currently =parDefault= for the =templates= param probes only
 =~/aiActivityTemplates=, with user-first precedence.
 
 
-* Stage 7 TODOs
+* Stage 7 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -159,7 +167,7 @@ and =CLAUDE.md= directly importing the four subordinate files is simpler
 and equally functional. Merge and delete.
 
 
-* Stage 8 TODOs
+* Stage 8 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -170,7 +178,7 @@ and equally functional. Merge and delete.
 Goal: Make sure that aiActivity works fine outside of bisos
 
 
-* Stage 9 TODOs
+* Stage 9 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -192,7 +200,7 @@ session:
    activity
 
 
-* Stage 10 TODOs
+* Stage 10 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
@@ -219,16 +227,18 @@ Two related changes:
    property of symlinks; =refresh= gives it back explicitly).
 
 
-* Stage 11 TODOs
+* Stage 11 TODOs -- Accomplished and archived.
 ** +
 ** Accomplished and archived. <2026-09-22 Tue 22:15>
 ** -
+
 
 * Stage 12: Capture the Concept of AI-Outputs.org 
 
 Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
 
-* Stage 12 TODOs
+
+* Stage 12 TODOs -- Archived. No longer relevant.
 ** +
 ** Archived. No longer relevant.
 ** -
@@ -237,6 +247,7 @@ Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
 * Stage 14: Maintenance and New Feature Ideas
 
 Goal: Based on usage consider new features, and non-urgent bugs.
+
 
 * Stage 14 TODOs
 ** +
@@ -303,7 +314,7 @@ Goal: Make sure relevant common activities, commands and skills are consistent a
 - Others  /de/active/aiTemplates
 
 
-* Stage 15 TODOs
+* Stage 15 TODOs -- Loop
 ** +
 ** LOOP [#A] <<15.1>>
 SCHEDULED: <2026-09-23 Wed>
@@ -388,8 +399,9 @@ Relation to existing work: this takes over the commands part of [[15.1]] (the pe
 the templates repo's own WorkPlan [[file:/bisos/apps/defaults/ai-templates/AI-WorkPlan.org::2.4][2.4]]
 (command naming convention). Do not start until [[17.1]] is answered.
 
-* DONE Stage 17 TODOs
-CLOSED: [2026-10-20 Tue 17:23]
+
+* Stage 17 TODOs -- Done
+** +
 ** -
 
 
@@ -430,7 +442,8 @@ copies. Supersedes Stage 17's copy-sync (=aiActivityCmnds.cs=) once migrated.
   inputs to these, so the two bases are permanently in sync. The fork links =aiTemplates-workFlow=
   to a clone and keeps its own content as a real =aiTemplates-DE/=.
 
-* Stage 18 TODOs
+
+* Stage 18 TODOs -- Archived
 ** +
 ** Archived
 ** -
