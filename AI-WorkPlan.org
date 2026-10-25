@@ -244,12 +244,12 @@ Goal: Capture the Concept of AI-Outputs.org  from ./AI-Outputs.org
 ** -
 
 
-* Stage 14: Maintenance and New Feature Ideas
+* Stage 14: Maintenance and Proposed New Features
 
 Goal: Based on usage consider new features, and non-urgent bugs.
 
 
-* Stage 14 TODOs
+* Stage 14 TODOs -- In Progress
 ** +
 ** TODO [#A] <<14.9>>  Add a AI-Activity set of templates for YaSnippets
 SCHEDULED: <2026-10-01 Thu 10:23>
@@ -446,6 +446,74 @@ copies. Supersedes Stage 17's copy-sync (=aiActivityCmnds.cs=) once migrated.
 * Stage 18 TODOs -- Archived
 ** +
 ** Archived
+** -
+
+* Stage 19: Integration of aiActivity into Emacs
+
+Goal: Integrate aiActivity into Emacs
+
+
+* Stage 19 TODOs -- In Progress
+** +
+** STRT [#A] <<19.1>>  Add a AI-Activity set of templates for YaSnippets :aiAndMe:
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+It should show up under bx-ai-activity in the moded drop down.
+It should have a bx-ai-activity -> WorkPlan -> "aiAndMe"
+----- Results: ------
+Started. Needs review.
+
+** TODO [#A] <<19.2>> Automate git after stage commit from magit using /bx-git-commit-msg :aiAndMe:
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+Elisp to be developed after framework has been selected
+----- Results: ------
+
+** TODO [#A] <<19.3>> Identify automation of workflow process :aiAndMe:
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+Drive the workflow from within WorkPlan, instead of from the chatbot.
+----- Results: ------
+
+** -
+
+* Stage 20: LCNT Video Integration and Additions to README.org
+
+Goal: Join this repo and the aiActivity reveal presentation
+
+
+* Stage 20 TODOs -- In Progress
+** +
+** TODO [#A] <<20.1>>  Capture the Heterogenous and Lateral
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+Create an openoffice dir under images
+----- Results: ------
+
 ** -
 
 

@@ -1,4 +1,4 @@
-#+title: bisos.aiActivity: For Managing Your AI-Activity
++title: bisos.aiActivity: For Managing Your AI-Activity
 #+DATE: <2026-07-12 Sat>
 #+AUTHOR: Mohsen BANAN
 #+OPTIONS: toc:4
@@ -1211,6 +1211,8 @@ has created or converted manually is left intact.
 
 AI-Activities have two independent structural dimensions. They can be
 combined freely, and =aiActivity.cs= supports all combinations.
+
+[[file:py3/images/OpenOffice/aiActivityHeterogenous.png]]
 
 *** Homogeneous vs Heterogeneous
 
