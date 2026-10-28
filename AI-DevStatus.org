@@ -29,6 +29,26 @@ results and await review. *Stage 18* (templates bases assembled from two input
 trees) is implemented 2026-10-20: 18.1--18.8 have results and await review;
 18.9 (making the input trees repos) is Mohsen's. Template-maintenance TODOs live
 in the templates repo's own WorkPlan (its Stage 2, =<<2.1>>=--=<<2.4>>=).
+*Stage 20* (Emacs + VS Code + Claude, the design in =Emacs+VS-Code+Claude.org=) is in progress
+since 2026-10-27: 20.1, 20.2, 20.3.1, 20.3.2, 20.3.4 have results; 20.3.3 (session menu) is deferred.
+
+*Done on 2026-10-27/28* (Stage 20; details in its Results in =AI-WorkPlan.org=):
+
+- *New CSXU =claudeSessions.cs=* (logic =py3/bisos/aiActivity/claudeSessions.py=), local (desktop) VS
+  Code only: =list= (live sessions, tab-separated, newest first; =--mode=local|remote|all=, =--cwd=),
+  =latest= (a sessionId only), =promptUri=, =prompt=. Sessions are read from Claude Code's own registry,
+  =~/.claude/sessions/<pid>.json= (undocumented, seen in 2.1.311), alive by =/proc/<pid>/stat= start time.
+- =prompt= uses the extension's URI =vscode://anthropic.claude-code/open?session=&prompt= through
+  =code --open-url= (=DISPLAY= required; =VSCODE_IPC_HOOK_CLI= dropped). Into a *running* session the
+  extension drops the prompt, so the text goes on the clipboard (=xclip=) and is pasted with Ctrl+V by
+  =xdotool= once the session is in front; the user presses Enter.
+- *Emacs layer* in =blee/env3= (another repo, no AI files; its record is here, 20.3.4):
+  =bcpg:claudePlus.el= =bap:claudeSessions/prompt= (thin over the CLI); =bcpg:magitPlus.el= =x c= sends
+  =/bx-git-commit-msg <repo>=, then =c c= offers =.git/CLAUDE_COMMIT_MSG= as before.
+- *Outside this repo* (=bisos/bsip4=, =/bisos/core/bsip/bin/=): =vscode-sbom.pcs= installs the local VS
+  Code extensions (=extsInstallPinned=, =extsInstallLatest=, =extsReport=; 20.1) and its readme explains
+  shared =~/.claude= credentials, local vs remote (20.2: =sync-claude-creds.ps1= not needed);
+  =rawBisos-sbom.pcs= gained =xclip= and =xdotool=.
 
 *Done on 2026-10-20* (Stage 18; details in its Results):
 
@@ -220,6 +240,11 @@ session-workflow sections.
   dangling, missing and real-directory links; a sub was left alone; the no-BISOS fallback was checked
   by monkeypatching the BISOS path.
 
+- =claudeSessions.cs= (2026-10-28): =list= / =latest= against the live registry in all three modes and
+  with =--cwd=; =prompt= with =--session=new= puts the prompt in the URI; into a running session the
+  clipboard + =xdotool= paste lands in the input box (Mohsen, focus first in a source file: "works
+  reliably"); the refusals (no =DISPLAY=, no =xclip=, a bad =--mode=) are usage errors.
+
 * What Is Untested
 
 - PyPI upload and =pipx install bisos.aiActivity= end to end. (The PyPI
@@ -249,6 +274,11 @@ session-workflow sections.
 - A colleague's machine: a clone of the workflow tree, one link, =assemblyCheck= (the fork's README
   describes it; not exercised).
 - No project is initiated from the bxexamples base.
+- The Emacs =x c= in Mohsen's own Emacs (checked in a batch Emacs only: bindings, transient, the
+  refusal path), and so the full stage → =x c= → Enter → =c c= cycle.
+- =claudeSessions.cs -i prompt= with several desktop VS Code windows (the first found gets the
+  paste), and whether the 0.5 s =xdotool= delay is always enough.
+- A prompt starting with =/= into a running session (does the slash menu get in the way of Enter?).
 
 * Known Gaps (not bugs --- areas for future work)
 
@@ -327,6 +357,16 @@ session-workflow sections.
   three-way update is one of the ideas in =PriorAndSimilarArt.org=.
 - *Two-part install friction*: the pip package plus a separately cloned
   templates repo.
+- *=claudeSessions.cs= rests on undocumented Claude Code internals* (2.1.311): the session registry
+  and the extension's =/open= handler (read from its =extension.js=). An upgrade can break either;
+  re-check =list= and =prompt= after one.
+- *Dblocks copied by hand (Stage 20)*: =claudeSessions.cs= (the =promptUri= / =prompt= classHeads; its
+  =cmndArgsSpec= has no =method/args= dblock), =claudeSessions.py='s headers, and the =cl-defun= headers
+  and folding section in =blee/env3='s =bcpg:claudePlus.el= / =bcpg:magitPlus.el=: regenerate in Blee.
+- *=claudeSessions.cs= has a Cmnd named =list=*, which shadows the builtin in that file: the commands
+  taking arguments are placed before it (their generated heads annotate =list[str]=). Renaming it
+  (=sessionsList=) would remove the constraint.
+- The Blee panel has nothing on =claudeSessions.cs=; README has a short section only.
 
 * Architecture
 
@@ -342,7 +382,10 @@ py3/
                                    cwdConfig_csu, startupClaudeTokens_csu
     aiActivityAssemble.cs      --- second csxu (template maintainers): assemblyDiff,
                                    assemblyCheck, assemblyUpdate
+    claudeSessions.cs          --- third csxu (Stage 20): list, latest, promptUri, prompt
+                                   into the local VS Code's Claude sessions
   bisos/aiActivity/
+    claudeSessions.py          --- its logic: the registry, the /open URI, xclip, xdotool
     startupClaudeTokens_csu.py --- startupClaudeTokens (Claude binding)
     assemble.py                --- aiActivityAssemble.cs's logic, pure pathlib
                                    functions (plan, apply, manifest)
@@ -426,6 +469,15 @@ See Stage 18; Stage 17's copy-sync is retired, and [[15.1]]'s sync loop is
 reduced to the input trees' commits.
 
 * Key Design Decisions
+
+- *Emacs to VS Code Claude: the CLI is primary, the elisp thin over it* (2026-10-28, Mohsen). All
+  logic is in =claudeSessions.cs= (usable from a shell); Emacs only calls it. Local (desktop) VS Code
+  only; the remote server is out of scope. No =/bx-claude= command to publish the session: Claude Code's
+  registry already lists them. The default target is the latest local session (no =--cwd=), since
+  =/bx-git-commit-msg= takes the repo as a path. A running session gets its prompt by clipboard +
+  =xdotool= paste, because the extension's =/open= applies a prompt only to a session it newly opens
+  (a negative result, recorded in 20.3.2). Magit: an explicit key (=x c=), not =magit-post-stage-hook=,
+  which runs after every =s=.
 
 - *The commands are one set, the workflow's, not an activity's* (2026-10-19, Mohsen). No layering:
   no activity-level =_claude/commands= override. The BISOS tree's set is primary; a fork holds real

@@ -331,9 +331,11 @@ then the figure.
     - [[#hierarchical-vs-lateral][Hierarchical vs Lateral]]
   - [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context: =startupClaudeTokens=]]
   - [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base: =aiActivityAssemble.cs=]]
+  - [[#prompt-a-vs-code-claude-session-claudesessionscs][Prompt a VS Code Claude Session: =claudeSessions.cs=]]
 - [[#key-files][Key Files]]
     - [[#aiactivitycs][aiActivity.cs]]
     - [[#aiactivityassemblecs][aiActivityAssemble.cs]]
+    - [[#claudesessionscs][claudeSessions.cs]]
     - [[#startupclaudetokens_csupy][startupClaudeTokens_csu.py]]
     - [[#pypi-and-github-packaging][PyPi and Github Packaging]]
 - [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
@@ -920,6 +922,10 @@ see [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specifici
 =assemblyDiff=, =assemblyCheck=, =assemblyUpdate=. See
 [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base]].
 
+*Prompting a local VS Code Claude session*, in a third command, =claudeSessions.cs=: =list=, =latest=,
+=promptUri=, =prompt=. See [[#prompt-a-vs-code-claude-session-claudesessionscs][Prompt a VS Code Claude
+Session]].
+
 The =--noLink=<file>= option on =initiate= / =initiateSub= converts a
 would-be symlink into a safe-copy for the named file. See
 [[#customizing-a-shared-template-file---nolink][Customizing a Shared
@@ -1375,6 +1381,30 @@ when to run it, in [[#maintaining-a-templates-base][Maintaining a Templates Base
 *Exit status*: the PyCS main exits 0 even when a =Cmnd= is refused and
 whichever verdict =assemblyCheck= gives, so read the output line.
 
+** Prompt a VS Code Claude Session: =claudeSessions.cs=
+
+/For a Claude session in the local (desktop) VS Code; the remote VS Code server is not a target./
+
+A third command finds the running Claude sessions and puts a prompt in one's input box, so an editor
+(Emacs) or a shell can hand Claude a prompt without switching to it. The prompt is never submitted:
+you read it and press Enter.
+
+| =list=      | the running sessions, one tab-separated line each, newest first; =--mode= local, remote or all; =--cwd= |
+| =latest=    | the sessionId of the most recently active local session                                        |
+| =promptUri= | the URI =prompt= would use; sends nothing                                                       |
+| =prompt=    | the prompt into the latest session, =--session=<id>=, or =--session=new=                         |
+
+: claudeSessions.cs -i list
+: DISPLAY=:1 claudeSessions.cs -i prompt "/bx-git-commit-msg ."
+
+=prompt= opens the session through the Claude extension's URI handler (=code --open-url=), so it
+needs the =DISPLAY= of the desktop VS Code. A session that is already open only comes to the front
+that way, so for a running session the text goes on the X clipboard (=xclip=) and is pasted with
+=xdotool=. Each command it runs is shown on stderr.
+
+Both the session list (Claude Code's =~/.claude/sessions/=) and the URI handler are undocumented
+Claude Code internals, read as they are in Claude Code 2.1.311; an upgrade may change them.
+
 * Key Files
 
 An overview of the relevant files of the bisos.aiActivity package:
@@ -1393,6 +1423,12 @@ lifecycle commands (=initiate=, =initiateSub=, =refresh=,
 =assemblyCheck=, =assemblyUpdate= make a templates base the aggregate of its two inputs,
 =aiTemplates-workFlow= and =aiTemplates-DE=, by a deep merge of relative links. The logic is in
 =py3/bisos/aiActivity/assemble.py=, plain functions over =pathlib= with no CS dependency.
+
+*** claudeSessions.cs
+
+=py3/bin/claudeSessions.cs=: A third CS-MU: =list=, =latest=, =promptUri=, =prompt= for the Claude
+sessions of the local VS Code. The logic is in =py3/bisos/aiActivity/claudeSessions.py=, with no CS
+dependency.
 
 *** startupClaudeTokens_csu.py
 

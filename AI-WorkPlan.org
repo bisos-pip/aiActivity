@@ -448,6 +448,7 @@ copies. Supersedes Stage 17's copy-sync (=aiActivityCmnds.cs=) once migrated.
 ** Archived
 ** -
 
+
 * Stage 19: Integration of aiActivity into Emacs
 
 Goal: Integrate aiActivity into Emacs
@@ -455,7 +456,7 @@ Goal: Integrate aiActivity into Emacs
 
 * Stage 19 TODOs -- In Progress
 ** +
-** STRT [#A] <<19.1>>  Add a AI-Activity set of templates for YaSnippets :aiAndMe:
+** STRT [#A] <<19.1>> Add a AI-Activity set of templates for YaSnippets :aiAndMe:
 SCHEDULED: <2026-10-24 Sat 12:36>
 :PROPERTIES:
 :ORIGIN: Mohsen
@@ -495,14 +496,168 @@ Drive the workflow from within WorkPlan, instead of from the chatbot.
 
 ** -
 
-* Stage 20: LCNT Video Integration and Additions to README.org
+
+* Stage 20: Emacs+vscode+claude Integration
+
+<<Stage 20>>
+
+Goal: Implement design of ./Emacs+VS-Code+Claude.org
+
+- Automate  installation of VSCode, Its plugins and needed configuration
+- Emacs-to-VSCodeClaude interface as generic utility
+- Based on VSCodeClaude pass socketname for emacsclient
+- Based on VSCodeClaue -- from magit stage issue /bx-git-commit-msg <cwd>
+
+* Stage 20 TODOs -- In Progress
+** +
+** TODO [#A] <<20.1>> In  /bisos/core/bsip/bin/vscode-sbom.pcs automate installation of relevant plugins
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+- Enumerate list of emacs integration vscode packages (claude-code, emacs, org-mode)
+- Enumerate list of bx selected packages (python, gitlenz)
+----- Results: ------
+2026-10-27, in =/bisos/core/bsip/bin/vscode-sbom.pcs= (repo =bisos/bsip4=), local (desktop) VS Code
+only; the remote server's extensions are installed by hand. =vscodeExtensionsList= of
+=(id, pinnedVersion)=, versions checked on the Marketplace that day: emacs integration
+(=anthropic.claude-code= 2.1.311, =tuttieee.emacs-mcx=, =realDestroyer.org-vscode=) and bx selected (the
+four =ms-python.*=, =eamodio.gitlens=). Functions =vscodeExtensionSpec=, =vscodeExtensionsInstall(mode)=
+(=pinned= / =latest=, =--force=, refuses root), =vscodeExtensionsReport=; thin Cmnds =extsReport=,
+=extsInstallPinned=, =extsInstallLatest= (dblocks regenerated in Blee by Mohsen). Mohsen installed
+with =extsInstallPinned=; it works. To move into the seed later. Org-mode: =realDestroyer.org-vscode=
+(maintained), not =tootone.org-mode= (unmaintained since 2017).
+
+** TODO [#A] <<20.2>> Is there a way to make  sync-claude-creds.ps1 push become a pull instead
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+- If we decide to keep it as a push, add destintation as arg (default deb13)
+- The sources for the script is to be in vscode-sbom.pcs
+- Or pick it up from a remote vscode connection. VSCode remote pushes credentials here, we then copy into local
+----- Results: ------
+2026-10-27: no code needed, only documentation. Both Claude extensions (the remote VS Code server's
+and the local desktop VS Code's) run on the Linux host as the same user, so they share =~/.claude=
+(=.credentials.json=, =~/.claude.json=, sessions); nothing is copied. In the corporate environment
+the login cannot be completed in the local instance, so it is done in the remote one (the Windows
+browser signs in) and the local instance uses it --- verified: a second Claude ran in the local VS
+Code on the remote's credentials. =sync-claude-creds.ps1= was never run against this container, so a
+remote VS Code login replaces it where a server is attached (other hosts without one are not
+covered). Re-login from the remote when the refresh token (about a week) lapses. Documented, with
+the local/remote/=.claude= files table, in =vscode-sbom.pcs -i readme=.
+
+** TODO [#A] <<20.3>> In /bisos/blee/env3/plus/bcpg\:claudePlus.el  add code for VSCodeClaudePrompt
+SCHEDULED: <2026-10-24 Sat 12:36>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Low
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+- Determine how to discover claue session. Perhaps claude knows it and can put in a well known place with a /bx-claude command
+----- Results: ------
+Decided 2026-10-28: layered --- a CLI in =bisos.aiActivity= first, which the elisp then uses. No
+=/bx-claude= command is needed: Claude Code already keeps a registry of running sessions,
+=~/.claude/sessions/<pid>.json= (=sessionId=, =cwd=, =name=, =status=, =startedAt=, =updatedAt=,
+=procStart=, =entrypoint=); undocumented, seen in 2.1.311. Tested with Mohsen in the local VS Code:
+- a new conversation or a new tab is a new process with its own file; =/clear= keeps the pid and
+  rewrites =sessionId= at once; a resume from history starts a new process with the resumed
+  =sessionId=; closing a tab ends the process and removes its =.json= and =.key=;
+- the registry's =sessionId= was always the conversation being written to;
+- =name= (e.g. =airflow-4b=) belongs to the process, not the conversation: a label only;
+- running is not visible: the side-bar panel keeps a conversation it switched away from running.
+Alive: =/proc/<pid>= exists and its =stat= field 22 equals =procStart=. Local vs remote: =/proc/<pid>/exe=
+under =~/.vscode/extensions/= or =~/.vscode-server/extensions/=.
+
+*** TODO <<20.3.1>> claudeSessions.cs: =list= and =latest= :ai:
+=--mode=local|remote|all= (default =local=), =--cwd=<dir>= (compared after resolving symlinks). Logic
+in =py3/bisos/aiActivity/claudeSessions.py=. =list= prints one tab-separated line per live session,
+=latest= the =sessionId= with the most recent =updatedAt= only, so elisp uses the output as is.
+----- Results: ------
+2026-10-28: =py3/bin/claudeSessions.cs= (=examples=, =list=, =latest=) and
+=py3/bisos/aiActivity/claudeSessions.py= (=sessionsRunning=, =sessionsSelect=, =Session.line=). =list=
+fields: sessionId, instance, cwd, name, status, updatedAt, pid (newest first). Only data goes to stdout;
+the =ALERT= lines and usage errors go to stderr; with no match =latest= prints nothing. Tried against the
+live registry: =local= gave the three airflow conversations, =remote= this one, =all= four, =--cwd= by the
+=/bxRepos= spelling matched, =--cwd=/tmp= empty, a bad =--mode= a usage error (=parChoices= does not
+restrict argparse here, so it is checked in the code). Dblocks copied by hand from
+=aiActivityAssemble.cs=: regenerate in Blee. Not on PATH until =setup.py='s scripts dblock is
+regenerated and the package reinstalled. Needs review.
+
+*** TODO <<20.3.2>> claudeSessions.cs: =prompt= --- build the /open URI and run code --open-url :ai:
+=-i prompt --session=<id> "<text>"=; the URI encoding in one place. Check that a background
+conversation comes to the front, and the slash-menu question for a prompt starting with =/=.
+----- Results: ------
+2026-10-28: =promptUri= (prints the URI only) and =prompt= (sends it) in =claudeSessions.cs=; library
+=openUri=, =openUriSend= in =claudeSessions.py=. The prompt is the arguments, joined with spaces;
+=--session=<id>=, =--session=new= (a new conversation), or by default the latest local session (in
+=--cwd=); an id that is not running gets a note on stderr, and is still sent. =openUriSend= drops
+=VSCODE_IPC_HOOK_CLI=: with it set the desktop =code= launcher defers to a =remote-cli= on PATH, which
+rejects =--open-url= (the cause of the earlier remote failure). The arg-taking commands sit before the
+=list= Cmnd, whose name would otherwise break the generated =list[str]= annotation. =cmndArgsSpec= is a
+plain method (no =method/args= dblock yet). Installed =list= / =latest= rechecked after Mohsen's
+reinstall. The first real send (from Claude's shell, no =DISPLAY=) returned 0 but did nothing: without
+the desktop VS Code's display (=:1= here, the only =/tmp/.X11-unix/X1=) the hand-off never reaches the
+window, and =code= still exits 0. =prompt= now refuses when =DISPLAY= is unset and notes the exact
+command it runs (stderr). Resent with =DISPLAY=:1=: it reached VS Code (a new log folder, as Mohsen's own
+runs made): =airflow-4b= came to the front, its input box blank. The first =/open= of an extension's URI
+makes VS Code ask permission in a pop-up (seen by Mohsen).
+*Negative result (extension 2.1.311, =createPanel= / =showSessionInSidebar=):* =/open= applies =prompt=
+only when it opens a session that is not open yet (a new conversation, or one from history). For a
+session already open in a tab or held by the side bar --- every running session --- it only reveals it
+and shows "Session is already open. Your prompt was not applied --- enter it manually." So a prompt into
+a running session needs another carrier (e.g. the clipboard: no =xclip= / =xsel= on this host; Emacs is
+itself an X client on =:1=). Open: which.
+Decided (Mohsen): the clipboard, by the CLI (primary; the elisp stays thin over it). =xclip= added to
+=/bisos/core/bsip/bin/rawBisos-sbom.pcs= (repo =bisos/bsip4=). =prompt= into a running session now
+sends a URI with =session= only (no notice) and puts the text on the clipboard with =xclip -selection
+clipboard= (library =clipboardSet=; output not captured, as xclip stays to serve the selection), noting
+"Ctrl+V, then Enter"; =--session=new= or a not-running id keep the prompt in the URI. =promptUri= notes
+which. Refuses when =xclip= is missing. Mohsen confirmed it behaves so. Then the Ctrl+V automated:
+=xdotool= added to =rawBisos-sbom.pcs=; after the open, =prompt= runs =xdotool sleep 0.5 search
+--onlyvisible --class code windowactivate --sync key --clearmodifiers ctrl+v= (library =pasteCommand=,
+=pasteSend=). The paste lands in the input box: tested by hand by Mohsen with the focus first in a source
+file, "works reliably". Without =xdotool= it falls back to the Ctrl+V note. Limitation: with several VS
+Code windows the first one found is used.
+
+*** TODO <<20.3.3>> Emacs menu to select a session (via claudeSessions.cs -i list)
+----- Results: ------
+2026-10-28, Mohsen: deferred. The default session (the latest) comes first, done under [[20.3.4]]; the
+menu would pass a sessionId from =claudeSessions.cs -i list= to the same function.
+
+*** TODO <<20.3.4>> Elisp prompt layer in bcpg:claudePlus.el (VSCodeClaudePrompt, the magit key)
+----- Results: ------
+2026-10-28 (started as 20.3.3): the prompt function (no session: the latest) and the magit key over
+it. In =bcpg:claudePlus.el= (repo =blee/env3=): =bap:claudeSessions/prompt (<text
+&optional <session)=, interactive, a thin =call-process= of =claudeSessions.cs -i prompt= (output in
+=*claudeSessions*=; a usage error in the output counts as failure, since a refused PyCS Cmnd exits 0).
+In =bcpg:magitPlus.el=: =bap:magit:claudeCommitMsg/request= sends =/bx-git-commit-msg <magit-toplevel>=
+(refuses when nothing is staged), in the transient =bap:magit:claudeDispatch= on =x c= in
+=magit-mode-map= and on =x= in =magit-dispatch= (=x= was free there; in the status buffer it was
+=magit-reset-quickly=, still reachable as =X=). The cycle: stage, =x c=, Enter in Claude, wait, =c c=, =y=
+(the existing =claudeCommitMsg/offer=). Checked in a batch Emacs: the bindings, the transient, the
+refusal path. Not yet run in Mohsen's Emacs. Dblock headers copied by hand: regenerate in Blee.
+
+** -
+
+* Stage 21: LCNT Video Integration and Additions to README.org
 
 Goal: Join this repo and the aiActivity reveal presentation
 
 
-* Stage 20 TODOs -- In Progress
+* Stage 21 TODOs -- In Progress
 ** +
-** TODO [#A] <<20.1>>  Capture the Heterogenous and Lateral
+** TODO [#A] <<21.1>>  Capture the Heterogenous and Lateral
 SCHEDULED: <2026-10-24 Sat 12:36>
 :PROPERTIES:
 :ORIGIN: Mohsen
