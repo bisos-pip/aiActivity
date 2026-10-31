@@ -17,7 +17,7 @@ which subject each step reads (R) and writes (W).
 
 | Step                      | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
 |---------------------------+--------------+------------------+------------------------------+------------------+----------------|
-| =/bx-confirm0=              |              |                  | R                            | R                |                |
+| =/bx-confirm-root=          |              |                  | R                            | R                |                |
 | =/bx-confirm-here=          |              |                  | R                            | R                |                |
 | =/bx-archive-read=        |              |                  | R (=_archive=)                 |                  |                |
 | =/bx-status-read=             |              |                  | R                            | R                |                |
@@ -58,7 +58,7 @@ which subject each step reads (R) and writes (W).
 
 | Fill   | Meaning                                                  | Steps                                                                                     |
 |--------+----------------------------------------------------------+-------------------------------------------------------------------------------------------|
-| blue   | read: loads into the session, changes no files           | =/bx-confirm0=, =/bx-confirm-here=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
+| blue   | read: loads into the session, changes no files           | =/bx-confirm-root=, =/bx-confirm-here=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
 | pink   | write: records session knowledge into files              | =/bx-done=, =/bx-status-update=                                                           |
 | purple | read-write                                               | Work, =/bx-git-commit-msg=, =/bx-ai-outputs=, =/bx-archive-update=                                   |
 

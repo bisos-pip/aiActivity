@@ -114,7 +114,7 @@ def aiUsageWorkflow(
     for (upper, _), (lower, _) in zip(layerLabels, layerLabels[1:]):
         d.edge(upper, lower, style='invis')
 
-    spine = {'confirm0', 'importArchive', 'work', 'commitMsg', 'aiOutputs', 'done', 'updateStatus', 'sessionVerify'}
+    spine = {'confirmRoot', 'importArchive', 'work', 'commitMsg', 'aiOutputs', 'done', 'updateStatus', 'sessionVerify'}
 
     # Invisible waypoints, one per rank, far left: the next-TODO loop runs
     # through them as a straight line clear of every other edge.
@@ -134,7 +134,7 @@ def aiUsageWorkflow(
                 s.node(name, label, **attrs)
 
     layer('lyr_start', [
-        ('confirm0',    '/bx-confirm0',    read),
+        ('confirmRoot', '/bx-confirm-root', read),
         ('confirmHere', '/bx-confirm-here', perhaps(read)),
     ])
     layer('lyr_loop1', [
@@ -204,7 +204,7 @@ def aiUsageWorkflow(
     d.edge('updateStatus', 'subjDevStatus', **writes)
 
     # Main path.
-    d.edge('confirm0', 'importArchive')
+    d.edge('confirmRoot', 'importArchive')
     d.edge('importArchive', 'work')
     d.edge('work', 'commitMsg')
     d.edge('commitMsg', 'aiOutputs')
@@ -225,7 +225,7 @@ def aiUsageWorkflow(
     d.edge('loopVia4', 'done', dir='none', **loop)
 
     # Alternatives at session start (same rank, not sequential).
-    d.edge('confirm0', 'confirmHere', style='dotted', arrowhead='none', label=' or ', fontsize='10')
+    d.edge('confirmRoot', 'confirmHere', style='dotted', arrowhead='none', label=' or ', fontsize='10')
     # Alternatives within the work loop: orient on archived work and/or re-read state.
     d.edge('importArchive', 'statusRead', style='dotted', arrowhead='none', label=' and/or ', fontsize='10')
 

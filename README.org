@@ -80,7 +80,9 @@ original author had.
 authors' own use is Emacs-based (via Blee), but org-mode files are
 plain text and read equally well in VS Code, IntelliJ, or any editor.
 Claude Code itself is editor-agnostic. The commitment is to org-mode as
-a file format, not to Emacs as an environment.
+a file format, not to Emacs as an environment. For those who do use
+Emacs, the Blee package [[https://github.com/bx-blee/vscode-claude][vscode-claude]]
+joins Emacs and VS Code Claude, as an optional layer over pure VS Code use.
 
 * Why AI-Activity, Not Chatbot?
 
@@ -329,13 +331,15 @@ then the figure.
   - [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology: Homogeneous, Heterogeneous, Hierarchical, Lateral]]
     - [[#homogeneous-vs-heterogeneous][Homogeneous vs Heterogeneous]]
     - [[#hierarchical-vs-lateral][Hierarchical vs Lateral]]
+    - [[#a-sessions-ai-activities-root-and-here][A Session's AI-Activities: Root and Here]]
   - [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context: =startupClaudeTokens=]]
   - [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base: =aiActivityAssemble.cs=]]
-  - [[#prompt-a-vs-code-claude-session-claudesessionscs][Prompt a VS Code Claude Session: =claudeSessions.cs=]]
+  - [[#prompt-a-vs-code-claude-session-vscodeclaudecs][Prompt a VS Code Claude Session: =vscodeClaude.cs=]]
 - [[#key-files][Key Files]]
     - [[#aiactivitycs][aiActivity.cs]]
     - [[#aiactivityassemblecs][aiActivityAssemble.cs]]
-    - [[#claudesessionscs][claudeSessions.cs]]
+    - [[#vscodecs-and-vscodeclaudecs][vscode.cs and vscodeClaude.cs]]
+    - [[#vscode_csupy-and-vscodeclaude_csupy][vscode_csu.py and vscodeClaude_csu.py]]
     - [[#startupclaudetokens_csupy][startupClaudeTokens_csu.py]]
     - [[#pypi-and-github-packaging][PyPi and Github Packaging]]
 - [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
@@ -865,7 +869,7 @@ step reads (R) and writes (W).
 # Re-paste when that file changes.
 | Step                           | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
 |--------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
-| =/bx-confirm0=                 |              |                  | R                              | R                |                |
+| =/bx-confirm-root=             |              |                  | R                              | R                |                |
 | =/bx-confirm-here=             |              |                  | R                              | R                |                |
 | =/bx-archive-read=           |              |                  | R (=_archive=)                 |                  |                |
 | =/bx-status-read=                |              |                  | R                              | R                |                |
@@ -922,9 +926,11 @@ see [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specifici
 =assemblyDiff=, =assemblyCheck=, =assemblyUpdate=. See
 [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base]].
 
-*Prompting a local VS Code Claude session*, in a third command, =claudeSessions.cs=: =list=, =latest=,
-=promptUri=, =prompt=. See [[#prompt-a-vs-code-claude-session-claudesessionscs][Prompt a VS Code Claude
-Session]].
+*Prompting a local VS Code Claude session*, in a third command, =vscodeClaude.cs=: =claudeSessionsList=,
+=claudeSessionsLatest=, =claudePromptUri=, =claudePrompt=; the VS Code itself in a fourth, =vscode.cs=:
+inspect (=vscodeTopology=, =vscodeExtensions=, ...), open (=vscodeOpenFile=,
+=vscodeOpenFolder=, =vscodeDiff=, =vscodeOpenUri=, ...). See
+[[#prompt-a-vs-code-claude-session-vscodeclaudecs][Prompt a VS Code Claude Session]].
 
 The =--noLink=<file>= option on =initiate= / =initiateSub= converts a
 would-be symlink into a safe-copy for the named file. See
@@ -1274,6 +1280,17 @@ Homogeneous/Heterogeneous and Hierarchical/Lateral are orthogonal and
 can be combined. A project can be Hierarchical in structure (base + subs)
 and Heterogeneous in templates (different bases for different subtrees).
 
+*** A Session's AI-Activities: Root and Here
+
+Seen from one Claude session, these structures are a hierarchy of AI-Activities. The session's
+*root* is its working directory --- in VS Code, the window's folder --- with the top =CLAUDE.md=
+(an =initiate=-d base), confirmed by =/bx-confirm-root=. Other activities *join* the session with
+=/bx-confirm-here <dir>=: an =initiateSub= sub of the root (hierarchical; homogeneous or
+heterogeneous) or a repo initiated on its own (lateral). An activity directory is any directory
+holding a =CLAUDE.md=; it need not be a git repo. AI-WORKFLOW.org, "The AI-Activities of a
+Session: Root and Here", has the rule; the Blee package
+[[https://github.com/bx-blee/vscode-claude][vscode-claude]] builds its session associations on it.
+
 ** Inspect the Startup Context: =startupClaudeTokens=
 
 Everything a session loads at startup is paid for on every request, so
@@ -1381,29 +1398,74 @@ when to run it, in [[#maintaining-a-templates-base][Maintaining a Templates Base
 *Exit status*: the PyCS main exits 0 even when a =Cmnd= is refused and
 whichever verdict =assemblyCheck= gives, so read the output line.
 
-** Prompt a VS Code Claude Session: =claudeSessions.cs=
+** Prompt a VS Code Claude Session: =vscodeClaude.cs=
 
 /For a Claude session in the local (desktop) VS Code; the remote VS Code server is not a target./
 
-A third command finds the running Claude sessions and puts a prompt in one's input box, so an editor
-(Emacs) or a shell can hand Claude a prompt without switching to it. The prompt is never submitted:
-you read it and press Enter.
+Two more commands drive the local VS Code and its Claude sessions, so that an editor (Emacs), a
+shell, or a VS Code task can hand Claude a prompt without switching to it. The prompt is never
+submitted: you read it and press Enter. They need no editor: an AI-Activity in pure VS Code uses
+them from a shell.
 
-| =list=      | the running sessions, one tab-separated line each, newest first; =--mode= local, remote or all; =--cwd= |
-| =latest=    | the sessionId of the most recently active local session                                        |
-| =promptUri= | the URI =prompt= would use; sends nothing                                                       |
-| =prompt=    | the prompt into the latest session, =--session=<id>=, or =--session=new=                         |
+They are two layers, each its own command (a small CSXU over one CSU, with its own examples): the
+vscode layer, =vscode.cs=, independent of Claude, and the Claude layer, =vscodeClaude.cs=, on top of
+it.
 
-: claudeSessions.cs -i list
-: DISPLAY=:1 claudeSessions.cs -i prompt "/bx-git-commit-msg ."
+=vscode.cs= --- VS Code itself:
 
-=prompt= opens the session through the Claude extension's URI handler (=code --open-url=), so it
-needs the =DISPLAY= of the desktop VS Code. A session that is already open only comes to the front
-that way, so for a running session the text goes on the X clipboard (=xclip=) and is pasted with
-=xdotool=. Each command it runs is shown on stderr.
+| Command                    | What it does                                                    |
+|----------------------------+-----------------------------------------------------------------|
+| =vscodeVersion=            | version, commit, architecture                                   |
+| =vscodeTopology=           | can this shell reach a desktop VS Code, on which =DISPLAY=      |
+| =vscodeWorkspaces=         | the folders VS Code has state for, newest first (a history)     |
+| =vscodeExtensions=         | the installed extensions (installing them: =vscode-sbom.pcs=)   |
+| =vscodeExtensionVersion=   | one extension's version, e.g. =anthropic.claude-code=           |
+| =vscodeFocus=              | bring a window to the front, by its folder's name               |
+| =vscodeOpenFile=           | a file, at a line and column                                    |
+| =vscodeOpenFolder=         | a folder, in the last active window or a new one (=--window==)  |
+| =vscodeAddFolder=          | add a folder to the current window's workspace                  |
+| =vscodeDiff=               | the diff view of two files                                      |
+| =vscodeOpenUri=            | hand a URI to the desktop VS Code (=code --open-url=)           |
+| =vscodePartner=            | the partner Emacs (Blee), or why there is none                  |
+| =bleeOpenFile=             | a file in the partner Emacs, at a line (VS Code to Emacs)       |
+| =vscodeBleeLinkSnippet=    | the VS Code task and key that run =bleeOpenFile=, to paste      |
+
+=vscodeClaude.cs= --- its Claude sessions:
+
+| Command                    | What it does                                                    |
+|----------------------------+-----------------------------------------------------------------|
+| =claudeSessionsList=       | the running sessions, one line each, newest first               |
+| =claudeSessionsLatest=     | the sessionId of the most recently active local session         |
+| =claudePromptUri=          | the URI =claudePrompt= would use; sends nothing                 |
+| =claudePrompt=             | the prompt into the latest session, a given one, or a new one   |
+| =hookToEmacs=              | a Claude Code hook: the event to the partner Emacs, if any      |
+| =hooksSnippet=             | the =~/.claude/settings.json= hooks entry for =hookToEmacs=     |
+
+=claudeSessionsList= takes =--mode= (local, remote, all) and =--cwd=; =claudePrompt= takes
+=--session= (an id, or =new=), =--cwd=, and =--submit=yes= to press Enter as well (default: you do).
+
+*The partner Emacs is optional.* =vscodePartner=, =bleeOpenFile= and =hookToEmacs= read the partner
+file that Blee's =b:vscode/init= writes (=/bisos/var/blee/vscode/partner-<user>.json=). With no live
+partner, =hookToEmacs= does nothing, at once and silently, so installing the hooks does not affect
+pure VS Code use.
+
+: vscodeClaude.cs -i claudeSessionsList
+: DISPLAY=:1 vscodeClaude.cs -i claudePrompt "/bx-git-commit-msg ."
+
+=claudePrompt= opens the session through the Claude extension's URI handler (=code --open-url=), so
+it needs the =DISPLAY= of the desktop VS Code. A session that is already open only comes to the
+front that way, so for a running session the text goes on the X clipboard (=xclip=) and is pasted
+with =xdotool=. Each command it runs is shown on stderr.
 
 Both the session list (Claude Code's =~/.claude/sessions/=) and the URI handler are undocumented
 Claude Code internals, read as they are in Claude Code 2.1.311; an upgrade may change them.
+
+*The Emacs layer: =vscode-claude=.* For those who work in Emacs, the Blee package
+[[https://github.com/bx-blee/vscode-claude][vscode-claude]] is layered the same way: =b:vscode.el=
+over =vscode.cs=, =b:vscode:claude.el= (=b:vscode:claude/atPrompt=, =x c= in magit) over
+=vscodeClaude.cs=. It is optional and does not interfere with pure VS Code use. Its README has the
+design: one Emacs partnering with one VS Code, the windows, the sessions and their AI-Activities,
+the channels in both directions, and =/bx-confirm-root='s optional =emacs== and =callback== arguments.
 
 * Key Files
 
@@ -1424,11 +1486,20 @@ lifecycle commands (=initiate=, =initiateSub=, =refresh=,
 =aiTemplates-workFlow= and =aiTemplates-DE=, by a deep merge of relative links. The logic is in
 =py3/bisos/aiActivity/assemble.py=, plain functions over =pathlib= with no CS dependency.
 
-*** claudeSessions.cs
+*** vscode.cs and vscodeClaude.cs
 
-=py3/bin/claudeSessions.cs=: A third CS-MU: =list=, =latest=, =promptUri=, =prompt= for the Claude
-sessions of the local VS Code. The logic is in =py3/bisos/aiActivity/claudeSessions.py=, with no CS
-dependency.
+=py3/bin/vscode.cs= and =py3/bin/vscodeClaude.cs=: two small CS-MUs, one per layer: the local VS Code,
+and its Claude sessions. Each is only a CSXU over one CSU below (its =csuList=), whose examples it
+shows. =vscodeClaude.cs= was =claudeSessions.cs=.
+
+*** vscode_csu.py and vscodeClaude_csu.py
+
+=py3/bisos/aiActivity/vscode_csu.py=: the vscode layer --- inspecting the local VS Code (its
+processes and =DISPLAY=, the workspaces it keeps state for in its undocumented =workspaceStorage/=,
+its extensions) and opening things in it; the X clipboard (=xclip=) and paste (=xdotool=) helpers.
+Also a library of the Claude layer. =py3/bisos/aiActivity/vscodeClaude_csu.py=: the Claude layer
+--- the session registry, the extension's =/open= URI, =claudeSessionsList=,
+=claudeSessionsLatest=, =claudePromptUri=, =claudePrompt=.
 
 *** startupClaudeTokens_csu.py
 

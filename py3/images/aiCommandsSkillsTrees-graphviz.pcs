@@ -137,7 +137,7 @@ def aiGeneralTree(
     d.edge('root', 'skills', **treeEdge)
 
     _subtree(d, 'commands', 'cmdStart', 'session start', [
-        ('/bx-confirm0', 'mother', 'cmnd'),
+        ('/bx-confirm-root', 'mother', 'cmnd'),
         ('/bx-confirm-here', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdLoop', 'work loop', [
@@ -213,6 +213,10 @@ def aiEcosystemTree(
         ('bx-pals-web-site', 'skills', 'skill'),
         ('bs-pals-web-edit', 'skills', 'skill'),
     ])
+    _subtree(d, 'root', 'ecoBlee', 'Blee', [
+        ('blee-pkg-authorship', 'skills', 'skill'),
+        ('bs-blee-emacs-server', 'skills', 'skill'),
+    ])
     _subtree(d, 'root', 'ecoPackaging', 'packaging and docs', [
         ('bisos-pip-setup-py', 'skills', 'skill'),
         ('bisos-pip-release', 'skills', 'skill'),
@@ -233,6 +237,7 @@ def aiEcosystemTree(
             ('cbm-package-authorship', 'cbm-authorship'),
             ('cbm-package-authorship', 'sysd-pcs-authorship'),
             ('cbm-package-authorship', 'banna-lookup'),
+            ('blee-pkg-authorship', 'comeega-authorship'),
     ]:
         d.edge(dependent, prerequisite, **prereq)
     # Conditional: only if the CBM leaves will be walked from a branch.

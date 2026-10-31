@@ -672,6 +672,104 @@ Create an openoffice dir under images
 ** -
 
 
+* Stage 22: Renamings from claudeSessions.cs to vscodeClaude.cs
+
+Goal: Rename the CSXU and the Cmnds so that they make better sense and are consistent with the model of
+
+/bisos/git/auth/bxRepos/blee/vscode-claude/AI-WorkPlan.org
+
+
+* Stage 22 TODOs -- In Progress
+** +
+** TODO [#A] <<22.1>>  Rename the CSXU and associated CSUs and Cmnds
+SCHEDULED: <2026-10-29 Thu 17:05>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: High
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+- Rename CSXU:  claudeSessions.cs to vscodeClaude.cs
+- Rename py3/bisos/aiActivity/claudeSessions.py to py3/bisos/aiActivity/vscodeClaude_csu.py
+      Move commands from claudeSessions.cs to vscodeClaude_csu.py
+- Rename Commands -- There is a vscode layer here and a cluade layer. So:
+    - prompt  -> claudePrompt
+    - promptUri -> claudePromptUri
+    - list -> claudeSessionsList
+    - latest -> claudeSesssionsLatest
+- Examples: Hello from vscodeClaude.cs Not hello from emacs. Don't violated layering
+     - Another Chapter or Sction for Emacs interface
+       - Later when /bxRepos/blee/vscode-claude -- But have a place holder
+- Based on these update the skills to show that we want the CSXU be small and that Cmnds and examples really should go in _csu.py
+- Re-test against the Co-Resident VS Code Claude
+----- Results: ------
+2026-10-29 (from a blee/vscode-claude session, its 4.1). Decided (Mohsen): two CSUs, one per layer.
+- =py3/bin/vscodeClaude.cs= --- the CSXU only: header, =csuList= (=vscode_csu=, =vscodeClaude_csu=),
+  an =examples= that calls each CSU's =examples_csu()=, then an "Emacs Interface" placeholder chapter.
+- =py3/bisos/aiActivity/vscode_csu.py= --- the vscode layer: =openUriSend=, =clipboardSet=, =pasteSend=
+  (moved from =claudeSessions.py=), =displayProblem=, and a new =vscodeOpenUri <uri>= (the Python half of
+  blee/vscode-claude's 10.6), so this layer has a command and examples of its own.
+- =py3/bisos/aiActivity/vscodeClaude_csu.py= --- the Claude layer: the registry, =claudeOpenUri= (was
+  =openUri=), the =mode= / =cwd= / =session= parameters, =claudeSessionsList=, =claudeSessionsLatest=
+  (the triple-s typo not taken), =claudePromptUri=, =claudePrompt=. With =list= renamed, nothing shadows
+  the builtin any more, so the class order constraint is gone.
+- =claudeSessions.cs= and =claudeSessions.py= deleted. Examples say "Hello from vscodeClaude.cs".
+- blee/vscode-claude =b:vscode:claude.el=: =vscodeClaude.cs -i claudePrompt=.
+- Skill =writing-cs-commands= (aiTemplates-DE): new section "Where commands go: a small CSXU, the
+  commands in CSUs"; parameters live in the CSU's =commonParamsSpecify()=; =vscodeClaude.cs= as a model.
+- README: the "Prompt a VS Code Claude Session" section (a layers table) and Key Files.
+Verified from the source tree (editable install, so no reinstall needed for that), through the dispatcher:
+=claudeSessionsList= in all three modes and =claudeSessionsLatest= give output identical to the old
+=list= / =latest=; =--cwd=, =claudePromptUri --session=new= identical to =promptUri=; the refusals (bad
+=--mode=, no =DISPLAY= for =claudePrompt= and =vscodeOpenUri=, =vscodeOpenUri= with no URI: the arg count
+is not enforced by =invocationValidate=, so it is checked in the code); the old names are refused.
+Not yet:
+- =setup.py='s scripts dblock still lists =bin/claudeSessions.cs=: =bx-dblock= needs Blee's Emacs server
+  (fails from Claude's shell). Mohsen: the dblocks, then the reinstall (puts =vscodeClaude.cs= on PATH and
+  removes =claudeSessions.cs=).
+- =claudePrompt= and =vscodeOpenUri= not sent to the co-resident VS Code: needs Mohsen watching the window.
+- Dblocks written by hand (classHeads, =examples_csu= heads, the =csuListProc= body): regenerate in Blee.
+Mohsen then did the dblocks, the reinstall and the live test.
+Revised 2026-10-29 (Mohsen): one CSXU per layer, since the two uses are often separate and the vscode
+layer's examples will grow. =py3/bin/vscode.cs= (=csuList= =vscode_csu=) and =vscodeClaude.cs= (=csuList=
+=vscodeClaude_csu= only; its CSU still imports =vscode_csu= as a library). Each CSXU's examples end with a
+"Related" chapter naming the other and its elisp layer (=b:vscode.el=, =b:vscode:claude.el=). Checked from
+the source tree: both menus; each refuses the other layer's commands; =claudeSessionsLatest=,
+=claudePromptUri=, the =DISPLAY= refusal. =vscode.cs= is on PATH after the reinstall (=setup.py= scripts
+dblock first).
+Then (Mohsen reinstalled; "make the examples more complete, cultivate vscode_csu.py"): =vscode.cs= gained
+Inspect (=vscodeVersion=, =vscodeTopology= --- launcher, =VSCODE_IPC_HOOK_CLI=, desktop main pid and
+=DISPLAY=, a verdict; =vscodeWindows=, =vscodeWorkspaces=), Extensions (=vscodeExtensions=,
+=vscodeExtensionVersion=; install/pin stays in =vscode-sbom.pcs=), Windows (=vscodeFocus [folder]=), Open
+(=vscodeOpenFile <file> [line [col]]=, =vscodeOpenFolder= with =--window=reuse|new=, =vscodeAddFolder=,
+=vscodeDiff=), with a chapter each in the examples. These are blee/vscode-claude's 10.2--10.8 on the Python
+side. =displayProblem= now names the desktop VS Code's =DISPLAY= (so =claudePrompt='s refusal does too).
+Findings: Chromium rewrites its helpers' argv into one space-joined string (so =--type== is searched as
+bytes), and overwrites the main process's environment: its =DISPLAY= is read from its children (the
+extension host's language servers, =ELECTRON_RUN_AS_NODE=). A Cmnd returning =opResults= gets it printed
+again by the framework, so data commands print and return =opResults=None=.
+Checked through the dispatcher: every read-only command (=vscodeTopology= ready; with no =DISPLAY=, =:7=,
+and =VSCODE_IPC_HOOK_CLI= set), =vscodeExtensionVersion= (case-insensitive, unknown id refused), the
+refusals of the open commands. Not run: the open, focus and diff commands against your VS Code window,
+nor when =windowsState= is written (live or at close).
+Then Mohsen tested the open, focus and diff commands on his VS Code window. =vscodeWindows= removed: its
+=storage.json= (=windowsState=) is not live --- written at 21:57, still so after windows were opened at
+23:39, and listing an =(empty)= window X did not show --- and the two-way integration does not need it.
+Should a paste into the wrong window ever matter (several VS Code windows), match the session's cwd
+folder name against the live X titles inside =claudePrompt=, as =vscodeFocus= does. =vscodeWorkspaces=
+kept: it is a history by design.
+2026-10-30, for blee/vscode-claude Stage 11 and 10.9: vscode_csu gained returnCommand/returnSend
+(Enter), the partner reader (partnerRead, /bisos/var/blee/vscode/partner-<user>.json), elispString,
+emacsEval, programPath, and vscodePartner, bleeOpenFile, vscodeBleeLinkSnippet. vscodeClaude_csu gained
+claudePrompt --submit=yes (Enter after the paste; 1.5s after a new conversation's URI), hookToEmacs
+(no partner: nothing, silent, exit 0) and hooksSnippet. Hand-written classHead dblocks (claudePrompt's
+now has submit): regenerate in Blee. Tested through the dispatchers and against a fresh Blee; submit
+not yet tried with Mohsen watching.
+
+** -
+
+
 # Local Variables:
 # eval: (setq-local toc-org-max-depth 4)
 # eval: (setq-local org-log-done 'time)

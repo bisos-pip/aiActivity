@@ -31,8 +31,31 @@ trees) is implemented 2026-10-20: 18.1--18.8 have results and await review;
 in the templates repo's own WorkPlan (its Stage 2, =<<2.1>>=--=<<2.4>>=).
 *Stage 20* (Emacs + VS Code + Claude, the design in =Emacs+VS-Code+Claude.org=) is in progress
 since 2026-10-27: 20.1, 20.2, 20.3.1, 20.3.2, 20.3.4 have results; 20.3.3 (session menu) is deferred.
+*Stage 22* (2026-10-29/31): =claudeSessions.cs= became two CSXUs, =vscode.cs= and =vscodeClaude.cs=,
+and gained the commands of blee/vscode-claude's Stages 10 and 11; 22.1 has results, awaiting review.
 
-*Done on 2026-10-27/28* (Stage 20; details in its Results in =AI-WorkPlan.org=):
+*Done on 2026-10-29/31* (Stage 22, for blee/vscode-claude; details in 22.1's Results):
+
+- *Two layers, two CSXUs*: =vscode.cs= over =vscode_csu.py= (VS Code itself: =vscodeVersion=,
+  =vscodeTopology=, =vscodeWorkspaces=, =vscodeExtensions=, =vscodeExtensionVersion=, =vscodeFocus=,
+  =vscodeOpenFile=, =vscodeOpenFolder=, =vscodeAddFolder=, =vscodeDiff=, =vscodeOpenUri=) and
+  =vscodeClaude.cs= over =vscodeClaude_csu.py= (=claudeSessionsList=, =claudeSessionsLatest=,
+  =claudePromptUri=, =claudePrompt=), which imports =vscode_csu= as a library. =claudeSessions.cs= and
+  =claudeSessions.py= are deleted; =vscodeWindows= was tried and removed (=storage.json= is not live).
+- *The partner Emacs* (optional): =vscode_csu.partnerRead= reads
+  =/bisos/var/blee/vscode/partner-<user>.json= (written by Blee's =b:vscode/init=), live only if its pid
+  is an emacs and its socket exists; =vscodePartner=, =bleeOpenFile= (VS Code to Emacs at a line),
+  =vscodeBleeLinkSnippet= (the VS Code task and key to paste).
+- *Submit and hooks*: =claudePrompt --submit=yes= presses Enter after the paste (=xdotool=);
+  =hookToEmacs= (a Claude Code hook: no partner, nothing, silent, exit 0; else =emacsclient= into
+  =b:vscode:claude/hookHandle=) and =hooksSnippet= (the =~/.claude/settings.json= entry, added by hand).
+- *Elsewhere*: the elisp is the Blee package =blee/vscode-claude= (its README.org is the design); the
+  =/bx-confirm-root= command (was =/bx-confirm0=) is in aiTemplates-workFlow; the skill
+  =blee-pkg-authorship= in aiTemplates-DE; =aiEcosystemTree= has a Blee group.
+
+*Done on 2026-10-27/28* (Stage 20; names as they were then --- now =vscodeClaude.cs=, and the elisp
+moved to blee/vscode-claude):
+
 
 - *New CSXU =claudeSessions.cs=* (logic =py3/bisos/aiActivity/claudeSessions.py=), local (desktop) VS
   Code only: =list= (live sessions, tab-separated, newest first; =--mode=local|remote|all=, =--cwd=),
@@ -166,10 +189,12 @@ session-workflow sections.
 - Stages 2--4 --- engine, docs, =deClaudify=.
 
 *Pointers to records outside the import chain* (newest first):
+- *blee/vscode-claude* (2026-10-29/31): the Emacs side of =vscode.cs= / =vscodeClaude.cs=; its
+  README.org (the design: partnership, associations, channels, hooks) and its AI-WorkPlan.org
+  Stages 10--12 hold the decisions this repo's commands implement.
 - *The two input trees*, =/bisos/git/bxRepos/bxexamples/aiTemplates-workFlow/= and =aiTemplates-DE/=
-  (Stage 18): the source of every templates base on this host. *Not under version control yet*
-  (untracked in =bxexamples/base= until 18.9 makes them repos), so they have no revert path; they hold
-  the only copy of the 2026-10-19/20 template work (the new skill, the figures, =AI-WORKFLOW.org=).
+  (Stage 18): the source of every templates base on this host; git repos since (18.9), each with its
+  own AI files.
   Edit there, then =aiActivityAssemble.cs -i assemblyUpdate --base=<base>= where files were added or
   removed.
 - =PriorAndSimilarArt.org= (this repo, not imported): the survey of similar tools, dated 2026-10-19;
@@ -240,7 +265,13 @@ session-workflow sections.
   dangling, missing and real-directory links; a sub was left alone; the no-BISOS fallback was checked
   by monkeypatching the BISOS path.
 
-- =claudeSessions.cs= (2026-10-28): =list= / =latest= against the live registry in all three modes and
+- =vscode.cs= and =vscodeClaude.cs= (2026-10-29/31), through their dispatchers: every inspect
+  command, every refusal, the =DISPLAY= hint; =claudePrompt= from Mohsen's Blee (=x c=, =x x= submitted,
+  =/bx-confirm-root= into a session); =hookToEmacs= into a fresh Blee, and with no or a stale partner
+  (exit 0, no output, about 0.4 s); =bleeOpenFile= at line and column. Mohsen tested the open, focus
+  and diff commands on his window.
+- =claudeSessions.cs= (2026-10-28, now =vscodeClaude.cs=): =list= / =latest= against the live
+  registry in all three modes and
   with =--cwd=; =prompt= with =--session=new= puts the prompt in the URI; into a running session the
   clipboard + =xdotool= paste lands in the input box (Mohsen, focus first in a source file: "works
   reliably"); the refusals (no =DISPLAY=, no =xclip=, a bad =--mode=) are usage errors.
@@ -276,7 +307,9 @@ session-workflow sections.
 - No project is initiated from the bxexamples base.
 - The Emacs =x c= in Mohsen's own Emacs (checked in a batch Emacs only: bindings, transient, the
   refusal path), and so the full stage → =x c= → Enter → =c c= cycle.
-- =claudeSessions.cs -i prompt= with several desktop VS Code windows (the first found gets the
+- The Claude Code hooks from a real session (=hooksSnippet= not yet in =~/.claude/settings.json=);
+  =--submit= into a new conversation; the =vscodeBleeLinkSnippet= task in VS Code.
+- =vscodeClaude.cs -i claudePrompt= with several desktop VS Code windows (the first found gets the
   paste), and whether the 0.5 s =xdotool= delay is always enough.
 - A prompt starting with =/= into a running session (does the slash menu get in the way of Enter?).
 
@@ -357,16 +390,13 @@ session-workflow sections.
   three-way update is one of the ideas in =PriorAndSimilarArt.org=.
 - *Two-part install friction*: the pip package plus a separately cloned
   templates repo.
-- *=claudeSessions.cs= rests on undocumented Claude Code internals* (2.1.311): the session registry
-  and the extension's =/open= handler (read from its =extension.js=). An upgrade can break either;
-  re-check =list= and =prompt= after one.
-- *Dblocks copied by hand (Stage 20)*: =claudeSessions.cs= (the =promptUri= / =prompt= classHeads; its
-  =cmndArgsSpec= has no =method/args= dblock), =claudeSessions.py='s headers, and the =cl-defun= headers
-  and folding section in =blee/env3='s =bcpg:claudePlus.el= / =bcpg:magitPlus.el=: regenerate in Blee.
-- *=claudeSessions.cs= has a Cmnd named =list=*, which shadows the builtin in that file: the commands
-  taking arguments are placed before it (their generated heads annotate =list[str]=). Renaming it
-  (=sessionsList=) would remove the constraint.
-- The Blee panel has nothing on =claudeSessions.cs=; README has a short section only.
+- *=vscodeClaude.cs= rests on undocumented Claude Code internals* (2.1.311): the session registry
+  and the extension's =/open= handler (read from its =extension.js=); =vscode.cs= on VS Code's
+  =workspaceStorage/=. An upgrade can break them; re-check =claudeSessionsList= and =claudePrompt=.
+- *Dblocks written by hand (Stages 20, 22)*: the classHeads and =examples_csu= heads of
+  =vscode_csu.py= and =vscodeClaude_csu.py= (=claudePrompt='s now has =submit=): regenerate in Blee.
+- The Blee panel has nothing on =vscode.cs= / =vscodeClaude.cs=; README has a section with their
+  command tables.
 
 * Architecture
 
@@ -382,10 +412,13 @@ py3/
                                    cwdConfig_csu, startupClaudeTokens_csu
     aiActivityAssemble.cs      --- second csxu (template maintainers): assemblyDiff,
                                    assemblyCheck, assemblyUpdate
-    claudeSessions.cs          --- third csxu (Stage 20): list, latest, promptUri, prompt
-                                   into the local VS Code's Claude sessions
+    vscode.cs                  --- csxu over vscode_csu (Stage 22): the local VS Code
+    vscodeClaude.cs            --- csxu over vscodeClaude_csu (Stage 22): its Claude sessions
   bisos/aiActivity/
-    claudeSessions.py          --- its logic: the registry, the /open URI, xclip, xdotool
+    vscode_csu.py              --- VS Code: processes, DISPLAY, open, focus, extensions,
+                                   xclip / xdotool, the partner Emacs, bleeOpenFile
+    vscodeClaude_csu.py        --- the session registry, the /open URI, claudePrompt
+                                   (--submit), hookToEmacs, hooksSnippet
     startupClaudeTokens_csu.py --- startupClaudeTokens (Claude binding)
     assemble.py                --- aiActivityAssemble.cs's logic, pure pathlib
                                    functions (plan, apply, manifest)
@@ -471,13 +504,21 @@ reduced to the input trees' commits.
 * Key Design Decisions
 
 - *Emacs to VS Code Claude: the CLI is primary, the elisp thin over it* (2026-10-28, Mohsen). All
-  logic is in =claudeSessions.cs= (usable from a shell); Emacs only calls it. Local (desktop) VS Code
+  logic is in =vscodeClaude.cs= (was =claudeSessions.cs=; usable from a shell); Emacs only calls it.
+  Local (desktop) VS Code
   only; the remote server is out of scope. No =/bx-claude= command to publish the session: Claude Code's
   registry already lists them. The default target is the latest local session (no =--cwd=), since
   =/bx-git-commit-msg= takes the repo as a path. A running session gets its prompt by clipboard +
   =xdotool= paste, because the extension's =/open= applies a prompt only to a session it newly opens
   (a negative result, recorded in 20.3.2). Magit: an explicit key (=x c=), not =magit-post-stage-hook=,
   which runs after every =s=.
+- *One CSXU per layer* (2026-10-29, Mohsen): =vscode.cs= (VS Code, no Claude) and =vscodeClaude.cs= (its
+  Claude sessions), each with its own examples, so that =b:vscode.el= and =b:vscode:claude.el= each sit
+  on their own program.
+- *The Emacs side is optional and named, never searched for* (2026-10-30): the partner file is read by
+  the vscode layer's own tools (=bleeOpenFile=, =hookToEmacs=); Claude reaches an Emacs only when a
+  prompt names it (=/bx-confirm-root emacs==). =hookToEmacs= without a live partner does nothing, so
+  installing the hooks does not affect pure VS Code use. Submitting (=--submit=yes=) is opt-in.
 
 - *The commands are one set, the workflow's, not an activity's* (2026-10-19, Mohsen). No layering:
   no activity-level =_claude/commands= override. The BISOS tree's set is primary; a fork holds real
