@@ -35,7 +35,7 @@ or per host (gitignored)]" fillcolor=lightgoldenrod1 shape=note style=filled]
 		base [label="<base>  (an ai-templates directory)
 mother/, <activity>/  [generated links]
 its own README.org, AI-*.org  [untouched]" fillcolor=khaki1 shape=folder style="filled,bold"]
-		bases [label="Bases:\l- bxexamples/aiActivityTemplates, with its\l  inputs as committed sibling links\l  (clone the three repos side by side);\l  on BISOS, /bisos/apps/defaults/ai-templates\l  is a link to it\l- a fork: its own aiTemplates-DE,\l  the workflow linked per host\l" fillcolor=white fontsize=10 shape=note style=filled]
+		bases [label="Bases:\l- bxObjects/aiActivityTemplates, with its\l  inputs as committed sibling links\l  (clone the three repos side by side);\l  on BISOS, /bisos/apps/defaults/ai-templates\l  is a link to it\l- a fork: its own aiTemplates-DE,\l  the workflow linked per host\l" fillcolor=white fontsize=10 shape=note style=filled]
 	}
 	base -> bases [style=invis]
 	engine -> base [label=" assembles " fontsize=10 penwidth=1.6]

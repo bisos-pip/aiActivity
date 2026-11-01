@@ -122,7 +122,7 @@
 <polyline fill="none" stroke="black" points="701.5,-263 701.5,-257 "/>
 <polyline fill="none" stroke="black" points="707.5,-257 701.5,-257 "/>
 <text text-anchor="start" x="470.5" y="-251" font-family="Times,serif" font-size="10.00">Bases:</text>
-<text text-anchor="start" x="470.5" y="-240" font-family="Times,serif" font-size="10.00">&#45; bxexamples/aiActivityTemplates, with its</text>
+<text text-anchor="start" x="470.5" y="-240" font-family="Times,serif" font-size="10.00">&#45; bxObjects/aiActivityTemplates, with its</text>
 <text text-anchor="start" x="470.5" y="-229" font-family="Times,serif" font-size="10.00"> &#160;inputs as committed sibling links</text>
 <text text-anchor="start" x="470.5" y="-218" font-family="Times,serif" font-size="10.00"> &#160;(clone the three repos side by side);</text>
 <text text-anchor="start" x="470.5" y="-207" font-family="Times,serif" font-size="10.00"> &#160;on BISOS, /bisos/apps/defaults/ai&#45;templates</text>

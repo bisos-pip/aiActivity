@@ -34,7 +34,7 @@ digraph {
 		lyr_loop2
 		loopVia2 [label="" color=darkgreen group=loop shape=point width=0.03]
 		work [label="Work on the selected TODO
-in AI-WorkPlan.org" fillcolor=plum group=spine shape=rectangle style="filled,rounded,bold"]
+(/bx-todo-do <anchor>)" fillcolor=plum group=spine shape=rectangle style="filled,rounded,bold"]
 		subjContent [label="Repo content
 (working tree)" fillcolor=white fontsize=11 group=subjects shape=folder style="filled,bold"]
 	}
@@ -57,7 +57,7 @@ in AI-WorkPlan.org" fillcolor=plum group=spine shape=rectangle style="filled,rou
 	{
 		rank=same
 		lyr_loop5
-		done [label="/bx-done <anchor>" fillcolor=lightpink group=spine shape=rectangle style=filled]
+		done [label="/bx-todo-done <anchor>" fillcolor=lightpink group=spine shape=rectangle style=filled]
 		subjWorkPlan [label="AI-WorkPlan.org
 (+ _archive)" fillcolor=white fontsize=11 group=subjects shape=note style="filled,bold"]
 	}

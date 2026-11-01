@@ -34,6 +34,13 @@ since 2026-10-27: 20.1, 20.2, 20.3.1, 20.3.2, 20.3.4 have results; 20.3.3 (sessi
 *Stage 22* (2026-10-29/31): =claudeSessions.cs= became two CSXUs, =vscode.cs= and =vscodeClaude.cs=,
 and gained the commands of blee/vscode-claude's Stages 10 and 11; 22.1 has results, awaiting review.
 
+*Moved out, 2026-10-31*: =vscode.cs=, =vscodeClaude.cs= and their CSUs (=vscode_csu=,
+=vscodeEmacs_csu=, =vscodeClaude_csu=) are now the package =bisos.vscodeClaude=
+(=/bisos/git/bxRepos/bisos-pip/vscodeClaude=, its AI-WorkPlan 2.1): layer 2 of the AI-Activity
+layers, with the Python of layers 3 and 4. This package is layer 1 only (=aiActivity.cs=,
+=aiActivityAssemble.cs=); README.org's "VS Code and Its Claude Sessions" points there. What follows
+about Stages 20 and 22 is history: the files it names now live in bisos.vscodeClaude.
+
 *Done on 2026-10-29/31* (Stage 22, for blee/vscode-claude; details in 22.1's Results):
 
 - *Two layers, two CSXUs*: =vscode.cs= over =vscode_csu.py= (VS Code itself: =vscodeVersion=,
@@ -192,9 +199,9 @@ session-workflow sections.
 - *blee/vscode-claude* (2026-10-29/31): the Emacs side of =vscode.cs= / =vscodeClaude.cs=; its
   README.org (the design: partnership, associations, channels, hooks) and its AI-WorkPlan.org
   Stages 10--12 hold the decisions this repo's commands implement.
-- *The two input trees*, =/bisos/git/bxRepos/bxexamples/aiTemplates-workFlow/= and =aiTemplates-DE/=
+- *The two input trees*, =/bisos/git/bxRepos/bxObjects/aiTemplates-workFlow/= and =aiTemplates-DE/=
   (Stage 18): the source of every templates base on this host; git repos since (18.9), each with its
-  own AI files.
+  own AI files. In =bxexamples/= until 2026-11-01, then moved to =bxObjects/= with new histories.
   Edit there, then =aiActivityAssemble.cs -i assemblyUpdate --base=<base>= where files were added or
   removed.
 - =PriorAndSimilarArt.org= (this repo, not imported): the survey of similar tools, dated 2026-10-19;
@@ -206,7 +213,7 @@ session-workflow sections.
   =blee-binders/evolution/aiActivity-outputs/= --- in its own git repo, =blee-binders/evolution=
   (=github.com/blee-binders/evolution=), not in =blee-binders=; commit it there. Actionable when
   =bisos.b='s =argsparseBasedOnCsParams= builds kwargs by action.
-- Templates-side work lives in the two input repos since 2026-10-20 (=bxexamples/aiTemplates-workFlow=,
+- Templates-side work lives in the two input repos since 2026-10-20 (=bxObjects/aiTemplates-workFlow=,
   =aiTemplates-DE=); the workflow figures moved from the workflow tree's =_nonTemplate_/images/= into
   this repo's =py3/images/= (18.12). Both input repos are aiActivity projects themselves (2026-10-20):
   the old BISOS base's plan (=ai-templates.k1=) is =aiTemplates-workFlow='s WorkPlan Stages 2--5.
@@ -468,20 +475,15 @@ Entry points (=setup.py= console_scripts): =aiActivity.cs= →
 
 ** Templates Trees
 
-Three templates trees are live:
+The templates trees (the BISOS and public bases are one directory):
 
 - *BISOS canonical* --- =/bisos/apps/defaults/ai-templates/=. Master
   source. All new activities and changes originate here.
-- *bxexamples public reference* ---
-  =/bisos/git/bxRepos/bxexamples/aiActivityTemplates/= (a git repo
-  published at https://github.com/bxexamples/aiActivityTemplates).
-  Kept as a full structural mirror of BISOS. Only differences: its
-  own top-level =README.org= (fork-identity) and =LICENSE=. Per-project
-  files at the BISOS templates root (=AI-Activity.org=,
-  =AI-DevStatus.org=, =AI-WorkPlan.org=, symlinked =AI-WORKFLOW.org=,
-  =CLAUDE.md=, and =.claude/=) are intentionally NOT propagated ---
-  BISOS eats its own dogfood by installing =aiActivity= against
-  itself, but bxexamples remains a bare templates repo.
+- *The public base* --- =/bisos/git/bxRepos/bxObjects/aiActivityTemplates/=
+  (https://github.com/bxObjects/aiActivityTemplates), the same directory as the BISOS
+  canonical one (=/bisos/apps/defaults/ai-templates= links to it). In =bxexamples/= until
+  2026-11-01; a frozen copy there is deferred, and other ecosystems fork the BISOS
+  =aiTemplates-DE= meanwhile.
 - *An organization's fork* --- a templates tree in that organization's own
   repository (tracked there, as of 2026-10-19; the earlier "untracked by
   design" no longer holds). Since 2026-10-20 an *assembled base*: the
@@ -496,8 +498,8 @@ Three templates trees are live:
   stale: the difference was a trailing newline; it now uses the workflow's.)
 
 Since 2026-10-20 there is no sync: the three bases are assembled from the same
-workflow tree (=bxexamples/aiTemplates-workFlow=), BISOS and bxexamples from the
-same ecosystem tree too (so they are identical), a fork from its own.
+workflow tree (=bxObjects/aiTemplates-workFlow=); BISOS and the public base are one
+directory, and a fork is assembled from its own ecosystem tree.
 See Stage 18; Stage 17's copy-sync is retired, and [[15.1]]'s sync loop is
 reduced to the input trees' commits.
 

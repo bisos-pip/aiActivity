@@ -68,8 +68,6 @@ requires = [
 scripts = [ 
 'bin/aiActivity.cs',
 'bin/aiActivityAssemble.cs',
-'bin/vscode.cs',
-'bin/vscodeClaude.cs',
 ]
 ####+END:
 

@@ -66,6 +66,8 @@ digraph {
 	ecoPackaging -> "blee-panel-authorship" [arrowhead=none color=gray40]
 	"graphviz-authoring" [label="graphviz-authoring" fillcolor=lightcyan shape=box style="filled,rounded"]
 	ecoPackaging -> "graphviz-authoring" [arrowhead=none color=gray40]
+	"libreoffice-draw-authoring" [label="libreoffice-draw-authoring" fillcolor=lightcyan shape=box style="filled,rounded"]
+	ecoPackaging -> "libreoffice-draw-authoring" [arrowhead=none color=gray40]
 	"spread-seeded-cs-commands" -> "seeded-cs-commands" [color=purple constraint=false penwidth=1.4 style=dotted]
 	"walkable-tree-planting" -> "seeded-cs-commands" [color=purple constraint=false penwidth=1.4 style=dotted]
 	"walkable-tree-planting" -> "spread-seeded-cs-commands" [color=purple constraint=false penwidth=1.4 style=dotted]

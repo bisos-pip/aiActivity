@@ -145,10 +145,12 @@ def aiGeneralTree(
         ('/bx-status-read', 'mother', 'cmnd'),
         ('/bx-git-commit-msg', 'mother', 'cmnd'),
         ('/bx-ai-outputs', 'mother', 'cmnd'),
-        ('/bx-done', 'mother', 'cmnd'),
+        ('/bx-todo-do', 'mother', 'cmnd'),
+        ('/bx-todo-done', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdEnd', 'session end', [
         ('/bx-git-uncommitted-list', 'mother', 'cmnd'),
+        ('/bx-git-commit-walk', 'mother', 'cmnd'),
         ('/bx-status-update', 'mother', 'cmnd'),
         ('/bx-archive-update', 'mother', 'cmnd'),
         ('/bx-session-verify', 'mother', 'cmnd'),
@@ -223,6 +225,7 @@ def aiEcosystemTree(
         ('readme-authorship', 'skills', 'skill'),
         ('blee-panel-authorship', 'skills', 'skill'),
         ('graphviz-authoring', 'skills', 'skill'),
+        ('libreoffice-draw-authoring', 'skills', 'skill'),
     ])
 
     # Prerequisites: "load <head> first" (explicit in the SKILL.md files).

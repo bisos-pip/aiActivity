@@ -65,7 +65,7 @@ into a project directory, git repo root, or subproject.
 
 This package is *just the execution engine* --- the template content lives
 in a separately-cloned repo
-([[https://github.com/bxexamples/aiActivityTemplates]], or your own fork).
+([[https://github.com/bxObjects/aiActivityTemplates]], or your own fork).
 See [[#two-part-architecture-execution-engine--templates][Two-Part Architecture]] below for details.
 
 The installed layout is *hierarchical and Claude-consumable*. Files fall

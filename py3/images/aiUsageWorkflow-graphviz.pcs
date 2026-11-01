@@ -142,7 +142,7 @@ def aiUsageWorkflow(
         ('statusRead',    '/bx-status-read',    perhaps(read)),
     ])
     layer('lyr_loop2', [
-        ('work', 'Work on the selected TODO\nin AI-WorkPlan.org', {**readWrite, 'style': 'filled,rounded,bold'}),
+        ('work', 'Work on the selected TODO\n(/bx-todo-do <anchor>)', {**readWrite, 'style': 'filled,rounded,bold'}),
     ], [
         ('subjContent', 'Repo content\n(working tree)', {**subject, 'shape': 'folder'}),
     ], outsides=[
@@ -162,7 +162,7 @@ def aiUsageWorkflow(
         ('subjOutputs', 'AI-Outputs.org\n(cross-project)', {**outside, 'shape': 'note'}),
     ])
     layer('lyr_loop5', [
-        ('done', '/bx-done <anchor>', write),
+        ('done', '/bx-todo-done <anchor>', write),
     ], [
         ('subjWorkPlan', 'AI-WorkPlan.org\n(+ _archive)', {**subject, 'shape': 'note'}),
     ])
