@@ -53,6 +53,16 @@ knowledge shared --- refine =bisos-pip/AI-Activity.org= once and every
 bisos-pip project sees it at its next session --- while the WorkPlan and
 DevStatus start as safe-copies, so each effort owns its own state.
 
+*Singletons.* Most kinds have many instances (every bisos-pip package is
+one). Some have exactly one: =bisos-genesis= is the one Raw-BISOS chain
+(=raw-bisos.sh= in =bxGenesis/start=) --- there is only one Raw-BISOS. For
+a singleton the kind and its instance coincide: what is specific to the one
+instance (its inventory, its procedures) can live in the kind's
+=AI-Activity.org= itself, since no other instance shares it; the WorkPlan and
+DevStatus still hold the current effort. Recognizing a singleton keeps a
+kind's guidance from being written as if for many projects when it serves
+one.
+
 *Instances nest.* A session is anchored in a /root/ AI-Activity and may work
 in others inside it or beside it (/here/; =/bx-confirm-root=,
 =/bx-confirm-here=); =initiateSub= installs a slim one inside another, such
