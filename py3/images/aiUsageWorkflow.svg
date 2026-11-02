@@ -72,20 +72,20 @@
 <!-- confirmRoot -->
 <g id="node9" class="node">
 <title>confirmRoot</title>
-<polygon fill="lightskyblue" stroke="black" points="449,-659 334,-659 334,-623 449,-623 449,-659"/>
-<text text-anchor="middle" x="391.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm&#45;root</text>
+<polygon fill="lightskyblue" stroke="black" points="448.5,-659 334.5,-659 334.5,-623 448.5,-623 448.5,-659"/>
+<text text-anchor="middle" x="391.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;session&#45;start</text>
 </g>
 <!-- confirmHere -->
 <g id="node10" class="node">
 <title>confirmHere</title>
-<polygon fill="lightskyblue" stroke="black" stroke-dasharray="5,2" points="614.5,-659 498.5,-659 498.5,-623 614.5,-623 614.5,-659"/>
-<text text-anchor="middle" x="556.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm&#45;here</text>
+<polygon fill="lightskyblue" stroke="black" stroke-dasharray="5,2" points="624,-659 503,-659 503,-623 624,-623 624,-659"/>
+<text text-anchor="middle" x="563.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;activity&#45;reach</text>
 </g>
 <!-- confirmRoot&#45;&gt;confirmHere -->
 <g id="edge36" class="edge">
 <title>confirmRoot&#45;&gt;confirmHere</title>
-<path fill="none" stroke="black" stroke-dasharray="1,5" d="M449.21,-641C465.1,-641 482.34,-641 498.27,-641"/>
-<text text-anchor="middle" x="473.75" y="-647" font-family="Times,serif" font-size="10.00"> or </text>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M448.77,-641C466.17,-641 485.33,-641 502.94,-641"/>
+<text text-anchor="middle" x="475.75" y="-647" font-family="Times,serif" font-size="10.00"> then </text>
 </g>
 <!-- importArchive -->
 <g id="node11" class="node">

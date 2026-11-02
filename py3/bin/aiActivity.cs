@@ -102,22 +102,24 @@ import bisos.pyDblock.dblock_particulars  # registers b:ai:file/particulars hand
    "bisos.b.userConfig_csu"
    "bisos.b.cwdConfig_csu"
    "bisos.aiActivity.startupClaudeTokens_csu"
+   "bisos.aiActivity.activityModel_csu"
  ))
 #+END_SRC
 #+RESULTS:
-| bisos.b.userConfig_csu | bisos.b.cwdConfig_csu | bisos.aiActivity.startupClaudeTokens_csu |
+| bisos.b.userConfig_csu | bisos.b.cwdConfig_csu | bisos.aiActivity.startupClaudeTokens_csu | bisos.aiActivity.activityModel_csu |
 #+end_org """
 
 ####+BEGIN: b:py3:cs:framework/csuListProc :pyImports t :csuImports t :csuParams t :csxuParams nil
 """ #+begin_org
-*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] ~Process CSU List~ with /3/ in csuList pyImports=t csuImports=t csuParams=t
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CsFrmWrk   [[elisp:(outline-show-subtree+toggle)][||]] ~Process CSU List~ with /4/ in csuList pyImports=t csuImports=t csuParams=t
 #+end_org """
 
 from bisos.b import userConfig_csu
 from bisos.b import cwdConfig_csu
 from bisos.aiActivity import startupClaudeTokens_csu
+from bisos.aiActivity import activityModel_csu
 
-csuList = [ 'bisos.b.userConfig_csu', 'bisos.b.cwdConfig_csu', 'bisos.aiActivity.startupClaudeTokens_csu', ]
+csuList = [ 'bisos.b.userConfig_csu', 'bisos.b.cwdConfig_csu', 'bisos.aiActivity.startupClaudeTokens_csu', 'bisos.aiActivity.activityModel_csu', ]
 
 g_importedCmndsModules = cs.csuList_importedModules(csuList)
 
@@ -742,6 +744,7 @@ class examples(cs.Cmnd):
              comment="# Walk up to git repo root; list each CLAUDE.md + AI-Activity.org target")
 
         startupClaudeTokens_csu.examples_csu()
+        activityModel_csu.examples_csu()
 
         # Migration reminder: old dotdir present but new one absent — shown last
         oldDotdir = pathlib.Path.cwd() / '.startAiActivity.cs'

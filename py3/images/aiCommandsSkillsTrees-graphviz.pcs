@@ -137,8 +137,10 @@ def aiGeneralTree(
     d.edge('root', 'skills', **treeEdge)
 
     _subtree(d, 'commands', 'cmdStart', 'session start', [
-        ('/bx-confirm-root', 'mother', 'cmnd'),
-        ('/bx-confirm-here', 'mother', 'cmnd'),
+        ('/bx-session-start', 'mother', 'cmnd'),
+        ('/bx-activity-reach', 'mother', 'cmnd'),
+        ('/bx-session-report', 'mother', 'cmnd'),
+        ('/bx-activity-report', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdLoop', 'work loop', [
         ('/bx-archive-read', 'mother', 'cmnd'),

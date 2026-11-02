@@ -63,11 +63,11 @@ DevStatus still hold the current effort. Recognizing a singleton keeps a
 kind's guidance from being written as if for many projects when it serves
 one.
 
-*Instances nest.* A session is anchored in a /root/ AI-Activity and may work
-in others inside it or beside it (/here/; =/bx-confirm-root=,
-=/bx-confirm-here=); =initiateSub= installs a slim one inside another, such
-as an =lcnt-libreoffice= figures directory inside a =blee-pkg= repo. When
-every directory draws on the same templates base the hierarchy is
+*Instances nest.* A session is anchored at its /Session-Root/, an
+AI-Activity Root, and may reach others inside it (/native/) or in other roots
+(/foreign/; =/bx-session-start=, =/bx-activity-reach=); =initiateSub=
+installs a slim one inside another, such as an =lcnt-libreoffice= figures
+directory inside a =blee-pkg= repo. When every directory draws on the same templates base the hierarchy is
 homogeneous, otherwise heterogeneous (see
 [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology]]).
 
@@ -374,7 +374,7 @@ then the figure.
   - [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology: Homogeneous, Heterogeneous, Hierarchical, Lateral]]
     - [[#homogeneous-vs-heterogeneous][Homogeneous vs Heterogeneous]]
     - [[#hierarchical-vs-lateral][Hierarchical vs Lateral]]
-    - [[#a-sessions-ai-activities-root-and-here][A Session's AI-Activities: Root and Here]]
+    - [[#a-sessions-ai-activities-session-root-native-and-foreign][A Session's AI-Activities: Session-Root, Native and Foreign]]
   - [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context: =startupClaudeTokens=]]
   - [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base: =aiActivityAssemble.cs=]]
   - [[#vs-code-and-its-claude-sessions-bisosvscodeclaude][VS Code and Its Claude Sessions: bisos.vscodeClaude]]
@@ -382,6 +382,7 @@ then the figure.
     - [[#aiactivitycs][aiActivity.cs]]
     - [[#aiactivityassemblecs][aiActivityAssemble.cs]]
     - [[#startupclaudetokens_csupy][startupClaudeTokens_csu.py]]
+    - [[#activitymodel_csupy][activityModel_csu.py]]
     - [[#pypi-and-github-packaging][PyPi and Github Packaging]]
 - [[#documentation-and-blee-panels][Documentation and Blee-Panels]]
   - [[#bisosaiactivity-blee-panels][bisos.aiActivity Blee-Panels]]
@@ -910,8 +911,8 @@ step reads (R) and writes (W).
 # Re-paste when that file changes.
 | Step                              | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
 |-----------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
-| =/bx-confirm-root=                |              |                  | R                              | R                |                |
-| =/bx-confirm-here=                |              |                  | R                              | R                |                |
+| =/bx-session-start=               |              |                  | R                              | R                |                |
+| =/bx-activity-reach=              |              |                  | R                              | R                |                |
 | =/bx-archive-read=                |              |                  | R (=_archive=)                 |                  |                |
 | =/bx-status-read=                 |              |                  | R                              | R                |                |
 | =/bx-todo-do <anchor>= (the work) | RW           |                  | RW (its Results)               |                  |                |
@@ -926,7 +927,7 @@ step reads (R) and writes (W).
 | =/bx-archive-update=              |              |                  | RW (+ W =_archive=)            |                  |                |
 | =/bx-session-verify=              | R (+ README) | R (session's)    | R                              | R                |                |
 
-The confirm commands actually read the whole =CLAUDE.md= import chain.
+The start and reach commands actually read the whole =CLAUDE.md= import chain.
 The table shows only the per-project files that change.
 
 ** Table of Commands
@@ -963,6 +964,14 @@ see [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specifici
 |-----------------------+----------------------------------------------------------------------------|
 | =listClaudesPath=     | Walk up from cwd to git repo root; list each =CLAUDE.md= + resolved =AI-Activity.org= target, cwd flush-left and each ancestor indented one step further. |
 | =startupClaudeTokens= | Estimate the tokens Claude Code loads at session start from cwd, per source, following =@= imports. See [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context]]. |
+
+*Model commands* (read-only, agent-neutral; see
+[[#a-sessions-ai-activities-session-root-native-and-foreign][A Session's AI-Activities]]):
+
+| Command            | Purpose                                                                      |
+|--------------------+------------------------------------------------------------------------------|
+| =activityReport=   | The AI-Activity at or above a dir: root or sub, home, homogeneous or heterogeneous, activity type, nested root; with =--sessionRoot=, native or foreign. =--format=json=. |
+| =sessionRootCheck= | Rule 1: =OK:= or =REFUSED:= (naming the nearest AI-Activity Root above).   |
 
 *Template-maintainer commands*, in a separate command, =aiActivityAssemble.cs=:
 =assemblyDiff=, =assemblyCheck=, =assemblyUpdate=. See
@@ -1323,16 +1332,24 @@ Homogeneous/Heterogeneous and Hierarchical/Lateral are orthogonal and
 can be combined. A project can be Hierarchical in structure (base + subs)
 and Heterogeneous in templates (different bases for different subtrees).
 
-*** A Session's AI-Activities: Root and Here
+*** A Session's AI-Activities: Session-Root, Native and Foreign
 
-Seen from one Claude session, these structures are a hierarchy of AI-Activities. The session's
-*root* is its working directory --- in VS Code, the window's folder --- with the top =CLAUDE.md=
-(an =initiate=-d base), confirmed by =/bx-confirm-root=. Other activities *join* the session with
-=/bx-confirm-here <dir>=: an =initiateSub= sub of the root (hierarchical; homogeneous or
-heterogeneous) or a repo initiated on its own (lateral). An activity directory is any directory
-holding a =CLAUDE.md=; it need not be a git repo. AI-WORKFLOW.org, "The AI-Activities of a
-Session: Root and Here", has the rule; the Blee package
-[[https://github.com/bx-blee/vscode-claude][vscode-claude]] builds its session associations on it.
+Two kinds of root are kept apart. An *AI-Activity Root* is a directory where =initiate= was run
+(=CLAUDE.md=, =.claude/=, =AI-WORKFLOW.org=): it carries the tooling, and exists whether or not any
+Claude runs. A session's *Session-Root* is its working directory --- in VS Code, the window's
+folder --- fixed for the session's life; it must be an AI-Activity Root (checked by
+=/bx-session-start=, through =aiActivity.cs -i sessionRootCheck=). A sub (=initiateSub=) is never a
+Session-Root.
+
+Every AI-Activity has one *home*, the AI-Activity Root it sits under. To a session, an AI-Activity
+is *native* when its home is the session's Session-Root and *foreign* otherwise; the session
+*reaches* either kind with =/bx-activity-reach <dir>=, which brings its content, never its tooling.
+Two sessions on one AI-Activity --- a foreign reach into another session's native one, or two
+sessions at one root --- may conflict; that is accepted and reported. =/bx-session-report= and
+=/bx-activity-report= say where things stand; =aiActivity.cs -i activityReport= computes it from the
+file system. AI-WORKFLOW.org, "The AI-Activities of a Session", has the rules; the
+ModelAndTerminology Blee panel (=py3/panels/bisos.aiActivity/ModelAndTerminology/=) the long form;
+the Blee package [[https://github.com/bx-blee/vscode-claude][vscode-claude]] builds on it.
 
 ** Inspect the Startup Context: =startupClaudeTokens=
 
@@ -1479,6 +1496,13 @@ lifecycle commands (=initiate=, =initiateSub=, =refresh=,
 =startupClaudeTokens=. Encodes Claude Code's startup-loading rules (walk-up,
 =@= imports, memory, skill descriptions) as a static, read-only estimate. Listed in
 =aiActivity.cs='s =csuList=.
+
+*** activityModel_csu.py
+
+=py3/bisos/aiActivity/activityModel_csu.py=: CS-Unit providing =activityReport= and
+=sessionRootCheck=: the AI-Activity model (root or sub, home, native or foreign to a Session-Root)
+as file-system facts, for the =/bx-= commands and for editor integrations. Listed in
+=aiActivity.cs='s =csuList=. Tested by =py3/tests/activityModel-verify.sh=.
 
 *** PyPi and Github Packaging
 

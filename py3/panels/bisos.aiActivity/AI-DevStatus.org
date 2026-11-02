@@ -1,0 +1,44 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me(m) ai(a)
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-11-02T17:45:46+00:00
+#   User:      bystar
+#   Templates: /bisos/git/auth/bxRepos/bxObjects/aiActivityTemplates
+#   Command:   /bisos/venv/py3/devbin/aiActivity.cs -i initiateSub --activity=blee-panels
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is to be maintained by Claude. When a release is being made, claude should be
+prompted to update this document.
+
+Companion docs: [[file:][]] (agent guidance / layering), [[file:README.org][README.org]] (overview).
+
+
+* Current State
+As of 2026-11-02. A blee-panels sub-activity of bisos-pip/aiActivity (=initiateSub=), for the
+bisos.aiActivity Blee panels. Two panels were written here, both uncommitted:
+- =newStart/=: starting Blee + VS Code Claude from scratch (WorkPlan 2.1, 2.2): the setup done once
+  per platform (informational: the vscodeClaude CBM assemble, as =bashRun:= buttons), each start step
+  by step (since 2026-11-02 one step, the driver's =session-start=), what broke on the VM and what
+  is left, and its TODOs.
+- =ModelAndTerminology/=: the AI-Activity model agreed with Mohsen on 2026-11-02 --- AI-Activity Root
+  and Session-Root, home, native and foreign, six rules, the session and activity commands, the
+  Blee side, open points --- and implemented the same day (bisos-pip/aiActivity 23.1,
+  aiTemplates-workFlow 6.1, bisos-pip/vscodeClaude 5.1, blee/vscode-claude 14.1).
+
+* What Is Untested
+- Both panels' dblock bodies after the last header changes: Update Buf Dblocks in Blee.
+- The newStart steps on a fresh VM with =session-start=.
+
+* Key Design Decisions
+- Panel sections are chapters, =:outLevel 1= (0 is a part; this panel has none).
+- Commands in a panel are =bashRun:= links (blee/env3 =lsip-basic.el=), or the command dblocks.
+- Pointers outside this sub's chain: the VSCode Blee panel (blee-binders/blee-core =VSCode/=), VS Code
+  concepts mapped to Emacs; blee/vscode-claude's AI-WorkPlan Stage 14.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

@@ -134,8 +134,8 @@ def aiUsageWorkflow(
                 s.node(name, label, **attrs)
 
     layer('lyr_start', [
-        ('confirmRoot', '/bx-confirm-root', read),
-        ('confirmHere', '/bx-confirm-here', perhaps(read)),
+        ('confirmRoot', '/bx-session-start', read),
+        ('confirmHere', '/bx-activity-reach', perhaps(read)),
     ])
     layer('lyr_loop1', [
         ('importArchive', '/bx-archive-read', perhaps(read)),
@@ -225,7 +225,7 @@ def aiUsageWorkflow(
     d.edge('loopVia4', 'done', dir='none', **loop)
 
     # Alternatives at session start (same rank, not sequential).
-    d.edge('confirmRoot', 'confirmHere', style='dotted', arrowhead='none', label=' or ', fontsize='10')
+    d.edge('confirmRoot', 'confirmHere', style='dotted', arrowhead='none', label=' then ', fontsize='10')
     # Alternatives within the work loop: orient on archived work and/or re-read state.
     d.edge('importArchive', 'statusRead', style='dotted', arrowhead='none', label=' and/or ', fontsize='10')
 

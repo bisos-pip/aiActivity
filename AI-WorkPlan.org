@@ -779,6 +779,36 @@ imports the partner reader from it. aiActivity.cs gained the userConfig setting 
 
 ** -
 
+* Stage 23: Session-Root, Native and Foreign --- the Classifier
+
+Goal: the file-system facts of the ModelAndTerminology panel (py3/panels/bisos.aiActivity), computed
+once, in Python, for the /bx- commands (aiTemplates-workFlow 6.1) and for Blee (blee/vscode-claude).
+
+* Stage 23 TODOs
+** +
+** TODO [#A] <<23.1>> activityModel_csu: activityReport and sessionRootCheck :aiAndMe:
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: High
+:REPO: this
+:BASE: this
+:FOUND: <2026-11-02 Mon>
+:END:
+----- Results: ------
+2026-11-02 (Claude): new =py3/bisos/aiActivity/activityModel_csu.py=, in aiActivity.cs's csuList:
+- =activityReport [dir] [--sessionRoot=] [--format=text|json]=: the AI-Activity at or above dir, root
+  or sub, its home, homogeneous or heterogeneous (a sub's =.claude/skills= target against its
+  home's), its activity type, a nested root; with --sessionRoot, whether it is valid and native or
+  foreign (a nested root under it: foreign, warned). File system only.
+- =sessionRootCheck [dir]=: rule 1, one line =OK:= or =REFUSED:= naming the nearest root above
+  (exit 0 either way).
+- An AI-Activity Root is a directory with =CLAUDE.md=, =.claude/= and =AI-WORKFLOW.org=.
+- Tested: =py3/tests/activityModel-verify.sh=, a scratch tree (root, homogeneous and heterogeneous
+  subs, a nested root, a sub without a root, a plain directory), 18 checks, 0 failed; and on real
+  directories (blee/vscode-claude, this repo's bisos.aiActivity and newStart subs, /bxRepos).
+- The csuList's elisp block and csuListProc body, and the new file's classHead bodies, were written
+  in the generated form: regenerate in Blee. Not yet: the README's command table, the panel.
+** -
 
 # Local Variables:
 # eval: (setq-local toc-org-max-depth 4)

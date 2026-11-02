@@ -2,13 +2,13 @@
 
 ####+BEGIN: bx:bsip:bash:seed-spec :types "seedFtoCommon.sh"
 SEED="
-*  /[dblock]/ /Seed/ :: [[file:/bisos/core/bsip/bin/seedFtoCommon.sh]] |
+*  /[dblock]/ /Seed/ :: [[file:/bisos/core/bsip/bin/seedFtoCommon.sh]] | 
 "
 FILE="
-*  /This File/ :: /l/pip/facter/py3/panels/bisos.facter/ftoProc.sh
+*  /This File/ :: /bisos/panels/bisos-core/bisos-pip/bisos.aiActivity/ftoProc.sh 
 "
-if [ "${loadFiles}" "" ] ; then
-    /bisos/core/bsip/bin/seedFtoCommon.sh -l $0 "$@"
+if [ "${loadFiles}" == "" ] ; then
+    /bisos/core/bsip/bin/seedFtoCommon.sh -l $0 "$@" 
     exit $?
 fi
 ####+END:
@@ -31,8 +31,9 @@ README
 
 ####+BEGIN: bx:dblock:pypi:bash:nodesList :types ""
 nodesList="
-facter-perfSysd.cs
+.aiActivity.cs
 _nodeBase_
+newStart
 "
 ####+END:
 

@@ -34,6 +34,18 @@ since 2026-10-27: 20.1, 20.2, 20.3.1, 20.3.2, 20.3.4 have results; 20.3.3 (sessi
 *Stage 22* (2026-10-29/31): =claudeSessions.cs= became two CSXUs, =vscode.cs= and =vscodeClaude.cs=,
 and gained the commands of blee/vscode-claude's Stages 10 and 11; 22.1 has results, awaiting review.
 
+*Done on 2026-11-02* (from a blee/vscode-claude session; Stage 23, details in 23.1's Results): the
+AI-Activity model of the ModelAndTerminology Blee panel
+(=py3/panels/bisos.aiActivity/ModelAndTerminology/=) --- an AI-Activity Root (=CLAUDE.md=, =.claude/=, =AI-WORKFLOW.org=) apart from a session's
+Session-Root, which must be one; home, native and foreign --- as =activityModel_csu.py=:
+=aiActivity.cs -i activityReport= (=--sessionRoot=, =--format=json=) and =-i sessionRootCheck=, tested
+by =py3/tests/activityModel-verify.sh= (19 checks). Used by the new layer-0 commands
+(aiTemplates-workFlow 6.1) and by Blee (blee/vscode-claude 14.1). README.org ("A Session's
+AI-Activities: Session-Root, Native and Foreign", the model commands, Key Files) and the figures
+(aiUsageWorkflow, aiGeneralTree) follow. New sub-activity =py3/panels/bisos.aiActivity/= (blee-panels,
+=initiateSub=): the newStart and ModelAndTerminology panels. Not yet: the csuList and classHead
+dblock bodies regenerated in Blee.
+
 *Moved out, 2026-10-31*: =vscode.cs=, =vscodeClaude.cs= and their CSUs (=vscode_csu=,
 =vscodeEmacs_csu=, =vscodeClaude_csu=) are now the package =bisos.vscodeClaude=
 (=/bisos/git/bxRepos/bisos-pip/vscodeClaude=, its AI-WorkPlan 2.1): layer 2 of the AI-Activity
@@ -196,6 +208,9 @@ session-workflow sections.
 - Stages 2--4 --- engine, docs, =deClaudify=.
 
 *Pointers to records outside the import chain* (newest first):
+- *The =py3/panels/bisos.aiActivity/= sub-activity* (2026-11-02): its own AI-WorkPlan.org (Stage 2,
+  the newStart panel) and the ModelAndTerminology panel, the long form of the model 23.1 implements.
+- *blee/vscode-claude* (2026-11-02): its AI-WorkPlan.org Stage 14, the Blee side of the model.
 - *blee/vscode-claude* (2026-10-29/31): the Emacs side of =vscode.cs= / =vscodeClaude.cs=; its
   README.org (the design: partnership, associations, channels, hooks) and its AI-WorkPlan.org
   Stages 10--12 hold the decisions this repo's commands implement.

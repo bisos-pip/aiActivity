@@ -17,8 +17,8 @@ which subject each step reads (R) and writes (W).
 
 | Step                              | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
 |-----------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
-| =/bx-confirm-root=                |              |                  | R                              | R                |                |
-| =/bx-confirm-here=                |              |                  | R                              | R                |                |
+| =/bx-session-start=               |              |                  | R                              | R                |                |
+| =/bx-activity-reach=              |              |                  | R                              | R                |                |
 | =/bx-archive-read=                |              |                  | R (=_archive=)                 |                  |                |
 | =/bx-status-read=                 |              |                  | R                              | R                |                |
 | =/bx-todo-do <anchor>= (the work) | RW           |                  | RW (its Results)               |                  |                |
@@ -59,7 +59,7 @@ which subject each step reads (R) and writes (W).
 
 | Fill   | Meaning                                                  | Steps                                                                                     |
 |--------+----------------------------------------------------------+-------------------------------------------------------------------------------------------|
-| blue   | read: loads into the session, changes no files           | =/bx-confirm-root=, =/bx-confirm-here=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
+| blue   | read: loads into the session, changes no files           | =/bx-session-start=, =/bx-activity-reach=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
 | pink   | write: records session knowledge into files              | =/bx-todo-done=, =/bx-status-update=                                                      |
 | purple | read-write                                               | =/bx-todo-do= (the work), =/bx-git-commit-msg=, =/bx-ai-outputs=, =/bx-archive-update=                                   |
 
