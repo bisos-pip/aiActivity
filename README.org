@@ -15,33 +15,76 @@
 
 * The Concept and Model of an AI-Activity
 
-An *AI-Activity* is a durable, collaborative effort between a human and
-an AI assistant (Claude Code) toward a specific purpose --- writing a
-document, building new software, enhancing existing software, and so on.
-Unlike a one-shot chat, an activity is expected to span many sessions,
+An *AI-Activity* is a kind of work that a human and an AI assistant do
+together, written down so that every session starts already knowing how
+that work is done. Writing a bisos-pip package is one activity; a Blee
+package, an LCNT document, an Astro site and a LibreOffice figure are
+others. Each kind of work has its own conventions, tools, pitfalls and
+vocabulary; an AI-Activity captures them once, and every project of that
+kind inherits them. Unlike a one-shot chat, the work spans many sessions,
 possibly across machines and over long stretches of time. Its state,
-conventions, and progress live in files under version control rather
-than in any one session's memory.
+conventions and progress live in files under version control rather than
+in any one session's memory.
 
-Two org-mode files encode the activity, playing distinct roles:
+*What defines an activity.* Three things, all content the AI reads, none
+of it code:
 
-- =AI-Activity.org= describes the human's *usual way of doing that kind
-  of work* --- their conventions, preferred libraries, patterns, and
-  gotchas. It is *reusable*: symlinked from a shared activity template
-  so the same conventions apply to every project of that kind. Examples
-  of concrete activities: =bisos-pip= (Python package authorship),
-  =xu-single= (single-XU PyCS scripts), =blee-panels= (Blee panel
-  authorship), =lcnt= (LaTeX content).
-- =AI-WorkPlan.org= describes *this specific effort* --- what will be
-  built or written, broken into stages with TODOs. It is per-effort:
-  edited freely, org-archived as work completes, and paired with
-  =AI-DevStatus.org= which records where the effort stands right now.
+1. *Its orientation*, =AI-Activity.org=, always loaded: what this kind of
+   work is, its structure, its conventions, the rules for the AI. Examples:
+   =bisos-pip= (Python package authorship), =xu-single= (single-XU PyCS
+   scripts), =blee-panels= (Blee panel authorship), =lcnt= (LaTeX content).
+2. *Its skills*, procedures loaded on demand when a task matches a skill's
+   description (how to write a =cs.Cmnd=, how to edit an =.odg=, how to
+   release to PyPI): the skills whose home is that activity, and the shared
+   ones it relies on (see [[#skills][Skills]]).
+3. *The workflow it shares with every other activity*: =AI-WORKFLOW.org=,
+   the =/bx-= commands, and the plan and status files --- =AI-WorkPlan.org=
+   (this effort's stages and TODOs) and =AI-DevStatus.org= (where it stands
+   now, the handoff). Activities differ in 1 and 2; 3 is common to all.
 
-Activities are classes of work; WorkPlans are instances. The templates
-=/bisos.aiActivity/= installs are what encode this distinction on
-disk --- shared invariants and activity conventions are symlinked from a
-templates repo (so improvements propagate); WorkPlan and DevStatus start
-as safe-copies (so each effort owns its own state).
+*A kind and its instances.* The word names both. The *kind* is a directory
+in a templates base (e.g. =bisos-pip/=, with its =AI-Activity.org= and
+skills). An *instance*, an /activity dir/, is a project directory where
+=aiActivity.cs -i initiate --activity=bisos-pip= was run: it gets a
+=CLAUDE.md= that imports the chain, links to the kind's =AI-Activity.org=,
+to =AI-WORKFLOW.org=, the commands and the skills, and its own
+=AI-WorkPlan.org= and =AI-DevStatus.org=. The links keep the kind's
+knowledge shared --- refine =bisos-pip/AI-Activity.org= once and every
+bisos-pip project sees it at its next session --- while the WorkPlan and
+DevStatus start as safe-copies, so each effort owns its own state.
+
+*Singletons.* Most kinds have many instances (every bisos-pip package is
+one). Some have exactly one: =bisos-genesis= is the one Raw-BISOS chain
+(=raw-bisos.sh= in =bxGenesis/start=) --- there is only one Raw-BISOS. For
+a singleton the kind and its instance coincide: what is specific to the one
+instance (its inventory, its procedures) can live in the kind's
+=AI-Activity.org= itself, since no other instance shares it; the WorkPlan and
+DevStatus still hold the current effort. Recognizing a singleton keeps a
+kind's guidance from being written as if for many projects when it serves
+one.
+
+*Instances nest.* A session is anchored in a /root/ AI-Activity and may work
+in others inside it or beside it (/here/; =/bx-confirm-root=,
+=/bx-confirm-here=); =initiateSub= installs a slim one inside another, such
+as an =lcnt-libreoffice= figures directory inside a =blee-pkg= repo. When
+every directory draws on the same templates base the hierarchy is
+homogeneous, otherwise heterogeneous (see
+[[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology]]).
+
+*Engine-neutral content.* Nothing in an activity is specific to Claude
+except the file names Claude Code looks for (see
+[[#claude-specificity-agent-neutral-content-claude-binding][Claude Specificity]]). In practice it
+runs in Claude Code, in a terminal or in VS Code; it needs no editor.
+
+*Why it matters.* The knowledge compounds: a pitfall found in one project
+becomes a line in its activity or a skill, and the next project and the
+next session start with it --- the difference from treating a chatbot as a
+fresh conversation every time ([[#why-ai-activity-not-chatbot][Why AI-Activity, Not Chatbot?]]).
+
+This README describes the model and the engine. Which activities and skills
+an ecosystem has is documented by its own templates tree: for BISOS / Blee /
+ByStar, in the README of
+[[https://github.com/bxObjects/aiTemplates-DE][aiTemplates-DE]].
 
 * Collaboration Across People and Across Sessions
 
@@ -80,7 +123,9 @@ original author had.
 authors' own use is Emacs-based (via Blee), but org-mode files are
 plain text and read equally well in VS Code, IntelliJ, or any editor.
 Claude Code itself is editor-agnostic. The commitment is to org-mode as
-a file format, not to Emacs as an environment.
+a file format, not to Emacs as an environment. For those who do use
+Emacs, the Blee package [[https://github.com/bx-blee/vscode-claude][vscode-claude]]
+joins Emacs and VS Code Claude, as an optional layer over pure VS Code use.
 
 * Why AI-Activity, Not Chatbot?
 
@@ -141,7 +186,7 @@ act; the benefit is collective.
 
 The collection also grows across dimensions: new activities cover new domains;
 forks encode conventions for different organizations or contexts. The
-[[https://github.com/bxexamples/aiActivityTemplates][bxexamples/aiActivityTemplates]] repository is the public reference fork ---
+[[https://github.com/bxObjects/aiActivityTemplates][bxObjects/aiActivityTemplates]] repository is the public reference fork ---
 a starting point for those who want to contribute back or build their own
 canonical tree. But the default relationship is inheritance, not isolation:
 one canonical tree, many projects drawing from it, knowledge compounding
@@ -176,7 +221,7 @@ into a project directory, git repo root, or subproject.
 
 This package is *just the execution engine* --- the template content lives
 in a separately-cloned repo
-([[https://github.com/bxexamples/aiActivityTemplates]], or your own fork).
+([[https://github.com/bxObjects/aiActivityTemplates]], or your own fork).
 See [[#two-part-architecture-execution-engine--templates][Two-Part Architecture]] below for details.
 
 The installed layout is *hierarchical and Claude-consumable*. Files fall
@@ -329,8 +374,10 @@ then the figure.
   - [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology: Homogeneous, Heterogeneous, Hierarchical, Lateral]]
     - [[#homogeneous-vs-heterogeneous][Homogeneous vs Heterogeneous]]
     - [[#hierarchical-vs-lateral][Hierarchical vs Lateral]]
+    - [[#a-sessions-ai-activities-root-and-here][A Session's AI-Activities: Root and Here]]
   - [[#inspect-the-startup-context-startupclaudetokens][Inspect the Startup Context: =startupClaudeTokens=]]
   - [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base: =aiActivityAssemble.cs=]]
+  - [[#vs-code-and-its-claude-sessions-bisosvscodeclaude][VS Code and Its Claude Sessions: bisos.vscodeClaude]]
 - [[#key-files][Key Files]]
     - [[#aiactivitycs][aiActivity.cs]]
     - [[#aiactivityassemblecs][aiActivityAssemble.cs]]
@@ -447,7 +494,7 @@ persists the first one that exists as the default templates base:
    *Post-Installation Setup*), the engine finds the base automatically.
 2. =/bisos/apps/defaults/ai-templates= --- the BISOS-provisioned system
    path. Present on BISOS systems out of the box: a link to the
-   =bxexamples/aiActivityTemplates= clone.
+   =bxObjects/aiActivityTemplates= clone.
 
 If neither exists, no default is set and the user must run
 =userConfig_set --parName=templates --parValue=<path>= explicitly.
@@ -465,17 +512,17 @@ The engine is only as good as the templates tree behind it. Just as
 tree is itself two distinct things, each its own repository:
 
 1. *BISOS-AI-Workflow*
-   ([[https://github.com/bxexamples/aiTemplates-workFlow][aiTemplates-workFlow]]) --- the
+   ([[https://github.com/bxObjects/aiTemplates-workFlow][aiTemplates-workFlow]]) --- the
    =/bx-*= commands, the workflow skills, the =mother/= workflow files and the
    generic activities that /drive/ an AI-Activity. The same for everyone;
    adopt it as-is.
 2. *BISOS-Digital-Ecosystem-Skills*
-   ([[https://github.com/bxexamples/aiTemplates-DE][aiTemplates-DE]]) --- the
+   ([[https://github.com/bxObjects/aiTemplates-DE][aiTemplates-DE]]) --- the
    skills and activities that encode /our/ ecosystem's ways of doing things
    (BISOS / Blee / ByStar). Not for you to use; a pattern for writing your own.
 
 The engine installs from a third tree, the templates base
-([[https://github.com/bxexamples/aiActivityTemplates][aiActivityTemplates]]),
+([[https://github.com/bxObjects/aiActivityTemplates][aiActivityTemplates]]),
 assembled from these two. Below: how a base is built from its two inputs; each
 input, as a tree, from our own templates; the commands' place in it; and what
 you do to make your own
@@ -514,7 +561,7 @@ grey = an ecosystem's input; the purple-outlined folder is a project (Claude bin
   the inputs.
 - *One base for BISOS and the public tree.* On a BISOS host
   =/bisos/apps/defaults/ai-templates= is a link to the
-  =bxexamples/aiActivityTemplates= clone, so the two are the same directory.
+  =bxObjects/aiActivityTemplates= clone, so the two are the same directory.
 
 Running the assembler:
 [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base]],
@@ -530,7 +577,7 @@ every project gets them: one set, not one per activity (see
 How a session uses them is shown under
 [[#the-session-workflow-at-a-glance][The Session Workflow at a Glance]].
 
-In this tree and the next, fill colour shows where each item lives in the
+In this tree, fill colour shows where each item lives in the
 templates, which is also which projects see it.
 
 [[file:py3/images/aiGeneralTree.png]]
@@ -538,12 +585,12 @@ templates, which is also which projects see it.
 ** BISOS-Digital-Ecosystem-Skills: =aiTemplates-DE=
 
 *Build your own equivalent.* The BISOS / Blee / ByStar ways of doing
-things, written down as skills that Claude loads when a task calls for
-them. There are twenty skills in seven areas, some building on others
-(dotted arrows: "load this one first"), all in one shared set,
-=mother/_skills/=, because BISOS work crosses activities.
-
-[[file:py3/images/aiEcosystemTree.png]]
+things: the activities (=bisos-pip=, =blee-pkg=, =lcnt=, ...) and the skills
+that Claude loads when a task calls for them, all in one shared set,
+=mother/_skills/=, because BISOS work crosses activities. They are documented
+where they live, in the
+[[https://github.com/bxObjects/aiTemplates-DE][aiTemplates-DE README]]: each
+activity, and the skills drawn as a tree.
 
 You will not use these skills; they encode /our/ ecosystem. The pattern is
 what transfers. Your organization has its own equivalents: an authorship
@@ -706,9 +753,9 @@ directory, side by side.
 
 #+begin_src bash
 cd ~
-git clone https://github.com/bxexamples/aiActivityTemplates
-git clone https://github.com/bxexamples/aiTemplates-workFlow
-git clone https://github.com/bxexamples/aiTemplates-DE
+git clone https://github.com/bxObjects/aiActivityTemplates
+git clone https://github.com/bxObjects/aiTemplates-workFlow
+git clone https://github.com/bxObjects/aiTemplates-DE
 #+end_src
 
 That's it. =aiActivityTemplates= carries its two input links as relative
@@ -736,7 +783,7 @@ keep =aiTemplates-workFlow= as it is and write your own ecosystem input (see
 ** For BISOS users: nothing to do (usually)
 
 BISOS provisions =/bisos/apps/defaults/ai-templates= as part of the
-environment --- a link to the =bxexamples/aiActivityTemplates= clone, beside
+environment --- a link to the =bxObjects/aiActivityTemplates= clone, beside
 its =aiTemplates-workFlow= and =aiTemplates-DE= clones --- and the engine
 auto-detects it. No clone or config step needed.
 
@@ -861,22 +908,23 @@ step reads (R) and writes (W).
 
 # Copied from py3/images/aiUsageWorkflow.org (the source, next to the figure, in this repo).
 # Re-paste when that file changes.
-| Step                           | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
-|--------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
-| =/bx-confirm0=                 |              |                  | R                              | R                |                |
-| =/bx-confirm-here=             |              |                  | R                              | R                |                |
-| =/bx-archive-read=           |              |                  | R (=_archive=)                 |                  |                |
-| =/bx-status-read=                |              |                  | R                              | R                |                |
-| Work on the selected TODO      | RW           |                  | R                              |                  |                |
-| /You:/ =git add=, =git commit= | R            | W                |                                |                  |                |
-| =/bx-git-uncommitted-list=     |              | R (session's)    |                                |                  |                |
-| =/bx-git-commit-msg=           | R (staged)   | W (message only) |                                |                  |                |
-| =/bx-ai-outputs= (index)       |              |                  |                                |                  | R              |
-| =/bx-ai-outputs= (capture)     |              |                  |                                |                  | W              |
-| =/bx-done <anchor>=            |              |                  | W                              |                  |                |
-| =/bx-status-update=            |              |                  | R                              | W                |                |
-| =/bx-archive-update=                  |              |                  | RW (+ W =_archive=)            |                  |                |
-| =/bx-session-verify=            | R (+ README) | R (session's)    | R                              | R                |                |
+| Step                              | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
+|-----------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
+| =/bx-confirm-root=                |              |                  | R                              | R                |                |
+| =/bx-confirm-here=                |              |                  | R                              | R                |                |
+| =/bx-archive-read=                |              |                  | R (=_archive=)                 |                  |                |
+| =/bx-status-read=                 |              |                  | R                              | R                |                |
+| =/bx-todo-do <anchor>= (the work) | RW           |                  | RW (its Results)               |                  |                |
+| /You:/ =git add=, =git commit=    | R            | W                |                                |                  |                |
+| =/bx-git-uncommitted-list=        |              | R (session's)    |                                |                  |                |
+| =/bx-git-commit-walk=             |              | R (session's)    |                                |                  |                |
+| =/bx-git-commit-msg=              | R (staged)   | W (message only) |                                |                  |                |
+| =/bx-ai-outputs= (index)          |              |                  |                                |                  | R              |
+| =/bx-ai-outputs= (capture)        |              |                  |                                |                  | W              |
+| =/bx-todo-done <anchor>=          |              |                  | W                              |                  |                |
+| =/bx-status-update=               |              |                  | R                              | W                |                |
+| =/bx-archive-update=              |              |                  | RW (+ W =_archive=)            |                  |                |
+| =/bx-session-verify=              | R (+ README) | R (session's)    | R                              | R                |                |
 
 The confirm commands actually read the whole =CLAUDE.md= import chain.
 The table shows only the per-project files that change.
@@ -919,6 +967,11 @@ see [[#claude-specificity-agent-neutral-content-claude-binding][Claude Specifici
 *Template-maintainer commands*, in a separate command, =aiActivityAssemble.cs=:
 =assemblyDiff=, =assemblyCheck=, =assemblyUpdate=. See
 [[#assemble-a-templates-base-aiactivityassemblecs][Assemble a Templates Base]].
+
+*Prompting a local VS Code Claude session* (=vscodeClaude.cs=) and driving VS Code itself
+(=vscode.cs=) are not part of this package: they are in
+[[https://github.com/bisos-pip/vscodeClaude][bisos.vscodeClaude]]. See
+[[#vs-code-and-its-claude-sessions-bisosvscodeclaude][VS Code and Its Claude Sessions]].
 
 The =--noLink=<file>= option on =initiate= / =initiateSub= converts a
 would-be symlink into a safe-copy for the named file. See
@@ -1135,8 +1188,10 @@ Skills come in two kinds, one per layer of the templates:
   doing things. Ours are the BISOS / Blee / ByStar skills, from
   =writing-cs-commands= and =dblock-authoring= to =bisos-pip-release=.
 
-Both are drawn as trees, with where each one lives, in
-[[#templates][Templates]].
+The workflow skills are drawn, with the commands, in
+[[#templates][Templates]]; the ecosystem's skills in the README of its own
+templates tree (for BISOS,
+[[https://github.com/bxObjects/aiTemplates-DE][aiTemplates-DE]]).
 
 To author a new skill, add a folder under the appropriate templates
 directory. The engine supports two homes:
@@ -1212,7 +1267,7 @@ has created or converted manually is left intact.
 AI-Activities have two independent structural dimensions. They can be
 combined freely, and =aiActivity.cs= supports all combinations.
 
-[[file:py3/images/OpenOffice/aiActivityHeterogenous.png]]
+[[file:py3/images/LibreOffice/aiActivityHeterogenous.png]]
 
 *** Homogeneous vs Heterogeneous
 
@@ -1228,7 +1283,7 @@ An *AI-Activity* is *Heterogeneous* when different directories or repos
 reference *different* templates bases. A typical example: proprietary
 pip packages are =initiate=-d against a private templates fork (with
 company-specific conventions), while open-source packages in the same
-workspace use the public =bxexamples/aiActivityTemplates= clone. Each
+workspace use the public =bxObjects/aiActivityTemplates= clone. Each
 directory's =AI-WORKFLOW.org= symlink points to a different templates
 tree, so a fresh Claude session in each picks up the correct conventions
 automatically.
@@ -1267,6 +1322,17 @@ root), loading the correct conventions for each.
 Homogeneous/Heterogeneous and Hierarchical/Lateral are orthogonal and
 can be combined. A project can be Hierarchical in structure (base + subs)
 and Heterogeneous in templates (different bases for different subtrees).
+
+*** A Session's AI-Activities: Root and Here
+
+Seen from one Claude session, these structures are a hierarchy of AI-Activities. The session's
+*root* is its working directory --- in VS Code, the window's folder --- with the top =CLAUDE.md=
+(an =initiate=-d base), confirmed by =/bx-confirm-root=. Other activities *join* the session with
+=/bx-confirm-here <dir>=: an =initiateSub= sub of the root (hierarchical; homogeneous or
+heterogeneous) or a repo initiated on its own (lateral). An activity directory is any directory
+holding a =CLAUDE.md=; it need not be a git repo. AI-WORKFLOW.org, "The AI-Activities of a
+Session: Root and Here", has the rule; the Blee package
+[[https://github.com/bx-blee/vscode-claude][vscode-claude]] builds its session associations on it.
 
 ** Inspect the Startup Context: =startupClaudeTokens=
 
@@ -1374,6 +1440,19 @@ when to run it, in [[#maintaining-a-templates-base][Maintaining a Templates Base
 
 *Exit status*: the PyCS main exits 0 even when a =Cmnd= is refused and
 whichever verdict =assemblyCheck= gives, so read the output line.
+
+** VS Code and Its Claude Sessions: bisos.vscodeClaude
+
+The command-line interfaces to the local VS Code and its Claude Code extension --- =vscode.cs= (open a
+file at a line, a folder, a diff, a URI; the partner Emacs) and =vscodeClaude.cs= (list the running
+sessions, prompt one, the Claude Code hooks), with =vscode-sbom.pcs= --- are in their own package,
+[[https://github.com/bisos-pip/vscodeClaude][bisos.vscodeClaude]]. Until 2026-10-31 they were part of
+this one.
+
+They are layered over this package, not under it: bisos.aiActivity is layer 1 (AI-Activity), and
+names no VS Code command. An AI-Activity in pure VS Code needs neither, and uses them from a shell
+when it wants to. The Blee package [[https://github.com/bx-blee/vscode-claude][vscode-claude]]
+is the Emacs side, over bisos.vscodeClaude; its README has the figure of all the layers.
 
 * Key Files
 

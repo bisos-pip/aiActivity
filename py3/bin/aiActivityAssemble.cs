@@ -250,8 +250,8 @@ class examples(cs.Cmnd):
         cs.examples.commonBrief()
 
         # Concrete values where the well-known trees exist on this host (WorkPlan 18.11), else placeholders.
-        knownBase = pathlib.Path('/bisos/git/bxRepos/bxexamples/aiActivityTemplates')
-        knownWorkFlow = pathlib.Path('/bisos/git/bxRepos/bxexamples/aiTemplates-workFlow')
+        knownBase = pathlib.Path('/bisos/git/bxRepos/bxObjects/aiActivityTemplates')
+        knownWorkFlow = pathlib.Path('/bisos/git/bxRepos/bxObjects/aiTemplates-workFlow')
         base = str(knownBase) if knownBase.is_dir() else '<templatesBase>'
         workFlow = str(knownWorkFlow) if knownWorkFlow.is_dir() else '<workFlowClone>'
 

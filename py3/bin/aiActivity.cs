@@ -557,6 +557,19 @@ def commonParamsSpecify(
         parSuggestions=_suggestTemplates,  # examples menu only; see CmndParam.parSuggestionsGet
     )
     csParams.parDictAdd(
+        parName='gitOpener',
+        parDescription=(
+            "A command that opens a git repo for committing in the user's editor, run as "
+            "'<gitOpener> <repoPath>' by /bx-git-commit-walk. Empty: the walk only lists the repos. "
+            "Set by an editor integration, e.g. blee/vscode-claude: 'vscode.cs -i bleeMagit'."),
+        parDataType=None,
+        parDefault=None,
+        parChoices=[],
+        argparseShortOpt=None,
+        argparseLongOpt='--gitOpener',
+        parPermanence=["userConfig"],
+    )
+    csParams.parDictAdd(
         parName='noLink',
         parDescription=(
             "Override symlink behavior: safe-copy the specified file instead "

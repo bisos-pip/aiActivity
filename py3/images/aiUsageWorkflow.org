@@ -15,22 +15,23 @@ which subject each step reads (R) and writes (W).
 
 * Read/Write Map
 
-| Step                      | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
-|---------------------------+--------------+------------------+------------------------------+------------------+----------------|
-| =/bx-confirm0=              |              |                  | R                            | R                |                |
-| =/bx-confirm-here=          |              |                  | R                            | R                |                |
-| =/bx-archive-read=        |              |                  | R (=_archive=)                 |                  |                |
-| =/bx-status-read=             |              |                  | R                            | R                |                |
-| Work on the selected TODO | RW           |                  | R                            |                  |                |
-| /You:/ =git add=, =git commit=  | R            | W                |                              |                  |                |
-| =/bx-git-uncommitted-list=  |              | R (session's)    |                              |                  |                |
-| =/bx-git-commit-msg=        | R (staged)   | W (message only) |                              |                  |                |
-| =/bx-ai-outputs= (index)    |              |                  |                              |                  | R              |
-| =/bx-ai-outputs= (capture)  |              |                  |                              |                  | W              |
-| =/bx-done <anchor>=         |              |                  | W                            |                  |                |
-| =/bx-status-update=         |              |                  | R                            | W                |                |
-| =/bx-archive-update=               |              |                  | RW (+ W =_archive=)            |                  |                |
-| =/bx-session-verify=         | R (+ README) | R (session's)    | R                              | R                |                |
+| Step                              | Repo content | Repo git         | AI-WorkPlan.org (+ =_archive=) | AI-DevStatus.org | AI-Outputs.org |
+|-----------------------------------+--------------+------------------+--------------------------------+------------------+----------------|
+| =/bx-confirm-root=                |              |                  | R                              | R                |                |
+| =/bx-confirm-here=                |              |                  | R                              | R                |                |
+| =/bx-archive-read=                |              |                  | R (=_archive=)                 |                  |                |
+| =/bx-status-read=                 |              |                  | R                              | R                |                |
+| =/bx-todo-do <anchor>= (the work) | RW           |                  | RW (its Results)               |                  |                |
+| /You:/ =git add=, =git commit=    | R            | W                |                                |                  |                |
+| =/bx-git-uncommitted-list=        |              | R (session's)    |                                |                  |                |
+| =/bx-git-commit-walk=             |              | R (session's)    |                                |                  |                |
+| =/bx-git-commit-msg=              | R (staged)   | W (message only) |                                |                  |                |
+| =/bx-ai-outputs= (index)          |              |                  |                                |                  | R              |
+| =/bx-ai-outputs= (capture)        |              |                  |                                |                  | W              |
+| =/bx-todo-done <anchor>=          |              |                  | W                              |                  |                |
+| =/bx-status-update=               |              |                  | R                              | W                |                |
+| =/bx-archive-update=              |              |                  | RW (+ W =_archive=)            |                  |                |
+| =/bx-session-verify=              | R (+ README) | R (session's)    | R                              | R                |                |
 
 * Reading the Map
 
@@ -47,7 +48,7 @@ which subject each step reads (R) and writes (W).
   visible from every other project.
 - *Session start reads; session end writes.* The confirm commands load
   state into the session; =/bx-status-read= re-reads it from disk within
-  the work loop, picking up your edits. =/bx-done= and =/bx-status-update=
+  the work loop, picking up your edits. =/bx-todo-done= and =/bx-status-update=
   write what the session learned back to files, so the next session can
   start cold. =/bx-session-verify= checks, before you close, that they did.
 - *Column headings are the subjects as files.* The confirm commands
@@ -58,8 +59,8 @@ which subject each step reads (R) and writes (W).
 
 | Fill   | Meaning                                                  | Steps                                                                                     |
 |--------+----------------------------------------------------------+-------------------------------------------------------------------------------------------|
-| blue   | read: loads into the session, changes no files           | =/bx-confirm0=, =/bx-confirm-here=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
-| pink   | write: records session knowledge into files              | =/bx-done=, =/bx-status-update=                                                           |
-| purple | read-write                                               | Work, =/bx-git-commit-msg=, =/bx-ai-outputs=, =/bx-archive-update=                                   |
+| blue   | read: loads into the session, changes no files           | =/bx-confirm-root=, =/bx-confirm-here=, =/bx-archive-read=, =/bx-status-read=, =/bx-session-verify= |
+| pink   | write: records session knowledge into files              | =/bx-todo-done=, =/bx-status-update=                                                      |
+| purple | read-write                                               | =/bx-todo-do= (the work), =/bx-git-commit-msg=, =/bx-ai-outputs=, =/bx-archive-update=                                   |
 
 Solid border = always; dashed border = perhaps.

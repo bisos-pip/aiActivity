@@ -69,23 +69,23 @@
 <title>lyr_close</title>
 </g>
 <!-- lyr_end&#45;&gt;lyr_close -->
-<!-- confirm0 -->
+<!-- confirmRoot -->
 <g id="node9" class="node">
-<title>confirm0</title>
-<polygon fill="lightskyblue" stroke="black" points="438,-659 345,-659 345,-623 438,-623 438,-659"/>
-<text text-anchor="middle" x="391.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm0</text>
+<title>confirmRoot</title>
+<polygon fill="lightskyblue" stroke="black" points="449,-659 334,-659 334,-623 449,-623 449,-659"/>
+<text text-anchor="middle" x="391.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm&#45;root</text>
 </g>
 <!-- confirmHere -->
 <g id="node10" class="node">
 <title>confirmHere</title>
-<polygon fill="lightskyblue" stroke="black" stroke-dasharray="5,2" points="603.5,-659 487.5,-659 487.5,-623 603.5,-623 603.5,-659"/>
-<text text-anchor="middle" x="545.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm&#45;here</text>
+<polygon fill="lightskyblue" stroke="black" stroke-dasharray="5,2" points="614.5,-659 498.5,-659 498.5,-623 614.5,-623 614.5,-659"/>
+<text text-anchor="middle" x="556.5" y="-637.9" font-family="Times,serif" font-size="12.00">/bx&#45;confirm&#45;here</text>
 </g>
-<!-- confirm0&#45;&gt;confirmHere -->
+<!-- confirmRoot&#45;&gt;confirmHere -->
 <g id="edge36" class="edge">
-<title>confirm0&#45;&gt;confirmHere</title>
-<path fill="none" stroke="black" stroke-dasharray="1,5" d="M438.12,-641C453.62,-641 471.06,-641 487.32,-641"/>
-<text text-anchor="middle" x="462.75" y="-647" font-family="Times,serif" font-size="10.00"> or </text>
+<title>confirmRoot&#45;&gt;confirmHere</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M449.21,-641C465.1,-641 482.34,-641 498.27,-641"/>
+<text text-anchor="middle" x="473.75" y="-647" font-family="Times,serif" font-size="10.00"> or </text>
 </g>
 <!-- importArchive -->
 <g id="node11" class="node">
@@ -93,9 +93,9 @@
 <polygon fill="lightskyblue" stroke="black" stroke-dasharray="5,2" points="449,-590 334,-590 334,-554 449,-554 449,-590"/>
 <text text-anchor="middle" x="391.5" y="-568.9" font-family="Times,serif" font-size="12.00">/bx&#45;archive&#45;read</text>
 </g>
-<!-- confirm0&#45;&gt;importArchive -->
+<!-- confirmRoot&#45;&gt;importArchive -->
 <g id="edge25" class="edge">
-<title>confirm0&#45;&gt;importArchive</title>
+<title>confirmRoot&#45;&gt;importArchive</title>
 <path fill="none" stroke="black" d="M391.5,-622.75C391.5,-616 391.5,-608.09 391.5,-600.59"/>
 <polygon fill="black" stroke="black" points="395,-600.43 391.5,-590.43 388,-600.43 395,-600.43"/>
 </g>
@@ -122,7 +122,7 @@
 <title>work</title>
 <path fill="plum" stroke="black" stroke-width="2" d="M471.5,-521C471.5,-521 311.5,-521 311.5,-521 305.5,-521 299.5,-515 299.5,-509 299.5,-509 299.5,-497 299.5,-497 299.5,-491 305.5,-485 311.5,-485 311.5,-485 471.5,-485 471.5,-485 477.5,-485 483.5,-491 483.5,-497 483.5,-497 483.5,-509 483.5,-509 483.5,-515 477.5,-521 471.5,-521"/>
 <text text-anchor="middle" x="391.5" y="-506.4" font-family="Times,serif" font-size="12.00">Work on the selected TODO</text>
-<text text-anchor="middle" x="391.5" y="-493.4" font-family="Times,serif" font-size="12.00">in AI&#45;WorkPlan.org</text>
+<text text-anchor="middle" x="391.5" y="-493.4" font-family="Times,serif" font-size="12.00">(/bx&#45;todo&#45;do &lt;anchor&gt;)</text>
 </g>
 <!-- importArchive&#45;&gt;work -->
 <g id="edge26" class="edge">
@@ -226,13 +226,13 @@
 <!-- done -->
 <g id="node22" class="node">
 <title>done</title>
-<polygon fill="lightpink" stroke="black" points="458.5,-277 324.5,-277 324.5,-241 458.5,-241 458.5,-277"/>
-<text text-anchor="middle" x="391.5" y="-255.9" font-family="Times,serif" font-size="12.00">/bx&#45;done &lt;anchor&gt;</text>
+<polygon fill="lightpink" stroke="black" points="473.5,-277 309.5,-277 309.5,-241 473.5,-241 473.5,-277"/>
+<text text-anchor="middle" x="391.5" y="-255.9" font-family="Times,serif" font-size="12.00">/bx&#45;todo&#45;done &lt;anchor&gt;</text>
 </g>
 <!-- loopVia4&#45;&gt;done -->
 <g id="edge35" class="edge">
 <title>loopVia4&#45;&gt;done</title>
-<path fill="none" stroke="darkgreen" stroke-width="1.6" d="M123.73,-326.87C126.04,-325.62 145.02,-315.41 161.5,-310 215.17,-292.37 277.95,-279.2 324.35,-270.81"/>
+<path fill="none" stroke="darkgreen" stroke-width="1.6" d="M123.73,-326.87C126.04,-325.62 145.02,-315.41 161.5,-310 209.54,-294.22 264.88,-282.01 309.24,-273.61"/>
 </g>
 <!-- subjOutputs&#45;&gt;aiOutputs -->
 <!-- aiOutputs&#45;&gt;subjOutputs -->
@@ -251,8 +251,8 @@
 <!-- done&#45;&gt;subjWorkPlan -->
 <g id="edge22" class="edge">
 <title>done&#45;&gt;subjWorkPlan</title>
-<path fill="none" stroke="crimson" stroke-width="1.6" d="M458.54,-259C501.87,-259 545.2,-259 588.54,-259"/>
-<polygon fill="crimson" stroke="crimson" stroke-width="1.6" points="588.67,-262.5 598.67,-259 588.67,-255.5 588.67,-262.5"/>
+<path fill="none" stroke="crimson" stroke-width="1.6" d="M473.63,-259C511.9,-259 550.17,-259 588.44,-259"/>
+<polygon fill="crimson" stroke="crimson" stroke-width="1.6" points="588.7,-262.5 598.7,-259 588.7,-255.5 588.7,-262.5"/>
 </g>
 <!-- updateStatus -->
 <g id="node24" class="node">

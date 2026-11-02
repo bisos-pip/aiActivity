@@ -298,7 +298,7 @@ def aiActivityAssembleFlow(
                'its own README.org, AI-*.org  [untouched]',
                shape='folder', style='filled,bold', fillcolor='khaki1')
         s.node('bases', 'Bases:\\l'
-               '- bxexamples/aiActivityTemplates, with its\\l'
+               '- bxObjects/aiActivityTemplates, with its\\l'
                '  inputs as committed sibling links\\l'
                '  (clone the three repos side by side);\\l'
                '  on BISOS, /bisos/apps/defaults/ai-templates\\l'

@@ -137,7 +137,7 @@ def aiGeneralTree(
     d.edge('root', 'skills', **treeEdge)
 
     _subtree(d, 'commands', 'cmdStart', 'session start', [
-        ('/bx-confirm0', 'mother', 'cmnd'),
+        ('/bx-confirm-root', 'mother', 'cmnd'),
         ('/bx-confirm-here', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdLoop', 'work loop', [
@@ -145,10 +145,12 @@ def aiGeneralTree(
         ('/bx-status-read', 'mother', 'cmnd'),
         ('/bx-git-commit-msg', 'mother', 'cmnd'),
         ('/bx-ai-outputs', 'mother', 'cmnd'),
-        ('/bx-done', 'mother', 'cmnd'),
+        ('/bx-todo-do', 'mother', 'cmnd'),
+        ('/bx-todo-done', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdEnd', 'session end', [
         ('/bx-git-uncommitted-list', 'mother', 'cmnd'),
+        ('/bx-git-commit-walk', 'mother', 'cmnd'),
         ('/bx-status-update', 'mother', 'cmnd'),
         ('/bx-archive-update', 'mother', 'cmnd'),
         ('/bx-session-verify', 'mother', 'cmnd'),
@@ -213,12 +215,17 @@ def aiEcosystemTree(
         ('bx-pals-web-site', 'skills', 'skill'),
         ('bs-pals-web-edit', 'skills', 'skill'),
     ])
+    _subtree(d, 'root', 'ecoBlee', 'Blee', [
+        ('blee-pkg-authorship', 'skills', 'skill'),
+        ('bs-blee-emacs-server', 'skills', 'skill'),
+    ])
     _subtree(d, 'root', 'ecoPackaging', 'packaging and docs', [
         ('bisos-pip-setup-py', 'skills', 'skill'),
         ('bisos-pip-release', 'skills', 'skill'),
         ('readme-authorship', 'skills', 'skill'),
         ('blee-panel-authorship', 'skills', 'skill'),
         ('graphviz-authoring', 'skills', 'skill'),
+        ('libreoffice-draw-authoring', 'skills', 'skill'),
     ])
 
     # Prerequisites: "load <head> first" (explicit in the SKILL.md files).
@@ -233,6 +240,7 @@ def aiEcosystemTree(
             ('cbm-package-authorship', 'cbm-authorship'),
             ('cbm-package-authorship', 'sysd-pcs-authorship'),
             ('cbm-package-authorship', 'banna-lookup'),
+            ('blee-pkg-authorship', 'comeega-authorship'),
     ]:
         d.edge(dependent, prerequisite, **prereq)
     # Conditional: only if the CBM leaves will be walked from a branch.

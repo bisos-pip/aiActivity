@@ -11,13 +11,13 @@ currentBase=`pwd`
 
 ####+BEGIN: bx:bisos:bash:seed-spec :types "/bisos/core/lcnt/bin/seedFigProc.sh"
 SEED="
-*  /[dblock]/ /Seed/ :: [[file:/bisos/core/lcnt/bin/seedFigProc.sh]] |
+*  /[dblock]/ /Seed/ :: [[file:/bisos/core/lcnt/bin/seedFigProc.sh]] | 
 "
 FILE="
-*  /This File/ :: /bxRepos/bisos-pip/aiActivity/py3/images/OpenOffice/figProc.sh
+*  /This File/ :: /bxRepos/bisos-pip/aiActivity/py3/images/LibreOffice/figProc.sh 
 "
 if [ "${loadFiles}" == "" ] ; then
-    /bisos/core/lcnt/bin/seedFigProc.sh -l $0 "$@"
+    /bisos/core/lcnt/bin/seedFigProc.sh -l $0 "$@" 
     exit $?
 fi
 ####+END:
@@ -37,11 +37,12 @@ ${figsList}
 "
 
 ####+BEGIN: bx:dblock:bash:end-of-file :types ""
-# {{{ DBLOCK-end-of-file
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  Common        ::  /[dblock] -- End-Of-File Controls/ [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+#+STARTUP: showall
 #local variables:
-#major-mode: shellscript-mode
-#folded-file: nil
+#major-mode: sh-mode
 #fill-column: 90
 # end:
-# }}} DBLOCK-end-of-file
 ####+END:
