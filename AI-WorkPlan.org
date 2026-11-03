@@ -5,6 +5,18 @@
 #+TAGS: me ai aiAndMe
 
 ####+BEGIN: b:ai:workflow/driver
+*  [[elisp:(revert-buffer)][revert-buffer]] | [[elisp:(toggle-read-only)][read/wr]] | [[elisp:(show-all)][Show-All]]  [[elisp:(org-shifttab)][Overview]]  [[elisp:(progn (org-shifttab) (org-content))][Content]] | [[elisp:(delete-other-windows)][(1)]] | [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]] [[elisp:(save-buffer)][Save]] [[elisp:(kill-buffer)][Quit]] [[elisp:(bury-buffer)][Bury]] [[elisp:(magit)][Magit]]
+*  [[elisp:(org-cycle)][AI Workflow Driver :: /bx- commands]]    *After |S|: submitted*
+  newStart :: [[elisp:(blee:bnsm:panel-goto "/bisos/panels/bisos-core/bisos-pip/bisos.aiActivity/newStart/_nodeBase_")][Panel]] | [[bashRun:vscodeClaude-assemble.cs -i fullCheck][setup-check]] | [[bashRun:vscodeClaude-assemble.cs -i fullUpdate][setup]] | [[elisp:(b:vscode/init)][partner-init]] | [[elisp:(b:vscode/partnerShow)][partner-show]] | [[aiActivity:session-start][session-start]]
+  VS Code  :: [[elisp:(b:vscode/fileOpen)][Visit]] | [[elisp:(b:vscode/rootOpen)][root-window]] | [[elisp:(b:vscode:claude/dispatch)][Transient]]
+  Session  :: [[elisp:(b:vscode:claude/sessionSelect)][select-session]] | [[aiActivity:session-start][session-start]] | [[aiActivity:session-report][session-report]]  *|S|*  [[aiActivity:S=session-start][session-start]]
+  Activity :: [[aiActivity:activity-reach][activity-reach]] | [[aiActivity:activity-report][activity-report]]  *|S|*  [[aiActivity:S=activity-reach][activity-reach]]
+  Read     :: [[aiActivity:status-read][status-read]] | [[aiActivity:archive-read][archive-read]] | [[aiActivity:ai-outputs][ai-outputs]]  *|S|*  [[aiActivity:S=status-read][status-read]] | [[aiActivity:S=archive-read][archive-read]] | [[aiActivity:S=ai-outputs][ai-outputs]]
+  Work     :: [[aiActivity:todo-do][todo-do]] | [[aiActivity:todo-done][todo-done]]  *|S|*  [[aiActivity:S=todo-do][todo-do]] | [[aiActivity:S=todo-done][todo-done]]
+  Record   :: [[aiActivity:status-update][status-update]] | [[aiActivity:archive-update][archive-update]]  *|S|*  [[aiActivity:S=status-update][status-update]] | [[aiActivity:S=archive-update][archive-update]]
+  Git      :: [[aiActivity:git-commit-msg][git-commit-msg]] | [[aiActivity:git-commit-walk][git-commit-walk]]  *|S|*  [[aiActivity:S=git-commit-msg][git-commit-msg]]
+  Close    :: [[aiActivity:git-uncommitted-list][git-uncommitted-list]] | [[aiActivity:session-verify][session-verify]]  *|S|*  [[aiActivity:S=git-uncommitted-list][git-uncommitted-list]] | [[aiActivity:S=session-verify][session-verify]]
+
 ####+END:
 
 ####+BEGIN: b:ai:file/particulars
