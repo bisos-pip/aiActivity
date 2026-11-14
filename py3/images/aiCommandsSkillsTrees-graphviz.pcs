@@ -155,6 +155,7 @@ def aiGeneralTree(
         ('/bx-git-commit-walk', 'mother', 'cmnd'),
         ('/bx-status-update', 'mother', 'cmnd'),
         ('/bx-archive-update', 'mother', 'cmnd'),
+        ('/bx-skills-improve', 'mother', 'cmnd'),
         ('/bx-session-verify', 'mother', 'cmnd'),
     ])
     _subtree(d, 'commands', 'cmdSetup', 'setup', [

@@ -236,6 +236,13 @@ session-workflow sections.
   against code.claude.com/docs/en/memory.md and skills.md on 2026-10-07.
   Re-verify if Claude Code changes its loading behaviour.
 
+*2026-11-14: =/bx-skills-improve=* (new command, in the workflow tree, =aiTemplates-workFlow=): before
+=/bx-session-verify=, proposes evidence-backed edits to skills and commands from a session's lessons; report first,
+edits on agreement, no commits. =bx-session-verify= points to it; the command table of =mother/AI-WORKFLOW.org= and the
+figure =py3/images/aiGeneralTree= (re-rendered: gv, pdf, svg, jpg, png) list it. Not in the figure or the
+R/W matrix of the README: =bx-git-pull-list-add= (also absent there); the matrix has no column for skills. Untested
+beyond one run for a session.
+
 * What Works
 
 - =aiActivity.cs= / =-i examples= --- the self-documenting menu: activities

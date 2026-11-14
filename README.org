@@ -369,6 +369,7 @@ then the figure.
   - [[#install-a-subproject-overlay][Install a Subproject Overlay]]
   - [[#customizing-a-shared-template-file---nolink][Customizing a Shared Template File: =--noLink=]]
   - [[#skills][Skills]]
+  - [[#skills-as-ingredients-aiactivityorg-as-compositor][Skills as Ingredients, AI-Activity.org as Compositor]]
   - [[#refresh-claudemd-from-templates][Refresh CLAUDE.md From Templates]]
   - [[#remove-ai-collaboration-files][Remove AI Collaboration Files]]
   - [[#ai-activity-topology-homogeneous-heterogeneous-hierarchical-lateral][AI-Activity Topology: Homogeneous, Heterogeneous, Hierarchical, Lateral]]
@@ -1223,6 +1224,24 @@ Each =SKILL.md= starts with YAML front-matter (=---=-delimited) containing
 =name:= and =description:= fields. The description drives when Claude
 loads the skill; write it as a concrete trigger ("Use when writing or
 modifying a PyCS =cs.Cmnd= subclass") rather than a topic label.
+
+** Skills as Ingredients, AI-Activity.org as Compositor
+
+Think of the skills as /ingredients/ and of an activity's =AI-Activity.org= as the /compositor/. The
+=AI-Activity.org= is always loaded, so it is the one place that can say which skills this activity uses and
+when each applies: its "Available Skills" table is that composition. It is more than a list of skills, since it
+also holds what no single skill owns: the activity's domain model and the reasons for it, and the decisions
+that cross skills. Skills compose with each other too (a skill that says "load the other skill first"), so
+composition has two levels: the activity picks skills, and skills require skills. The skills themselves are one
+shared set, so one skill is an ingredient of many activities, which is why a skill holds no activity-specific
+policy.
+
+The rule of thumb is: *the activity file holds what and when; the skill holds how.* Because the
+=AI-Activity.org= is loaded in every session and a skill only when it matches, the compositor must stay thin:
+a procedure copied into it is paid for every session and drifts from its skill. A lesson that is a trigger or a
+cross-skill decision belongs in the =AI-Activity.org=; a lesson that is a procedure or a pitfall belongs in the
+skill. The decision rule is in the =authoring-skills= skill ("When to Write a Skill vs Adding to
+AI-Activity.org"), and =/bx-skills-improve= uses it to place what a session learned.
 
 ** Refresh CLAUDE.md From Templates
 
